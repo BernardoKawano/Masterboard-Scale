@@ -416,7 +416,7 @@ body::after {
 #chat-screen {
   display: none;
   flex-direction: column;
-  height: 100dvh;
+  height: var(--chat-height, 100dvh);
   height: 100vh;
 }
  
@@ -1326,10 +1326,12 @@ body::after {
 
   /* Chat: teclado virtual — usa dvh e variável CSS para offset do teclado */
   #chat-screen {
-    height: 100dvh;
-    height: -webkit-fill-available;
+    height: var(--chat-height, 100dvh);
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: var(--chat-top, 0px);
+    left: 0;
+    right: 0;
+    bottom: auto;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -2023,7 +2025,8 @@ body::after {
       <textarea id="userInput" rows="1"
         placeholder="Digite sua resposta..."
         onkeydown="handleKey(event)"
-        oninput="autoResize(this)"></textarea>
+        oninput="autoResize(this)"
+        onfocus="handleInputFocus()"></textarea>
       <button class="send-btn" id="sendBtn" onclick="sendMessage()">
         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
@@ -2123,12 +2126,14 @@ const MAX_MSGS = 14;
     const cs = document.getElementById('chat-screen');
     cs.style.display = 'flex';
     cs.style.position = 'fixed';
-    cs.style.top = '0';
+    cs.style.top = 'var(--chat-top, 0px)';
     cs.style.left = '0';
     cs.style.right = '0';
-    cs.style.bottom = '0';
+    cs.style.bottom = 'auto';
+    cs.style.height = 'var(--chat-height, 100dvh)';
     cs.style.zIndex = '999';
     cs.style.background = '#0A0A0A';
+    syncChatViewport();
     window.history.replaceState({}, '', '/');
     window.addEventListener('DOMContentLoaded', startChat);
     if (document.readyState !== 'loading') startChat();
@@ -2138,11 +2143,74 @@ const MAX_MSGS = 14;
 function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  scrollChatToBottom(60);
 }
  
 function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
+
+function isMobileChatViewport() {
+  return window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+}
+
+function syncChatViewport() {
+  const chat = document.getElementById('chat-screen');
+  if (!chat || !isMobileChatViewport()) {
+    document.documentElement.style.removeProperty('--chat-height');
+    document.documentElement.style.removeProperty('--chat-top');
+    return;
+  }
+
+  const viewport = window.visualViewport;
+  const height = viewport ? viewport.height : window.innerHeight;
+  const top = viewport ? viewport.offsetTop : 0;
+
+  document.documentElement.style.setProperty('--chat-height', `${Math.round(height)}px`);
+  document.documentElement.style.setProperty('--chat-top', `${Math.round(top)}px`);
+}
+
+function scrollChatToBottom(delay = 0) {
+  const run = () => {
+    const wrap = document.getElementById('messages');
+    if (!wrap) return;
+    wrap.scrollTop = wrap.scrollHeight;
+  };
+
+  if (delay > 0) {
+    setTimeout(run, delay);
+  } else {
+    run();
+  }
+}
+
+function handleInputFocus() {
+  syncChatViewport();
+  scrollChatToBottom(120);
+  scrollChatToBottom(320);
+}
+
+function initChatViewportHandling() {
+  syncChatViewport();
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      syncChatViewport();
+      scrollChatToBottom(80);
+    });
+    window.visualViewport.addEventListener('scroll', () => {
+      syncChatViewport();
+      scrollChatToBottom(80);
+    });
+  }
+
+  window.addEventListener('resize', () => {
+    syncChatViewport();
+    scrollChatToBottom(80);
+  });
+}
+
+initChatViewportHandling();
 
 function showForm() {
   document.getElementById('intro').style.display = 'none';
@@ -2240,7 +2308,8 @@ function appendMessage(role, text) {
       <div class="msg-bubble">${text.replace(/\n/g, '<br>')}</div>
     </div>`;
   wrap.appendChild(div);
-  wrap.scrollTop = wrap.scrollHeight;
+  scrollChatToBottom();
+  scrollChatToBottom(160);
 }
  
 function showTyping() {
@@ -2256,7 +2325,7 @@ function showTyping() {
       <div class="typing-dot"></div>
     </div>`;
   wrap.appendChild(div);
-  wrap.scrollTop = wrap.scrollHeight;
+  scrollChatToBottom();
 }
  
 function removeTyping() {
@@ -2288,7 +2357,11 @@ async function sendFirst() {
   checkForReport(reply);
   isLoading = false;
   document.getElementById('sendBtn').disabled = false;
-  document.getElementById('userInput').focus();
+  if (!isMobileChatViewport()) {
+    document.getElementById('userInput').focus();
+  } else {
+    scrollChatToBottom(180);
+  }
 }
  
 async function sendMessage() {
@@ -2322,7 +2395,11 @@ async function sendMessage() {
  
   isLoading = false;
   document.getElementById('sendBtn').disabled = false;
-  input.focus();
+  if (!isMobileChatViewport()) {
+    input.focus();
+  } else {
+    scrollChatToBottom(180);
+  }
 }
  
 function checkForReport(reply) {
