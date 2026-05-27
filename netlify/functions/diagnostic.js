@@ -30,10 +30,10 @@ Não pergunte novamente nenhum desses dados.
 AS 7 PERGUNTAS — FAÇA UMA POR VEZ, NESSA ORDEM:
 
 1. CONTEXTO:
-"Qual é o nome da empresa, o que ela vende e qual o ticket médio por venda?"
+"Qual é o nome da empresa e o que ela vende?"
 
 2. S — Strategic Architecture:
-"Você consegue descrever em uma frase quem é seu cliente ideal?"
+"Você consegue descrever em uma frase quem é seu cliente ideal e qual o ticket médio por venda?"
 
 3. C — Commercial Engine:
 "Como os clientes chegam até você hoje?"
