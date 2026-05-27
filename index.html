@@ -2043,66 +2043,116 @@ let isLoading = false;
 let msgCount = 0;
 let formData = {};
 const MAX_MSGS = 14;
+let demoChatMode = false;
+let demoStep = 0;
+
+const DEMO_REPORT = {
+  tipo: 'relatorio',
+  nome: 'Bernardo Kawano',
+  empresa: 'Masterboard',
+  email: 'bernardo@masterboard.com.br',
+  whatsapp: '(11) 99999-9999',
+  faturamento: 'R$1M–R$5M/ano',
+  localizacao: 'São Paulo – SP',
+  score_geral: 38,
+  nivel: 'Em Desenvolvimento',
+  dimensoes: {
+    S: { score: 25, status: 'ICP definido por intuição, sem validação', gargalo: 'Não há perfil de cliente ideal documentado' },
+    C: { score: 40, status: 'Canal único, dependente de indicação', gargalo: 'Sem engine de aquisição ativo ou previsível' },
+    A: { score: 20, status: 'Sem previsão de receita estruturada', gargalo: 'Forecast baseado em feeling, não em dados' },
+    L: { score: 30, status: 'Operação trava quando founder sai', gargalo: 'Time não opera sem presença constante do líder' },
+    E: { score: 45, status: 'Reuniões acontecem, sem cadência formal', gargalo: 'Pipeline review não segue ritmo definido' },
+    G: { score: 50, status: 'Gestão informal, sem playbook', gargalo: null },
+  },
+  gargalo_critico: 'Ausência de previsibilidade de receita — a operação depende do fundador para cada etapa do ciclo.',
+  prioridades: [
+    'Definir e documentar o ICP com critérios comportamentais e econômicos objetivos',
+    'Construir pelo menos um canal de aquisição ativo com métricas semanais rastreadas',
+    'Implementar forecast semanal com dados reais de pipeline — não de feeling',
+  ],
+  parecer: 'A Masterboard tem os ingredientes certos, mas sem um motor de receita estruturado, o crescimento ainda é refém da energia do fundador. O gargalo não é falta de talento — é falta de sistema.',
+  setor_insights: 'Empresas de ecossistema e comunidade nesse faturamento cometem dois erros recorrentes: confundem engajamento com receita previsível, e postergam a formalização de processos comerciais porque "estão crescendo por indicação". O resultado é um teto invisível que aparece exatamente quando a operação tenta dar o próximo salto.',
+  ecossistema_match: 'Temos conexões estratégicas com decisores corporativos no segmento de inovação e formação de times em São Paulo que podem acelerar a expansão da carteira da Masterboard nos próximos 90 dias.',
+  masterboard_tabela: [
+    {
+      desafio: 'Transformar comunidade e autoridade em receita previsível',
+      impacto: 'Pipeline irregular, dependência de relacionamento direto e dificuldade de forecast',
+      conexao: 'Empresários B2B, CRM, vendas consultivas e parceiros de geração de demanda',
+    },
+    {
+      desafio: 'Escalar operação sem perder curadoria e qualidade do ecossistema',
+      impacto: 'Risco de diluir a proposta de valor e criar gargalos manuais na entrega',
+      conexao: 'Processos, automação, governança de comunidade e gestão operacional',
+    },
+    {
+      desafio: 'Expandir para outras regiões com posicionamento consistente',
+      impacto: 'Crescimento regional pode ficar dependente de indicações locais e eventos pontuais',
+      conexao: 'Líderes empresariais regionais, parceiros comerciais e hubs de inovação',
+    },
+  ],
+};
+
+const DEMO_CHAT_REPLIES = [
+  'Sou o Archie, o engine de diagnóstico da ScaleCo. Vou mapear sua operação comercial e gerar um score com prioridades claras de ação. Vamos começar?\n\nQual é o nome da empresa, o que ela vende e qual o ticket médio por venda?',
+  'Você consegue descrever em uma frase quem é seu cliente ideal?',
+  'Como os clientes chegam até você hoje?',
+  'Você consegue prever quanto vai faturar no próximo mês?',
+  'Se você sair por 30 dias, o comercial continua funcionando, ou trava em você?',
+  'Quando uma meta não é batida, você consegue identificar exatamente em qual etapa do funil falhou?',
+  'Existe um ritmo claro de gestão da receita — reuniões, forecast, pipeline review — ou cada semana funciona de um jeito?',
+  JSON.stringify(DEMO_REPORT),
+];
 
 // ── MODO DEMO: ?demo=showoff — mostra tela showoff + relatório sem API ──
 (function() {
   const p = new URLSearchParams(window.location.search);
-  if (p.get('demo') === 'showoff') {
-    const mockReport = {
-      tipo: 'relatorio',
+  if (p.get('demo') === 'chat') {
+    demoChatMode = true;
+    formData = {
       nome: 'Bernardo Kawano',
-      empresa: 'Masterboard',
       email: 'bernardo@masterboard.com.br',
       whatsapp: '(11) 99999-9999',
       faturamento: 'R$1M–R$5M/ano',
       localizacao: 'São Paulo – SP',
-      score_geral: 38,
-      nivel: 'Em Desenvolvimento',
-      dimensoes: {
-        S: { score: 25, status: 'ICP definido por intuição, sem validação', gargalo: 'Não há perfil de cliente ideal documentado' },
-        C: { score: 40, status: 'Canal único, dependente de indicação', gargalo: 'Sem engine de aquisição ativo ou previsível' },
-        A: { score: 20, status: 'Sem previsão de receita estruturada', gargalo: 'Forecast baseado em feeling, não em dados' },
-        L: { score: 30, status: 'Operação trava quando founder sai', gargalo: 'Time não opera sem presença constante do líder' },
-        E: { score: 45, status: 'Reuniões acontecem, sem cadência formal', gargalo: 'Pipeline review não segue ritmo definido' },
-        G: { score: 50, status: 'Gestão informal, sem playbook', gargalo: null },
-      },
-      gargalo_critico: 'Ausência de previsibilidade de receita — a operação depende do fundador para cada etapa do ciclo.',
-      prioridades: [
-        'Definir e documentar o ICP com critérios comportamentais e econômicos objetivos',
-        'Construir pelo menos um canal de aquisição ativo com métricas semanais rastreadas',
-        'Implementar forecast semanal com dados reais de pipeline — não de feeling',
-      ],
-      parecer: 'A Masterboard tem os ingredientes certos, mas sem um motor de receita estruturado, o crescimento ainda é refém da energia do fundador. O gargalo não é falta de talento — é falta de sistema.',
-      setor_insights: 'Empresas de ecossistema e comunidade nesse faturamento cometem dois erros recorrentes: confundem engajamento com receita previsível, e postergam a formalização de processos comerciais porque "estão crescendo por indicação". O resultado é um teto invisível que aparece exatamente quando a operação tenta dar o próximo salto.',
-      ecossistema_match: 'Temos conexões estratégicas com decisores corporativos no segmento de inovação e formação de times em São Paulo que podem acelerar a expansão da carteira da Masterboard nos próximos 90 dias.',
-      masterboard_tabela: [
-        {
-          desafio: 'Transformar comunidade e autoridade em receita previsível',
-          impacto: 'Pipeline irregular, dependência de relacionamento direto e dificuldade de forecast',
-          conexao: 'Empresários B2B, CRM, vendas consultivas e parceiros de geração de demanda',
-        },
-        {
-          desafio: 'Escalar operação sem perder curadoria e qualidade do ecossistema',
-          impacto: 'Risco de diluir a proposta de valor e criar gargalos manuais na entrega',
-          conexao: 'Processos, automação, governança de comunidade e gestão operacional',
-        },
-        {
-          desafio: 'Expandir para outras regiões com posicionamento consistente',
-          impacto: 'Crescimento regional pode ficar dependente de indicações locais e eventos pontuais',
-          conexao: 'Líderes empresariais regionais, parceiros comerciais e hubs de inovação',
-        },
-      ],
     };
 
+    const openDemoChat = () => {
+      document.getElementById('intro').style.display = 'none';
+      const s = document.getElementById('sintomas-section');
+      if (s) s.style.display = 'none';
+      document.getElementById('form-screen').style.display = 'none';
+      const cs = document.getElementById('chat-screen');
+      cs.style.display = 'flex';
+      cs.style.position = 'fixed';
+      cs.style.top = 'var(--chat-top, 0px)';
+      cs.style.left = '0';
+      cs.style.right = '0';
+      cs.style.bottom = 'auto';
+      cs.style.height = 'var(--chat-height, 100dvh)';
+      cs.style.zIndex = '999';
+      cs.style.background = '#0A0A0A';
+      syncChatViewport();
+      startChat();
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', openDemoChat);
+    } else {
+      openDemoChat();
+    }
+    return;
+  }
+
+  if (p.get('demo') === 'showoff') {
     document.getElementById('intro').style.display = 'none';
     const s = document.getElementById('sintomas-section');
     if (s) s.style.display = 'none';
     document.getElementById('form-screen').style.display = 'none';
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => showShowoff(mockReport));
+      document.addEventListener('DOMContentLoaded', () => showShowoff(DEMO_REPORT));
     } else {
-      showShowoff(mockReport);
+      showShowoff(DEMO_REPORT);
     }
     return;
   }
@@ -2334,6 +2384,13 @@ function removeTyping() {
 }
  
 async function callAgent(messages) {
+  if (demoChatMode) {
+    const reply = DEMO_CHAT_REPLIES[Math.min(demoStep, DEMO_CHAT_REPLIES.length - 1)];
+    demoStep++;
+    await new Promise((resolve) => setTimeout(resolve, 650));
+    return reply;
+  }
+
   const res = await fetch('/api/diagnostic', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
