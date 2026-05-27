@@ -110,6 +110,33 @@ body::after {
   margin: 0 auto 12px;
 }
 
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 22px);
+  margin-bottom: 26px;
+  flex-wrap: wrap;
+}
+
+.brand-lockup .mb-logo-img {
+  width: min(245px, 46vw);
+}
+
+.brand-x {
+  color: rgba(255,255,255,0.34);
+  font-size: clamp(18px, 2.4vw, 28px);
+  font-weight: 300;
+  line-height: 1;
+}
+
+.scaleco-logo-img {
+  display: block;
+  width: min(170px, 34vw);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 16px rgba(45,91,227,0.18));
+}
+
 .mb-symbol-mark {
   display: inline-block;
   width: 28px;
@@ -1208,6 +1235,24 @@ body::after {
   .chat-header { padding: 12px 16px; }
   .progress-bar { width: 80px; }
   #chat-screen { height: 100dvh; overflow: hidden; }
+
+  .brand-lockup {
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .brand-lockup .mb-logo-img {
+    width: min(190px, 52vw);
+  }
+
+  .scaleco-logo-img {
+    width: min(118px, 32vw);
+  }
+
+  .brand-x {
+    font-size: 18px;
+  }
 }
 
 /* ── MOBILE FIRST — ajustes críticos para celular ── */
@@ -1846,7 +1891,11 @@ body::after {
 
   <div class="intro-content">
 
-    <img src="assets/masterboard-logo-yellow-transparent.png" class="mb-logo-img is-small" alt="Masterboard" style="margin-bottom:24px;">
+    <div class="brand-lockup" aria-label="Masterboard em parceria com ScaleCo">
+      <img src="assets/masterboard-logo-yellow-transparent.png" class="mb-logo-img is-small" alt="Masterboard">
+      <span class="brand-x" aria-hidden="true">×</span>
+      <img src="assets/scaleco-logo-transparent.png" class="scaleco-logo-img" alt="ScaleCo">
+    </div>
 
     <h1 class="intro-headline">
       Sua empresa <span>escala</span><br>ou só cresce com esforço?
