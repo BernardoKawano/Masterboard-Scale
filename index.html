@@ -953,7 +953,9 @@ body::after {
   padding: 14px 36px;
   font-family: 'Funnel Display', sans-serif;
   font-size: 16px;
+  font-weight: 800;
   letter-spacing: 3px;
+  text-transform: uppercase;
   cursor: pointer;
   border: none;
   transition: background 0.2s;
@@ -2679,7 +2681,7 @@ function getCTAContent(score) {
   if (score < 60) {
     return {
       sub: `Encontramos problemas, potenciais riscos e gargalos diretos na sua operação. Alguns deles exigem arquitetura de receita, não apenas mais esforço comercial. Por isso, o próximo passo é uma mentoria estratégica com Fábio Couto para entender onde o motor de crescimento está travando.`,
-      cta: `QUERO FALAR COM O FÁBIO`
+      cta: `AGENDAR CONSULTORIA`
     };
   } else if (score < 80) {
     return {
