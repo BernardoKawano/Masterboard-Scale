@@ -2,7 +2,11 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0A0A0A">
 <title>Scale Diagnostic™ · Masterboard × ScaleCo</title>
 <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -25,13 +29,22 @@
   --yellow-dim: #C99703;
 }
  
-html, body {
+html {
   height: 100%;
+  height: -webkit-fill-available;
+}
+
+body {
+  height: 100%;
+  min-height: 100%;
+  min-height: -webkit-fill-available;
   background: var(--black);
   color: var(--white);
   font-family: 'Funnel Display', sans-serif;
   font-size: 15px;
   line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
 }
  
 /* ── INTRO SCREEN ── */
@@ -115,7 +128,7 @@ html, body {
  
 .start-btn {
   background: var(--blue);
-  color: var(--white);
+  color: #000000;
   border: none;
   border-radius: 3px;
   padding: 16px 56px;
@@ -126,6 +139,8 @@ html, body {
   text-transform: uppercase;
   cursor: pointer;
   transition: background 0.2s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
  
 .start-btn:hover { background: var(--blue-dim); }
@@ -243,16 +258,19 @@ html, body {
 .form-submit {
   width: 100%;
   background: var(--blue);
-  color: var(--white);
+  color: #000000;
   border: none;
   border-radius: 8px;
   padding: 15px;
   font-family: 'Funnel Display', sans-serif;
   font-size: 17px;
+  font-weight: 700;
   letter-spacing: 3px;
   cursor: pointer;
   margin-top: 8px;
   transition: background 0.2s, transform 0.1s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .form-submit:hover { background: var(--blue-dim); }
@@ -407,7 +425,7 @@ html, body {
 .message.user .msg-bubble {
   background: var(--blue);
   border-color: var(--blue);
-  color: var(--white);
+  color: #000000;
   border-radius: 14px 4px 14px 14px;
 }
  
@@ -931,6 +949,132 @@ html, body {
   .chat-header { padding: 12px 16px; }
   .progress-bar { width: 80px; }
   #chat-screen { height: 100dvh; overflow: hidden; }
+}
+
+/* ── MOBILE FIRST — ajustes críticos para celular ── */
+@media (max-width: 768px) {
+
+  /* ANTI-ZOOM iOS: inputs precisam de font-size 16px para não causar zoom no Safari */
+  .form-input,
+  .form-input:focus,
+  select.form-input,
+  #userInput,
+  #userInput:focus,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Touch targets maiores (44px mínimo recomendado) */
+  .start-btn,
+  .form-submit,
+  .cta-btn,
+  .cta-btn-sec,
+  .intro-cta,
+  .capa-btn,
+  button[onclick="showForm()"] {
+    min-height: 52px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .send-btn {
+    width: 44px;
+    height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Form screen: scroll suave e padding seguro no iOS */
+  #form-screen {
+    padding: 24px 16px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    justify-content: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  .form-logo {
+    margin-top: 8px;
+    margin-bottom: 20px;
+  }
+
+  .form-card {
+    border-radius: 12px;
+  }
+
+  .form-card-title {
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+
+  .form-card-sub {
+    font-size: 13px;
+  }
+
+  /* Chat: teclado virtual — usa dvh e variável CSS para offset do teclado */
+  #chat-screen {
+    height: 100dvh;
+    height: -webkit-fill-available;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: 16px 12px;
+  }
+
+  .input-area {
+    padding: 10px 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    flex-shrink: 0;
+  }
+
+  #userInput {
+    min-height: 24px;
+  }
+
+  /* Report: botões full-width no mobile */
+  .cta-btn,
+  .cta-btn-sec {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 16px 20px;
+  }
+
+  .cta-block { padding: 24px 16px; }
+
+  /* Score legível */
+  .score-block { padding: 20px 16px; }
+  .score-parecer { font-size: 13px; }
+
+  /* Dimensões */
+  .dim-row { padding: 14px 14px; }
+  .dim-name { font-size: 11px; }
+
+  /* Header do chat mais compacto */
+  .chat-header-name { font-size: 14px; letter-spacing: 1px; }
+  .chat-header-status { font-size: 10px; }
+
+  /* Report header mais compacto */
+  .report-company { font-size: 22px; }
+  .report-title { font-size: 11px; }
+
+  /* Showoff screen: texto maior no mobile */
+  .showoff-line {
+    font-size: clamp(20px, 5.5vw, 28px);
+    max-width: 90vw;
+  }
+
+  .showoff-bar-wrap { width: 70vw; }
 }
 
   /* ── CAPA ── */
