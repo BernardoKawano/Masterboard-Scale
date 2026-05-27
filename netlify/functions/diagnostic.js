@@ -7,6 +7,13 @@ exports.handler = async function (event) {
 
 Sua missão: conduzir um diagnóstico cirúrgico em 7 perguntas para identificar onde a operação de receita do lead trava — e gerar um relatório estruturado com score, gargalos e prioridades.
 
+TOM DA EXPERIÊNCIA:
+- A camada ScaleCo é objetiva, cirúrgica e baseada no método SCALE.
+- A camada Masterboard entra depois do diagnóstico SCALE, com tom aspiracional e premium: mostra oportunidades de conexão, expansão e alavancagem de ecossistema.
+- Não bajule o lead. Passe sensação de acesso privilegiado, leitura empresarial sofisticada e clareza estratégica.
+- Use frases curtas, assertivas e memoráveis.
+- Não aumente o número de perguntas por causa da camada Masterboard.
+
 APRESENTAÇÃO INICIAL:
 Quando receber "olá", responda APENAS com esta mensagem exata — nada mais, nada menos:
 Sou o Archie, o engine de diagnóstico da ScaleCo. Vou mapear sua operação comercial e gerar um score com prioridades claras de ação. Vamos começar?
@@ -98,16 +105,24 @@ INVESTIGAÇÃO SETORIAL (executa internamente antes de gerar o relatório):
 Com base no setor da empresa, porte (faturamento) e localização capturados no formulário, e nas respostas das 7 perguntas, identifique:
 1. Os 2 erros mais comuns que empresas desse setor/porte cometem na operação de receita. Seja específico, direto, e escreva como quem já viu isso dezenas de vezes. Tom: cirúrgico, sem suavizar.
 2. Uma frase vendedora sobre o que o ecossistema Masterboard pode oferecer para essa empresa, considerando setor e localização. NÃO cite nomes reais de empresas ou pessoas. Seja específico sobre o tipo de conexão (ex: "clientes corporativos no segmento de saúde em São Paulo", "parceiros de distribuição no interior de SP"). Tom: confiante, exclusivo, como quem tem acesso privilegiado.
+3. Uma tabela com 3 desafios prováveis, impactos diretos e possíveis conexões estratégicas. A tabela deve parecer uma leitura executiva de board, não uma lista genérica.
 
 CAMPOS NOVOS NO JSON DE RELATÓRIO:
 - "setor_insights": "[2-3 frases diretas sobre os erros típicos do setor/porte identificado — tom de quem já viu isso antes, sem condescendência]"
 - "ecossistema_match": "[1 frase vendedora: ex: 'Temos conexões estratégicas com decisores no setor de [X] em [região] que podem acelerar sua operação nos próximos 90 dias.']"
+- "masterboard_tabela": [{"desafio":"[principal desafio objetivo]","impacto":"[impacto direto no negócio]","conexao":"[tipo de parceiro, cliente ou especialista do ecossistema que pode ajudar]"}]
 - "localizacao": "[cidade/estado capturado do formulário, ou null]"
+
+REGRAS DE VERACIDADE PARA A CAMADA MASTERBOARD:
+- Não invente dados públicos específicos como faturamento real, quantidade de funcionários, cargo formal ou expansão de unidades.
+- Se o dado não foi informado na conversa, trate como inferência operacional ou escreva "não confirmado".
+- A tabela Masterboard deve conter 3 linhas objetivas, focadas em desafios prováveis a partir do porte, setor, localização e respostas — não em afirmações factuais não verificadas.
+- Use a tabela para conectar dor → impacto → possível conexão estratégica do ecossistema.
 
 GERAÇÃO DO RELATÓRIO:
 Após as 7 perguntas e email confirmado, responda APENAS com este JSON puro (sem markdown, sem texto antes ou depois):
 
-{"tipo":"relatorio","nome":"[nome]","empresa":"[empresa]","email":"[email]","whatsapp":"[whatsapp ou null]","faturamento":"[faixa ou null]","localizacao":"[cidade/estado ou null]","score_geral":[0-100],"nivel":"[Crítico|Em Desenvolvimento|Estruturado|Escalável]","dimensoes":{"S":{"score":[0-100],"status":"[frase curta]","gargalo":"[gargalo ou null]"},"C":{"score":[0-100],"status":"[frase curta]","gargalo":"[gargalo ou null]"},"A":{"score":[0-100],"status":"[frase curta]","gargalo":"[gargalo ou null]"},"L":{"score":[0-100],"status":"[frase curta]","gargalo":"[gargalo ou null]"},"E":{"score":[0-100],"status":"[frase curta]","gargalo":"[gargalo ou null]"},"G":{"score":[0-100],"status":"[frase curta]","gargalo":"[gargalo ou null]"}},"gargalo_critico":"[maior problema em 1 frase]","prioridades":["ação 1","ação 2","ação 3"],"parecer":"[2-3 frases diretas e duras sobre a realidade da operação]","setor_insights":"[2-3 frases sobre erros típicos do setor/porte]","ecossistema_match":"[1 frase vendedora sobre conexões do ecossistema Masterboard]"}
+{"tipo":"relatorio","nome":"[nome]","empresa":"[empresa]","email":"[email]","whatsapp":"[whatsapp ou null]","faturamento":"[faixa ou null]","localizacao":"[cidade/estado ou null]","score_geral":[0-100],"nivel":"[Crítico|Em Desenvolvimento|Estruturado|Escalável]","dimensoes":{"S":{"score":[0-100],"status":"[frase curta]","gargalo":"[gargalo ou null]"},"C":{"score":[0-100],"status":"[frase curta]","gargalo":"[gargalo ou null]"},"A":{"score":[0-100],"status":"[frase curta]","gargalo":"[gargalo ou null]"},"L":{"score":[0-100],"status":"[frase curta]","gargalo":"[gargalo ou null]"},"E":{"score":[0-100],"status":"[frase curta]","gargalo":"[gargalo ou null]"},"G":{"score":[0-100],"status":"[frase curta]","gargalo":"[gargalo ou null]"}},"gargalo_critico":"[maior problema em 1 frase]","prioridades":["ação 1","ação 2","ação 3"],"parecer":"[2-3 frases diretas e duras sobre a realidade da operação]","setor_insights":"[2-3 frases sobre erros típicos do setor/porte]","ecossistema_match":"[1 frase vendedora sobre conexões do ecossistema Masterboard]","masterboard_tabela":[{"desafio":"[principal desafio]","impacto":"[impacto direto]","conexao":"[possível conexão estratégica]"},{"desafio":"[principal desafio]","impacto":"[impacto direto]","conexao":"[possível conexão estratégica]"},{"desafio":"[principal desafio]","impacto":"[impacto direto]","conexao":"[possível conexão estratégica]"}]}
 
 TOM: Direto, frases curtas, sem elogios. Nunca use "mentoria" ou "consultoria".`;
 
@@ -293,10 +308,29 @@ async function sendEmails(report) {
     `<tr><td style="padding:8px 12px;font-weight:700;color:#FBBE0A;font-size:18px;">${String(i + 1).padStart(2, "0")}</td><td style="padding:8px 12px;color:#ccc;font-size:14px;">${p}</td></tr>`
   ).join("");
 
-  const insightsHTML = report.setor_insights || report.ecossistema_match ? `
+  const masterboardRowsHTML = Array.isArray(report.masterboard_tabela) ? report.masterboard_tabela.map((row) => `
+    <tr>
+      <td style="padding:12px;border-top:1px solid #2a2200;color:#fff;font-size:12px;line-height:1.5;">${row.desafio || '—'}</td>
+      <td style="padding:12px;border-top:1px solid #2a2200;color:#ccc;font-size:12px;line-height:1.5;">${row.impacto || '—'}</td>
+      <td style="padding:12px;border-top:1px solid #2a2200;color:#FBBE0A;font-size:12px;line-height:1.5;">${row.conexao || '—'}</td>
+    </tr>
+  `).join('') : '';
+
+  const insightsHTML = report.setor_insights || report.ecossistema_match || masterboardRowsHTML ? `
     <div style="margin-top:20px;background:#1a1500;border:1px solid #3a2900;border-radius:8px;padding:20px;">
-      <div style="font-size:10px;letter-spacing:3px;color:#FBBE0A;text-transform:uppercase;margin-bottom:12px;">🔍 INVESTIGAÇÃO SETORIAL · MASTERBOARD</div>
+      <div style="font-size:10px;letter-spacing:3px;color:#FBBE0A;text-transform:uppercase;margin-bottom:12px;">INVESTIGAÇÃO SETORIAL · MASTERBOARD</div>
       ${report.setor_insights ? `<div style="font-size:13px;color:#ccc;line-height:1.7;margin-bottom:${report.ecossistema_match ? '14px' : '0'};">${report.setor_insights}</div>` : ''}
+      ${masterboardRowsHTML ? `
+        <table style="width:100%;border-collapse:collapse;margin:14px 0;background:#0D0D0D;border:1px solid #2a2200;">
+          <thead>
+            <tr>
+              <th style="padding:10px 12px;text-align:left;color:#fff;font-size:10px;letter-spacing:1px;text-transform:uppercase;">Principal desafio</th>
+              <th style="padding:10px 12px;text-align:left;color:#fff;font-size:10px;letter-spacing:1px;text-transform:uppercase;">Impacto direto</th>
+              <th style="padding:10px 12px;text-align:left;color:#fff;font-size:10px;letter-spacing:1px;text-transform:uppercase;">Conexão estratégica</th>
+            </tr>
+          </thead>
+          <tbody>${masterboardRowsHTML}</tbody>
+        </table>` : ''}
       ${report.ecossistema_match ? `
         <div style="border-top:1px solid #3a2900;padding-top:12px;">
           <div style="font-size:10px;letter-spacing:2px;color:#FBBE0A;text-transform:uppercase;margin-bottom:6px;">ECOSSISTEMA MASTERBOARD</div>

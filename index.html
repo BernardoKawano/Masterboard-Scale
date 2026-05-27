@@ -38,13 +38,81 @@ body {
   height: 100%;
   min-height: 100%;
   min-height: -webkit-fill-available;
-  background: var(--black);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(251,190,10,0.14), transparent 28%),
+    radial-gradient(circle at 88% 18%, rgba(201,151,3,0.10), transparent 26%),
+    radial-gradient(circle at 52% 92%, rgba(251,190,10,0.08), transparent 34%),
+    var(--black);
+  background-repeat: no-repeat;
+  background-size: 100vw 100vh, 100vw 100vh, 100vw 100vh, auto;
+  background-attachment: fixed, fixed, fixed, scroll;
   color: var(--white);
   font-family: 'Funnel Display', sans-serif;
   font-size: 15px;
   line-height: 1.6;
   -webkit-text-size-adjust: 100%;
   overflow-x: hidden;
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: auto;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(52px);
+  border-radius: 999px;
+  opacity: 0.42;
+  animation: glowBreath 8s ease-in-out infinite;
+}
+
+body::before {
+  width: 260px;
+  height: 260px;
+  left: -90px;
+  top: 18vh;
+  background: rgba(251,190,10,0.30);
+}
+
+body::after {
+  width: 320px;
+  height: 320px;
+  right: -120px;
+  bottom: 8vh;
+  background: rgba(201,151,3,0.22);
+  animation-delay: -3s;
+}
+
+#intro,
+#sintomas-section,
+#report-screen,
+.capa-page {
+  position: relative;
+  z-index: 1;
+}
+
+.mb-logo-img {
+  display: block;
+  width: min(320px, 78vw);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 18px rgba(251,190,10,0.14));
+  mix-blend-mode: screen;
+}
+
+.mb-logo-img.is-small {
+  width: min(240px, 62vw);
+}
+
+.mb-logo-img.is-report {
+  width: min(300px, 74vw);
+  margin: 0 auto 12px;
+}
+
+.yellow-mark {
+  color: var(--blue);
+  font-weight: 700;
 }
  
 /* ── INTRO SCREEN ── */
@@ -74,6 +142,17 @@ body {
 @keyframes archieFloat {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-3px); }
+}
+
+@keyframes glowBreath {
+  0%, 100% {
+    opacity: 0.24;
+    transform: translate3d(0, 0, 0) scale(0.92);
+  }
+  50% {
+    opacity: 0.58;
+    transform: translate3d(18px, -12px, 0) scale(1.12);
+  }
 }
  
 .intro-title {
@@ -159,7 +238,12 @@ body {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: #0A0A0A;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(251,190,10,0.18), transparent 30%),
+    radial-gradient(circle at 86% 72%, rgba(201,151,3,0.12), transparent 32%),
+    linear-gradient(135deg, #050505 0%, #0A0A0A 48%, #111007 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -178,12 +262,14 @@ body {
 }
 
 .form-card {
-  background: var(--black2);
-  border: 1px solid var(--gray-light);
+  background: rgba(17,17,17,0.82);
+  border: 1px solid rgba(251,190,10,0.14);
   border-radius: 14px;
   padding: 36px 32px;
   width: 100%;
   max-width: 440px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.42);
+  backdrop-filter: blur(18px);
 }
 
 .form-card-title {
@@ -518,8 +604,9 @@ body {
   min-height: 100vh;
   padding: 40px 24px 80px;
   animation: fadeIn 0.6s ease;
-  max-width: 680px;
+  max-width: 980px;
   margin: 0 auto;
+  background: transparent;
 }
  
 .report-header {
@@ -620,7 +707,7 @@ body {
   font-size: 14px;
   color: #BBBBBB;
   line-height: 1.7;
-  max-width: 480px;
+  max-width: 680px;
   margin: 0 auto;
 }
  
@@ -837,6 +924,126 @@ body {
   text-align: center;
   margin-top: 16px;
 }
+
+/* Masterboard intelligence block */
+.intelligence-block {
+  background:
+    radial-gradient(circle at top left, rgba(251,190,10,0.14), transparent 42%),
+    linear-gradient(135deg, rgba(255,255,255,0.045), rgba(255,255,255,0.01)),
+    var(--black2);
+  border: 1px solid rgba(251,190,10,0.22);
+  border-radius: 14px;
+  padding: 24px;
+  margin: 0 0 24px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 22px 70px rgba(0,0,0,0.34);
+}
+
+.intelligence-block::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(251,190,10,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(251,190,10,0.035) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent 76%);
+  pointer-events: none;
+}
+
+.intelligence-block > * {
+  position: relative;
+  z-index: 1;
+}
+
+.intelligence-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.intelligence-title {
+  font-size: clamp(22px, 5vw, 34px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: #FFFFFF;
+  margin-bottom: 10px;
+}
+
+.intelligence-copy {
+  color: #BEBEBE;
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.intelligence-table-wrap {
+  border: 0;
+  overflow: visible;
+}
+
+.intelligence-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+  background: transparent;
+  table-layout: auto;
+}
+
+.intelligence-table th,
+.intelligence-table td {
+  padding: 16px 18px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 0;
+}
+
+.intelligence-table th {
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.intelligence-table td {
+  color: #D8D8D8;
+  font-size: 14px;
+  line-height: 1.5;
+  background: rgba(0,0,0,0.28);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.intelligence-table td:first-child {
+  border-left: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px 0 0 12px;
+  width: 33%;
+}
+
+.intelligence-table td:nth-child(2) {
+  width: 34%;
+}
+
+.intelligence-table td:last-child {
+  border-right: 1px solid rgba(255,255,255,0.08);
+  border-radius: 0 12px 12px 0;
+  width: 33%;
+}
+
+.intelligence-footnote {
+  margin-top: 14px;
+  color: rgba(255,255,255,0.36);
+  font-size: 11px;
+  line-height: 1.5;
+}
  
 /* ── SHOWOFF SCREEN ── */
 #showoff-screen {
@@ -844,11 +1051,46 @@ body {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: #000000;
+  background:
+    radial-gradient(circle at 20% 18%, rgba(251,190,10,0.22), transparent 30%),
+    radial-gradient(circle at 82% 76%, rgba(201,151,3,0.18), transparent 34%),
+    linear-gradient(135deg, #000 0%, #090909 48%, #130f00 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 40px 24px;
+  overflow: hidden;
+}
+
+#showoff-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at center, rgba(255,255,255,0.10) 1px, transparent 1.4px);
+  background-size: 28px 28px;
+  opacity: 0.10;
+  animation: textureDrift 14s linear infinite;
+}
+
+#showoff-screen::after {
+  content: '';
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  border-radius: 999px;
+  background: rgba(251,190,10,0.18);
+  filter: blur(58px);
+  right: -120px;
+  top: 12vh;
+  animation: glowBreath 7s ease-in-out infinite;
+}
+
+#showoff-screen > * {
+  position: relative;
+  z-index: 1;
 }
 
 .showoff-logo {
@@ -876,6 +1118,11 @@ body {
 @keyframes showoffSpin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@keyframes textureDrift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(28px, 28px, 0); }
 }
 
 .showoff-line {
@@ -953,6 +1200,12 @@ body {
 
 /* ── MOBILE FIRST — ajustes críticos para celular ── */
 @media (max-width: 768px) {
+
+  body {
+    background-attachment: scroll;
+    background-size: 180vw 140vh, 180vw 140vh, 180vw 160vh, auto;
+    background-position: left top, right 20vh, center bottom, center;
+  }
 
   /* ANTI-ZOOM iOS: inputs precisam de font-size 16px para não causar zoom no Safari */
   .form-input,
@@ -1051,6 +1304,88 @@ body {
   }
 
   .cta-block { padding: 24px 16px; }
+
+  .intelligence-block {
+    padding: 22px 16px;
+  }
+
+  .intelligence-table-wrap {
+    overflow: visible;
+    border: none;
+  }
+
+  .intelligence-table {
+    min-width: 0;
+    display: block;
+    background: transparent;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+  }
+
+  .intelligence-table thead {
+    display: none;
+  }
+
+  .intelligence-table tbody,
+  .intelligence-table tr,
+  .intelligence-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .intelligence-table tbody {
+    border-spacing: 0;
+  }
+
+  .intelligence-table tr {
+    background: rgba(0,0,0,0.30);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .intelligence-table td {
+    width: 100%;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    padding: 13px 14px;
+    font-size: 13px;
+    background: rgba(0,0,0,0.18);
+  }
+
+  .intelligence-table tr td:first-child,
+  .intelligence-table tr td:nth-child(2),
+  .intelligence-table tr td:last-child {
+    width: 100%;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+  }
+
+  .intelligence-table tr td:first-child {
+    border-radius: 12px 12px 0 0;
+  }
+
+  .intelligence-table td:last-child {
+    border-bottom: none;
+    border-radius: 0 0 12px 12px;
+  }
+
+  .intelligence-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    color: var(--blue);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
 
   /* Score legível */
   .score-block { padding: 20px 16px; }
@@ -1216,7 +1551,12 @@ body {
   display: grid;
   grid-template-columns: 1fr;
   min-height: 100vh;
-  background: linear-gradient(to bottom, #0A0A0A 0%, #111111 40%, #0A0A0A 100%);
+  background:
+    radial-gradient(circle at 18% 18%, rgba(251,190,10,0.16), transparent 30%),
+    radial-gradient(circle at 88% 78%, rgba(201,151,3,0.12), transparent 32%),
+    linear-gradient(to bottom, #0A0A0A 0%, #111111 40%, #0A0A0A 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .intro-photo-wrap {
@@ -1494,6 +1834,8 @@ body {
 
   <div class="intro-content">
 
+    <img src="assets/masterboard-logo-yellow-transparent.png" class="mb-logo-img is-small" alt="Masterboard" style="margin-bottom:24px;">
+
     <h1 class="intro-headline">
       Sua empresa <span>escala</span><br>ou só cresce com esforço?
     </h1>
@@ -1607,11 +1949,8 @@ body {
 
 <!-- PRE-CHAT FORM -->
 <div id="form-screen">
-  <div class="form-logo" style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:32px;">
-    <svg width="28" height="20" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0 20L7 0L14 12L21 0L28 20H22L21 17L14 5L7 17L6 20H0Z" fill="#FBBE0A"/>
-    </svg>
-    <span style="font-family:'Funnel Display',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.12em;color:rgba(255,255,255,0.4);text-transform:uppercase;">masterboard × scaleco</span>
+  <div class="form-logo" style="display:flex;align-items:center;justify-content:center;margin-bottom:32px;">
+    <img src="assets/masterboard-logo-yellow-transparent.png" class="mb-logo-img is-small" alt="Masterboard">
   </div>
   <div class="form-card">
     <div class="form-card-title">ANTES DE COMEÇAR O DIAGNÓSTICO</div>
@@ -1661,10 +2000,7 @@ body {
 <!-- SHOWOFF SCREEN -->
 <div id="showoff-screen">
   <div class="showoff-logo">
-    <svg width="32" height="24" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0 20L7 0L14 12L21 0L28 20H22L21 17L14 5L7 17L6 20H0Z" fill="#FBBE0A"/>
-    </svg>
-    <span class="showoff-logo-text">masterboard × scaleco</span>
+    <img src="assets/masterboard-logo-yellow-transparent.png" class="mb-logo-img" alt="Masterboard">
   </div>
 
   <svg class="showoff-pulse" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1724,6 +2060,70 @@ let isLoading = false;
 let msgCount = 0;
 let formData = {};
 const MAX_MSGS = 14;
+
+// ── MODO DEMO: ?demo=showoff — mostra tela showoff + relatório sem API ──
+(function() {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('demo') === 'showoff') {
+    const mockReport = {
+      tipo: 'relatorio',
+      nome: 'Bernardo Kawano',
+      empresa: 'Masterboard',
+      email: 'bernardo@masterboard.com.br',
+      whatsapp: '(11) 99999-9999',
+      faturamento: 'R$1M–R$5M/ano',
+      localizacao: 'São Paulo – SP',
+      score_geral: 38,
+      nivel: 'Em Desenvolvimento',
+      dimensoes: {
+        S: { score: 25, status: 'ICP definido por intuição, sem validação', gargalo: 'Não há perfil de cliente ideal documentado' },
+        C: { score: 40, status: 'Canal único, dependente de indicação', gargalo: 'Sem engine de aquisição ativo ou previsível' },
+        A: { score: 20, status: 'Sem previsão de receita estruturada', gargalo: 'Forecast baseado em feeling, não em dados' },
+        L: { score: 30, status: 'Operação trava quando founder sai', gargalo: 'Time não opera sem presença constante do líder' },
+        E: { score: 45, status: 'Reuniões acontecem, sem cadência formal', gargalo: 'Pipeline review não segue ritmo definido' },
+        G: { score: 50, status: 'Gestão informal, sem playbook', gargalo: null },
+      },
+      gargalo_critico: 'Ausência de previsibilidade de receita — a operação depende do fundador para cada etapa do ciclo.',
+      prioridades: [
+        'Definir e documentar o ICP com critérios comportamentais e econômicos objetivos',
+        'Construir pelo menos um canal de aquisição ativo com métricas semanais rastreadas',
+        'Implementar forecast semanal com dados reais de pipeline — não de feeling',
+      ],
+      parecer: 'A Masterboard tem os ingredientes certos, mas sem um motor de receita estruturado, o crescimento ainda é refém da energia do fundador. O gargalo não é falta de talento — é falta de sistema.',
+      setor_insights: 'Empresas de ecossistema e comunidade nesse faturamento cometem dois erros recorrentes: confundem engajamento com receita previsível, e postergam a formalização de processos comerciais porque "estão crescendo por indicação". O resultado é um teto invisível que aparece exatamente quando a operação tenta dar o próximo salto.',
+      ecossistema_match: 'Temos conexões estratégicas com decisores corporativos no segmento de inovação e formação de times em São Paulo que podem acelerar a expansão da carteira da Masterboard nos próximos 90 dias.',
+      masterboard_tabela: [
+        {
+          desafio: 'Transformar comunidade e autoridade em receita previsível',
+          impacto: 'Pipeline irregular, dependência de relacionamento direto e dificuldade de forecast',
+          conexao: 'Empresários B2B, CRM, vendas consultivas e parceiros de geração de demanda',
+        },
+        {
+          desafio: 'Escalar operação sem perder curadoria e qualidade do ecossistema',
+          impacto: 'Risco de diluir a proposta de valor e criar gargalos manuais na entrega',
+          conexao: 'Processos, automação, governança de comunidade e gestão operacional',
+        },
+        {
+          desafio: 'Expandir para outras regiões com posicionamento consistente',
+          impacto: 'Crescimento regional pode ficar dependente de indicações locais e eventos pontuais',
+          conexao: 'Líderes empresariais regionais, parceiros comerciais e hubs de inovação',
+        },
+      ],
+    };
+
+    document.getElementById('intro').style.display = 'none';
+    const s = document.getElementById('sintomas-section');
+    if (s) s.style.display = 'none';
+    document.getElementById('form-screen').style.display = 'none';
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => showShowoff(mockReport));
+    } else {
+      showShowoff(mockReport);
+    }
+    return;
+  }
+})();
 
 // Se abriu via nova aba com ?start=1, pula landing e inicia chat direto
 (function() {
@@ -2047,6 +2447,29 @@ function getCTAContent(score) {
   }
 }
 
+function animateScore(targetScore) {
+  const scoreEl = document.getElementById('scoreNumber');
+  if (!scoreEl) return;
+
+  const target = Math.max(0, Math.min(Number(targetScore) || 0, 100));
+  const duration = 1400;
+  const start = performance.now();
+
+  function tick(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    scoreEl.textContent = Math.round(eased * target);
+
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      scoreEl.textContent = target;
+    }
+  }
+
+  requestAnimationFrame(tick);
+}
+
 const DIM_NAMES = {
   S: 'Strategic Architecture',
   C: 'Commercial Engine',
@@ -2075,9 +2498,72 @@ function renderReport(data) {
 
   const waText = encodeURIComponent(`Olá Fábio, acabei de fazer o diagnóstico da ScaleCo. Meu score foi ${data.score_geral} (${data.nivel}) e gostaria de conversar sobre o resultado.`);
 
+  const escapeHtml = (value) => String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+  const highlightText = (value) => {
+    let text = escapeHtml(value);
+    [
+      'receita previsível',
+      'conexões estratégicas',
+      'ecossistema Masterboard',
+      'próximos 90 dias',
+      'gargalos',
+      'forecast',
+      'expansão',
+      'operação',
+    ].forEach((term) => {
+      const safeTerm = escapeHtml(term);
+      text = text.replace(new RegExp(safeTerm, 'gi'), (match) => `<span class="yellow-mark">${match}</span>`);
+    });
+    return text;
+  };
+
+  const intelligenceRows = Array.isArray(data.masterboard_tabela) ? data.masterboard_tabela : [];
+  const intelligenceRowsHTML = intelligenceRows.map((row) => `
+      <tr>
+        <td data-label="Principal desafio">${highlightText(row.desafio)}</td>
+        <td data-label="Impacto direto">${highlightText(row.impacto)}</td>
+        <td data-label="Possível conexão estratégica">${highlightText(row.conexao)}</td>
+      </tr>
+    `).join('');
+
+  const intelligenceBlock = (data.setor_insights || data.ecossistema_match || intelligenceRowsHTML) ? `
+    <div class="intelligence-block">
+      <div class="intelligence-kicker">
+        <svg width="18" height="13" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 20L7 0L14 12L21 0L28 20H22L21 17L14 5L7 17L6 20H0Z" fill="#FBBE0A"/>
+        </svg>
+        Inteligência Masterboard
+      </div>
+      <div class="intelligence-title">O que descobrimos sobre ${escapeHtml(data.empresa || 'sua operação')}</div>
+      ${data.setor_insights ? `<div class="intelligence-copy">${highlightText(data.setor_insights)}</div>` : ''}
+      ${intelligenceRowsHTML ? `
+        <div class="intelligence-table-wrap">
+          <table class="intelligence-table">
+            <thead>
+              <tr>
+                <th>Principal desafio</th>
+                <th>Impacto direto</th>
+                <th>Possível conexão estratégica</th>
+              </tr>
+            </thead>
+            <tbody>${intelligenceRowsHTML}</tbody>
+          </table>
+        </div>
+      ` : ''}
+      ${data.ecossistema_match ? `<div class="intelligence-footnote">${highlightText(data.ecossistema_match)}</div>` : ''}
+    </div>
+  ` : '';
+
   rs.innerHTML = `
     <div class="report-header">
-      <div class="report-logo">SCALECO · SCALE DIAGNOSTIC™</div>
+      <img src="assets/masterboard-logo-yellow-transparent.png" class="mb-logo-img is-report" alt="Masterboard">
+      <div class="report-logo">SCALE METHOD™ · MASTERBOARD INTELLIGENCE</div>
       <img src="archie.jpeg" class="report-archie" alt="Archie">
       <div class="report-title">DIAGNÓSTICO DE ARQUITETURA</div>
       <div class="report-company">${data.empresa.toUpperCase()}</div>
@@ -2086,7 +2572,7 @@ function renderReport(data) {
 
     <div class="score-block">
       <div class="score-label">SCORE GERAL · SCALE METHOD™</div>
-      <div class="score-number" style="color:${scoreColor}">${data.score_geral}</div>
+      <div class="score-number" id="scoreNumber" style="color:${scoreColor}">0</div>
       <div><span class="score-nivel ${nivelClass}">${data.nivel}</span></div>
       <p class="score-parecer">${data.parecer}</p>
     </div>
@@ -2111,6 +2597,8 @@ function renderReport(data) {
       </div>
     </div>
 
+    ${intelligenceBlock}
+
     <div class="cta-block">
       <img src="archie.jpeg" class="cta-archie" alt="Archie">
       <div class="cta-title">PRÓXIMO PASSO</div>
@@ -2121,6 +2609,7 @@ function renderReport(data) {
   `;
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  animateScore(data.score_geral);
 }
 </script>
 
