@@ -1362,7 +1362,7 @@ body::after {
   #chat-screen {
     height: var(--chat-height, 100dvh);
     position: fixed;
-    top: var(--chat-top, 0px);
+    top: 0;
     left: 0;
     right: 0;
     bottom: auto;
@@ -2136,8 +2136,8 @@ const DEMO_REPORT = {
 };
 
 const DEMO_CHAT_REPLIES = [
-  'Sou o Archie, o engine de diagnóstico da ScaleCo. Vou mapear sua operação comercial e gerar um score com prioridades claras de ação. Vamos começar?\n\nQual é o nome da empresa e o que ela vende?',
-  'Você consegue descrever em uma frase quem é seu cliente ideal e qual o ticket médio por venda?',
+  'Sou o Archie, o engine de diagnóstico da ScaleCo. Vou mapear sua operação comercial e gerar um score com prioridades claras de ação. Vamos começar?\n\nQual é o nome da empresa, o que ela vende e qual o ticket médio por venda?',
+  'Você consegue descrever em uma frase quem é seu cliente ideal?',
   'Como os clientes chegam até você hoje?',
   'Você consegue prever quanto vai faturar no próximo mês?',
   'Se você sair por 30 dias, o comercial continua funcionando, ou trava em você?',
@@ -2251,16 +2251,17 @@ function syncChatViewport() {
   const chat = document.getElementById('chat-screen');
   if (!chat || !isMobileChatViewport()) {
     document.documentElement.style.removeProperty('--chat-height');
-    document.documentElement.style.removeProperty('--chat-top');
     return;
   }
 
   const viewport = window.visualViewport;
   const height = viewport ? viewport.height : window.innerHeight;
-  const top = viewport ? viewport.offsetTop : 0;
 
   document.documentElement.style.setProperty('--chat-height', `${Math.round(height)}px`);
-  document.documentElement.style.setProperty('--chat-top', `${Math.round(top)}px`);
+
+  if (chat.style.display === 'flex' && window.scrollY !== 0) {
+    window.scrollTo(0, 0);
+  }
 }
 
 function scrollChatToBottom(delay = 0) {
@@ -2440,6 +2441,9 @@ async function callAgent(messages) {
     body: JSON.stringify({ messages, formData }),
   });
   const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.reply || 'Erro ao processar resposta.');
+  }
   return data.reply;
 }
  
@@ -2480,27 +2484,6 @@ async function sendMessage() {
   msgCount++;
   updateProgress();
 
-  const isFinalAnswer = msgCount >= MAX_MSGS;
-  if (isFinalAnswer) {
-    isLoading = true;
-    document.getElementById('sendBtn').disabled = true;
-    appendMessage('assistant', 'Tudo pronto! Iremos fazer a investigação aprofundada do seu negócio. Só um momento.');
-
-    const reportPromise = callAgent(history)
-      .then((reply) => {
-        history.push({ role: 'assistant', content: reply });
-        msgCount++;
-        updateProgress();
-        return parseReport(reply);
-      });
-    reportPromise.catch(() => {});
-
-    setTimeout(() => {
-      showShowoffWhenReady(reportPromise);
-    }, 3000);
-    return;
-  }
-
   showTyping();
  
   try {
@@ -2509,7 +2492,9 @@ async function sendMessage() {
     history.push({ role: 'assistant', content: reply });
     msgCount++;
     updateProgress();
-    checkForReport(reply);
+    if (checkForReport(reply)) {
+      return;
+    }
   } catch (e) {
     removeTyping();
     appendMessage('assistant', 'Erro de conexão. Tente novamente.');
@@ -2523,14 +2508,35 @@ async function sendMessage() {
     scrollChatToBottom(180);
   }
 }
- 
+
 function checkForReport(reply) {
   const data = parseReport(reply);
   if (data) {
-    showShowoff(data);
-    return;
+    appendMessage('assistant', 'Tudo pronto! Iremos fazer a investigação aprofundada do seu negócio. Só um momento.');
+    setTimeout(() => {
+      showShowoff(data);
+    }, 3000);
+    return true;
   }
   appendMessage('assistant', reply);
+  return false;
+}
+
+function restoreChatWithAssistantReply(reply) {
+  document.getElementById('showoff-screen').style.display = 'none';
+  document.getElementById('chat-screen').style.display = 'flex';
+  history.push({ role: 'assistant', content: reply });
+  msgCount++;
+  updateProgress();
+  appendMessage('assistant', reply);
+  isLoading = false;
+  document.getElementById('sendBtn').disabled = false;
+
+  if (!isMobileChatViewport()) {
+    document.getElementById('userInput').focus();
+  } else {
+    scrollChatToBottom(180);
+  }
 }
 
 function parseReport(reply) {
@@ -2589,22 +2595,19 @@ async function showShowoffWhenReady(reportPromise) {
   const minimumShowoff = new Promise((resolve) => setTimeout(resolve, 5500));
 
   try {
-    const [reportData] = await Promise.all([reportPromise, minimumShowoff]);
+    const [result] = await Promise.all([reportPromise, minimumShowoff]);
     clearInterval(interval);
     showoff.style.display = 'none';
 
-    if (reportData) {
-      renderReport(reportData);
+    if (result && result.reportData) {
+      renderReport(result.reportData);
     } else {
-      throw new Error('Relatório inválido');
+      restoreChatWithAssistantReply(result?.reply || 'Preciso de uma resposta mais concreta antes de consolidar o relatório.');
     }
   } catch (e) {
     clearInterval(interval);
     showoff.style.display = 'none';
-    document.getElementById('chat-screen').style.display = 'flex';
-    appendMessage('assistant', 'Tive um problema para consolidar o relatório. Tente enviar a última resposta novamente.');
-    isLoading = false;
-    document.getElementById('sendBtn').disabled = false;
+    restoreChatWithAssistantReply('Tive uma instabilidade para consolidar o relatório. Pode reenviar essa última resposta para eu tentar novamente?');
   }
 }
 
@@ -2680,17 +2683,17 @@ function getNivelClass(nivel) {
 function getCTAContent(score) {
   if (score < 60) {
     return {
-      sub: `Encontramos problemas, potenciais riscos e gargalos diretos na sua operação. Alguns deles exigem arquitetura de receita, não apenas mais esforço comercial. Por isso, o próximo passo é uma mentoria estratégica com Fábio Couto para entender onde o motor de crescimento está travando.`,
-      cta: `AGENDAR CONSULTORIA`
+      sub: `Encontramos problemas, potenciais riscos e gargalos diretos na sua operação. Alguns deles exigem arquitetura de receita, não apenas mais esforço comercial. Por isso, o próximo passo é uma conversa estratégica com Fábio Couto para entender onde o motor de crescimento está travando.`,
+      cta: `AGENDAR CONVERSA ESTRATÉGICA`
     };
   } else if (score < 80) {
     return {
-      sub: `Você já tem uma base, mas ainda existem pontos de arquitetura de receita que podem limitar previsibilidade, escala e execução. A mentoria com Fábio Couto ajuda a separar o que é ajuste operacional do que é decisão estratégica de crescimento.`,
+      sub: `Você já tem uma base, mas ainda existem pontos de arquitetura de receita que podem limitar previsibilidade, escala e execução. A conversa com Fábio Couto ajuda a separar o que é ajuste operacional do que é decisão estratégica de crescimento.`,
       cta: `QUERO APERFEIÇOAR MINHA OPERAÇÃO`
     };
   } else {
     return {
-      sub: `Sua base mostra sinais de maturidade, mas a próxima camada de crescimento pede arquitetura de receita mais sofisticada. A mentoria com Fábio Couto conecta os achados do diagnóstico a decisões práticas de escala.`,
+      sub: `Sua base mostra sinais de maturidade, mas a próxima camada de crescimento pede arquitetura de receita mais sofisticada. A conversa com Fábio Couto conecta os achados do diagnóstico a decisões práticas de escala.`,
       cta: `QUERO LEVAR MINHA OPERAÇÃO PARA O PRÓXIMO NÍVEL`
     };
   }
@@ -2722,9 +2725,10 @@ function animateScore(targetScore) {
 const DIM_NAMES = {
   S: 'Strategic Architecture',
   C: 'Commercial Engine',
-  A: 'Analytics & Governance',
+  A: 'Analytics',
   L: 'Leadership Institutionalization',
   E: 'Execution Cadence',
+  G: 'Governance & Rhythm',
 };
  
 function renderReport(data) {
