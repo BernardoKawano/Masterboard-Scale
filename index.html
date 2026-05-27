@@ -2436,6 +2436,28 @@ async function sendMessage() {
   history.push({ role: 'user', content: text });
   msgCount++;
   updateProgress();
+
+  const isFinalAnswer = msgCount >= MAX_MSGS;
+  if (isFinalAnswer) {
+    isLoading = true;
+    document.getElementById('sendBtn').disabled = true;
+    appendMessage('assistant', 'Tudo pronto! Iremos fazer a investigação aprofundada do seu negócio. Só um momento.');
+
+    const reportPromise = callAgent(history)
+      .then((reply) => {
+        history.push({ role: 'assistant', content: reply });
+        msgCount++;
+        updateProgress();
+        return parseReport(reply);
+      });
+    reportPromise.catch(() => {});
+
+    setTimeout(() => {
+      showShowoffWhenReady(reportPromise);
+    }, 3000);
+    return;
+  }
+
   showTyping();
  
   try {
@@ -2460,17 +2482,87 @@ async function sendMessage() {
 }
  
 function checkForReport(reply) {
+  const data = parseReport(reply);
+  if (data) {
+    showShowoff(data);
+    return;
+  }
+  appendMessage('assistant', reply);
+}
+
+function parseReport(reply) {
   try {
     const jsonMatch = reply.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const data = JSON.parse(jsonMatch[0]);
       if (data.tipo === 'relatorio') {
-        showShowoff(data);
-        return;
+        return data;
       }
     }
   } catch (e) {}
-  appendMessage('assistant', reply);
+  return null;
+}
+
+async function showShowoffWhenReady(reportPromise) {
+  document.getElementById('chat-screen').style.display = 'none';
+
+  const showoff = document.getElementById('showoff-screen');
+  showoff.style.display = 'flex';
+
+  const lineEl = document.getElementById('showoff-line');
+  const subEl = document.getElementById('showoff-sub');
+  const barEl = document.getElementById('showoff-bar');
+
+  lineEl.classList.remove('visible');
+  subEl.classList.remove('visible');
+  barEl.style.transition = 'none';
+  barEl.style.width = '0%';
+
+  const lines = [
+    'Mapeando desafios do seu setor...',
+    'Cruzando com o ecossistema Masterboard...',
+    'Identificando conexões estratégicas...',
+    'Consolidando seu diagnóstico completo.',
+  ];
+
+  let i = 0;
+  setTimeout(() => {
+    barEl.style.transition = 'width 5s linear';
+    barEl.style.width = '100%';
+  }, 50);
+  setTimeout(() => { subEl.classList.add('visible'); }, 400);
+
+  function nextLine() {
+    lineEl.classList.remove('visible');
+    setTimeout(() => {
+      lineEl.textContent = lines[i % lines.length] || '';
+      lineEl.classList.add('visible');
+      i++;
+    }, 300);
+  }
+
+  nextLine();
+  const interval = setInterval(nextLine, 1250);
+  const minimumShowoff = new Promise((resolve) => setTimeout(resolve, 5500));
+
+  try {
+    const [reportData] = await Promise.all([reportPromise, minimumShowoff]);
+    clearInterval(interval);
+    showoff.style.display = 'none';
+
+    if (reportData) {
+      renderReport(reportData);
+    } else {
+      throw new Error('Relatório inválido');
+    }
+  } catch (e) {
+    clearInterval(interval);
+    showoff.style.display = 'none';
+    document.getElementById('chat-screen').style.display = 'flex';
+    appendMessage('assistant', 'Tive um problema para consolidar o relatório. Tente enviar a última resposta novamente.');
+    isLoading = false;
+    document.getElementById('sendBtn').disabled = false;
+  }
 }
 
 function showShowoff(reportData) {
