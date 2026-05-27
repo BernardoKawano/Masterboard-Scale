@@ -1271,6 +1271,22 @@ body::after {
   .brand-x {
     font-size: 10px;
   }
+
+  .intro-headline {
+    font-size: clamp(30px, 8.2vw, 38px);
+    line-height: 1.03;
+    max-width: 340px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .intro-headline-sub {
+    font-size: 0.66em;
+    line-height: 1.12;
+    max-width: 290px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 /* ── MOBILE FIRST — ajustes críticos para celular ── */
@@ -1701,6 +1717,7 @@ body::after {
   color: #FAFAF8;
   text-align: center;
   margin-bottom: 14px;
+  max-width: 520px;
 }
 
 .intro-headline span { color: #FBBE0A; }
@@ -1709,7 +1726,8 @@ body::after {
   display: block;
   color: #FBBE0A;
   font-size: 0.78em;
-  white-space: nowrap;
+  line-height: 1.08;
+  margin-top: 10px;
 }
 
 .intro-subline {
@@ -1925,7 +1943,7 @@ body::after {
 
     <h1 class="intro-headline">
       Diagnóstico de Arquitetura de Receita
-      <span class="intro-headline-sub">Metodologia aplicada em Big&nbsp;Techs</span>
+      <span class="intro-headline-sub">Metodologia aplicada em <span style="white-space:nowrap;">Big Techs</span></span>
     </h1>
 
     <p class="intro-subline">
