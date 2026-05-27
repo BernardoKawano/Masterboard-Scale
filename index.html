@@ -110,6 +110,18 @@ body::after {
   margin: 0 auto 12px;
 }
 
+.mb-symbol-mark {
+  display: inline-block;
+  width: 28px;
+  height: 20px;
+  flex: 0 0 28px;
+  background-image: url('assets/masterboard-logo-yellow-transparent.png');
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 190px auto;
+  filter: drop-shadow(0 0 10px rgba(251,190,10,0.18));
+}
+
 .yellow-mark {
   color: var(--blue);
   font-weight: 700;
@@ -2535,9 +2547,7 @@ function renderReport(data) {
   const intelligenceBlock = (data.setor_insights || data.ecossistema_match || intelligenceRowsHTML) ? `
     <div class="intelligence-block">
       <div class="intelligence-kicker">
-        <svg width="18" height="13" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0 20L7 0L14 12L21 0L28 20H22L21 17L14 5L7 17L6 20H0Z" fill="#FBBE0A"/>
-        </svg>
+        <span class="mb-symbol-mark" aria-hidden="true"></span>
         Inteligência Masterboard
       </div>
       <div class="intelligence-title">O que descobrimos sobre ${escapeHtml(data.empresa || 'sua operação')}</div>
