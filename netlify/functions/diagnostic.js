@@ -317,8 +317,8 @@ async function sendEmails(report) {
     C: "Commercial Engine",
     A: "Analytics",
     L: "Leadership Institutionalization",
-    E: "Execution Cadence",
-    G: "Governance & Rhythm"
+    E: "Execution",
+    G: "Governance"
   };
 
   const dimsHTML = Object.entries(report.dimensoes).map(([k, d]) =>
