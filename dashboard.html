@@ -419,7 +419,22 @@ const STATE_ALIASES = {
   rio_grande_do_norte: 'RN', rs: 'RS', rio_grande_do_sul: 'RS', ro: 'RO', rondonia: 'RO', rr: 'RR',
   roraima: 'RR', sc: 'SC', santa_catarina: 'SC', sp: 'SP', sao_paulo: 'SP', se: 'SE', sergipe: 'SE', to: 'TO', tocantins: 'TO',
 };
-const CITY_ALIASES = { curitiba: 'Curitiba', maringa: 'Maringá', sao_paulo: 'São Paulo' };
+const CITY_ALIASES = {
+  curitiba: 'Curitiba',
+  goiania: 'Goiânia',
+  londrina: 'Londrina',
+  maringa: 'Maringá',
+  sao_paulo: 'São Paulo',
+  sp: 'São Paulo',
+};
+const CITY_DEFAULT_STATES = {
+  curitiba: 'PR',
+  goiania: 'GO',
+  londrina: 'PR',
+  maringa: 'PR',
+  sao_paulo: 'SP',
+  sp: 'SP',
+};
 function normalizeKey(value) {
   return String(value || '')
     .trim()
@@ -444,6 +459,7 @@ function canonicalCity(value) {
   const cleaned = String(value || '').trim().replace(/\s+/g, ' ');
   return CITY_ALIASES[normalizeKey(cleaned)] || titleCaseCity(cleaned);
 }
+function inferStateForCity(value) { return CITY_DEFAULT_STATES[normalizeKey(value)] || ''; }
 function normalizeLocation(value) {
   const raw = String(value || '').trim();
   if (!raw) return '';
@@ -460,6 +476,10 @@ function normalizeLocation(value) {
     return state ? `${city}, ${state}` : canonicalCity(cleaned);
   }
   const key = normalizeKey(cleaned);
+  const directCity = canonicalCity(cleaned);
+  const directState = inferStateForCity(cleaned);
+  if (directState) return `${directCity}, ${directState}`;
+
   const stateAlias = Object.keys(STATE_ALIASES)
     .sort((a, b) => b.length - a.length)
     .find((alias) => key.endsWith(`_${alias}`));
@@ -467,7 +487,7 @@ function normalizeLocation(value) {
     const cityKey = key.slice(0, -(stateAlias.length + 1)).replace(/_/g, ' ');
     return `${canonicalCity(cityKey)}, ${STATE_ALIASES[stateAlias]}`;
   }
-  return canonicalCity(cleaned);
+  return directCity;
 }
 
 function clearFilters() {

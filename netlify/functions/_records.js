@@ -78,8 +78,20 @@ const STATE_ALIASES = {
 
 const CITY_ALIASES = {
   curitiba: 'Curitiba',
+  goiania: 'Goiânia',
+  londrina: 'Londrina',
   maringa: 'Maringá',
   sao_paulo: 'São Paulo',
+  sp: 'São Paulo',
+};
+
+const CITY_DEFAULT_STATES = {
+  curitiba: 'PR',
+  goiania: 'GO',
+  londrina: 'PR',
+  maringa: 'PR',
+  sao_paulo: 'SP',
+  sp: 'SP',
 };
 
 function normalizeKey(value) {
@@ -110,6 +122,10 @@ function canonicalCity(value) {
   return CITY_ALIASES[normalizeKey(cleaned)] || titleCaseCity(cleaned);
 }
 
+function inferStateForCity(value) {
+  return CITY_DEFAULT_STATES[normalizeKey(value)] || '';
+}
+
 function normalizeLocation(value) {
   const raw = cleanString(value);
   if (!raw) return '';
@@ -129,6 +145,10 @@ function normalizeLocation(value) {
   }
 
   const key = normalizeKey(cleaned);
+  const directCity = canonicalCity(cleaned);
+  const directState = inferStateForCity(cleaned);
+  if (directState) return `${directCity}, ${directState}`;
+
   const stateAlias = Object.keys(STATE_ALIASES)
     .sort((a, b) => b.length - a.length)
     .find((alias) => key.endsWith(`_${alias}`));
@@ -138,7 +158,7 @@ function normalizeLocation(value) {
     return `${canonicalCity(cityKey)}, ${STATE_ALIASES[stateAlias]}`;
   }
 
-  return canonicalCity(cleaned);
+  return directCity;
 }
 
 function createLeadId() {

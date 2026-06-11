@@ -75,7 +75,12 @@ test('normaliza variacoes de cidade e estado para agrupamento', () => {
   assert.equal(normalizeLocation('Maringá/PR'), 'Maringá, PR');
   assert.equal(normalizeLocation('Curitiba PR'), 'Curitiba, PR');
   assert.equal(normalizeLocation('Curitiba, Paraná'), 'Curitiba, PR');
-  assert.equal(normalizeLocation('Maringá'), 'Maringá');
+  assert.equal(normalizeLocation('Maringá'), 'Maringá, PR');
+  assert.equal(normalizeLocation('Curitiba'), 'Curitiba, PR');
+  assert.equal(normalizeLocation('Londrina'), 'Londrina, PR');
+  assert.equal(normalizeLocation('Goiânia'), 'Goiânia, GO');
+  assert.equal(normalizeLocation('São Paulo'), 'São Paulo, SP');
+  assert.equal(normalizeLocation('Sp'), 'São Paulo, SP');
 });
 
 test('mescla captura, inicio e conclusao sem perder createdAt', () => {
