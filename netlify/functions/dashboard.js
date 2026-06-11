@@ -1,5 +1,5 @@
 const { timingSafeEqual } = require('node:crypto');
-const { listDashboardRecords } = require('./_blobStore');
+const { connectBlobLambda, listDashboardRecords } = require('./_blobStore');
 
 exports.handler = async function (event) {
   if (event.httpMethod === 'OPTIONS') {
@@ -21,6 +21,7 @@ exports.handler = async function (event) {
   }
 
   try {
+    connectBlobLambda(event);
     const { records, summaries, durationMs } = await listDashboardRecords();
 
     return jsonResponse(200, {

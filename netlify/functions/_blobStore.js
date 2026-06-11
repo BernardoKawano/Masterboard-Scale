@@ -5,6 +5,11 @@ const {
   summarizeRecord,
 } = require('./_records');
 
+function connectBlobLambda(event) {
+  const { connectLambda } = require('@netlify/blobs');
+  connectLambda(event);
+}
+
 function getDiagnosticsStore() {
   const { getStore } = require('@netlify/blobs');
 
@@ -68,6 +73,7 @@ async function listDashboardRecords() {
 }
 
 module.exports = {
+  connectBlobLambda,
   listDashboardRecords,
   saveRecordPatch,
 };

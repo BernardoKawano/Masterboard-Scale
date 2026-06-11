@@ -4,7 +4,7 @@ const {
   createErrorPatch,
   createStartedPatch,
 } = require('./_records');
-const { saveRecordPatch } = require('./_blobStore');
+const { connectBlobLambda, saveRecordPatch } = require('./_blobStore');
 
 exports.handler = async function (event) {
   if (event.httpMethod !== "POST") {
@@ -144,6 +144,7 @@ TOM: Direto, frases curtas, sem elogios. Nunca use as palavras "mentoria" ou "co
 
   let body;
   try {
+    connectBlobLambda(event);
     body = JSON.parse(event.body || '{}');
     const { messages, formData } = body;
 
