@@ -157,6 +157,66 @@ function createErrorPatch(formData = {}, error, now = new Date()) {
   };
 }
 
+function createAdminPatch(leadId, action, now = new Date()) {
+  const normalizedLeadId = cleanString(leadId);
+  const at = timestamp(now);
+
+  if (!normalizedLeadId) throw new Error('leadId ausente para acao administrativa');
+
+  if (action === 'delete') {
+    return {
+      leadId: normalizedLeadId,
+      updatedAt: at,
+      deletedAt: at,
+      events: [{ type: 'dashboard_deleted', at }],
+    };
+  }
+
+  if (action === 'restore') {
+    return {
+      leadId: normalizedLeadId,
+      updatedAt: at,
+      deletedAt: '',
+      events: [{ type: 'dashboard_restored', at }],
+    };
+  }
+
+  if (action === 'mark_converted') {
+    return {
+      leadId: normalizedLeadId,
+      updatedAt: at,
+      commercialStatus: 'converted',
+      convertedAt: at,
+      soldAt: '',
+      events: [{ type: 'dashboard_marked_converted', at }],
+    };
+  }
+
+  if (action === 'mark_sold') {
+    return {
+      leadId: normalizedLeadId,
+      updatedAt: at,
+      commercialStatus: 'sold',
+      convertedAt: at,
+      soldAt: at,
+      events: [{ type: 'dashboard_marked_sold', at }],
+    };
+  }
+
+  if (action === 'clear_commercial_status') {
+    return {
+      leadId: normalizedLeadId,
+      updatedAt: at,
+      commercialStatus: '',
+      convertedAt: '',
+      soldAt: '',
+      events: [{ type: 'dashboard_cleared_commercial_status', at }],
+    };
+  }
+
+  throw new Error('Acao administrativa invalida');
+}
+
 function mergeFormData(existing = {}, incoming = {}) {
   const merged = { ...existing };
   Object.entries(incoming || {}).forEach(([key, value]) => {
@@ -179,6 +239,12 @@ function mergeRecord(existing, patch) {
   const existingRank = STATUS_RANK[existing.status] || 0;
   const patchRank = STATUS_RANK[patch.status] || 0;
   const nextStatus = patchRank >= existingRank ? patch.status : existing.status;
+  const patchHasConvertedAt = Object.prototype.hasOwnProperty.call(patch, 'convertedAt');
+  const nextConvertedAt = patch.commercialStatus === 'sold'
+    ? existing.convertedAt || patch.convertedAt || patch.updatedAt
+    : patchHasConvertedAt
+      ? patch.convertedAt
+      : existing.convertedAt;
 
   return {
     ...existing,
@@ -187,6 +253,7 @@ function mergeRecord(existing, patch) {
     createdAt: existing.createdAt || patch.createdAt || patch.updatedAt || timestamp(),
     updatedAt: patch.updatedAt || timestamp(),
     completedAt: patch.completedAt || existing.completedAt,
+    convertedAt: nextConvertedAt,
     formData: mergeFormData(existing.formData, patch.formData),
     events: [...(existing.events || []), ...(patch.events || [])],
   };
@@ -199,9 +266,13 @@ function summarizeRecord(record) {
   return {
     leadId: record.leadId,
     status: record.status,
+    commercialStatus: record.commercialStatus || '',
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
     completedAt: record.completedAt || '',
+    convertedAt: record.convertedAt || '',
+    soldAt: record.soldAt || '',
+    deletedAt: record.deletedAt || '',
     nome: report.nome || form.nome || '',
     empresa: report.empresa || '',
     email: report.email || form.email || '',
@@ -223,6 +294,7 @@ module.exports = {
   compactMessages,
   createCapturedPatch,
   createCompletedPatch,
+  createAdminPatch,
   createErrorPatch,
   createLeadId,
   createStartedPatch,

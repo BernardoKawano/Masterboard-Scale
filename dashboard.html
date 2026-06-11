@@ -134,6 +134,11 @@ tr:hover td { background: rgba(251,190,10,0.035); }
 .section { border-top: 1px solid var(--line); margin-top: 13px; padding-top: 13px; }
 .section h2 { margin-bottom: 10px; }
 .copy { color: #d8d8d8; font-size: 13px; line-height: 1.65; max-height: 190px; overflow: auto; white-space: pre-wrap; }
+.qa-list { display: grid; gap: 10px; }
+.qa-card { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+.qa-label { color: var(--yellow); font-size: 10px; font-weight: 900; letter-spacing: 0.13em; text-transform: uppercase; }
+.qa-text { color: #e8e8e8; font-size: 13px; line-height: 1.55; margin-top: 6px; white-space: pre-wrap; }
+.qa-answer { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; }
 .dimension { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 13px; margin-bottom: 9px; padding: 12px; }
 .dimension-top { display: flex; justify-content: space-between; }
 .bar { background: rgba(255,255,255,0.08); border-radius: 999px; height: 5px; margin: 9px 0; overflow: hidden; }
@@ -250,6 +255,7 @@ tr:hover td { background: rgba(251,190,10,0.035); }
                 <th data-sort="empresa">Empresa</th>
                 <th data-sort="score">Score</th>
                 <th data-sort="status">Status</th>
+                <th data-sort="commercialStatus">Comercial</th>
                 <th data-sort="faturamento">Faturamento</th>
                 <th data-sort="localizacao">Região</th>
                 <th data-sort="updatedAt">Última interação</th>
@@ -353,7 +359,7 @@ async function loadDashboard() {
 
 function showAuth() { $('auth').hidden = false; $('app').hidden = true; }
 function showApp() { $('auth').hidden = true; $('app').hidden = false; $('authError').textContent = ''; }
-function setLoading() { $('metrics').innerHTML = ''; $('tableBody').innerHTML = '<tr><td colspan="9" class="empty">Carregando...</td></tr>'; }
+function setLoading() { $('metrics').innerHTML = ''; $('tableBody').innerHTML = '<tr><td colspan="10" class="empty">Carregando...</td></tr>'; }
 function setView(view, updateUrl = true) {
   state.view = ['home', 'leads', 'kanban', 'pipeline', 'insights'].includes(view) ? view : 'home';
   document.querySelectorAll('.nav-btn').forEach((button) => button.classList.toggle('active', button.dataset.view === state.view));
@@ -383,9 +389,13 @@ function normalizeRecord(record) {
     gargalo: report.gargalo_critico || '',
     prioridades: Array.isArray(report.prioridades) ? report.prioridades : [],
     status: record.status || 'captured',
+    commercialStatus: record.commercialStatus || '',
     updatedAt: record.updatedAt || record.createdAt || '',
     createdAt: record.createdAt || '',
     completedAt: record.completedAt || '',
+    convertedAt: record.convertedAt || '',
+    soldAt: record.soldAt || '',
+    deletedAt: record.deletedAt || '',
   };
 }
 
@@ -417,17 +427,18 @@ function renderAll() {
 
 function filteredRecords() {
   return state.records.filter((record) => {
+    if (record.deletedAt) return false;
     if (state.status !== 'all' && record.status !== state.status) return false;
     if (state.score !== 'all' && !scoreMatch(record)) return false;
     if (state.date !== 'all' && !dateMatch(record.updatedAt, state.date)) return false;
     if (state.region && !String(record.localizacao).toLowerCase().includes(state.region)) return false;
     if (state.revenue !== 'all' && !revenueMatch(record.faturamento, state.revenue)) return false;
     if (!state.query) return true;
-    return [record.leadId, record.nome, record.empresa, record.email, record.whatsapp, record.faturamento, record.localizacao, record.nivel, record.gargalo]
+    return [record.leadId, record.nome, record.empresa, record.email, record.whatsapp, record.faturamento, record.localizacao, record.nivel, record.gargalo, labelCommercial(record)]
       .some((value) => String(value || '').toLowerCase().includes(state.query));
   }).sort(sorter);
 }
-function selectedRecords() { return state.records.filter((record) => state.selected.has(record.leadId)); }
+function selectedRecords() { return state.records.filter((record) => !record.deletedAt && state.selected.has(record.leadId)); }
 function sorter(a, b) {
   const key = state.sort.key;
   const dir = state.sort.dir === 'asc' ? 1 : -1;
@@ -458,7 +469,7 @@ function revenueMatch(value, kind) {
 }
 
 function renderMetrics() {
-  const all = state.records;
+  const all = state.records.filter((record) => !record.deletedAt);
   const visible = filteredRecords();
   const today = all.filter((record) => dateMatch(record.createdAt || record.updatedAt, 'today')).length;
   const week = all.filter((record) => dateMatch(record.createdAt || record.updatedAt, '7')).length;
@@ -467,11 +478,15 @@ function renderMetrics() {
   const qualified = completed.filter((record) => record.score >= 50);
   const average = completed.length ? Math.round(completed.reduce((sum, record) => sum + record.score, 0) / completed.length) : 0;
   const noContact = all.filter((record) => record.status === 'captured').length;
+  const converted = all.filter(isConverted).length;
+  const sold = all.filter((record) => record.commercialStatus === 'sold').length;
   const cards = [
     ['Leads', all.length, `${visible.length} visíveis`],
     ['Novos hoje', today, `${week} na semana · ${month} no mês`],
     ['Diagnósticos', completed.length, `${pct(completed.length, all.length)}% do total`],
     ['Qualificados', qualified.length, `${pct(qualified.length, completed.length)}% dos concluídos`],
+    ['Convertidos', converted, `${pct(converted, all.length)}% dos leads`],
+    ['Vendidos', sold, `${pct(sold, converted)}% dos convertidos`],
     ['Score médio', average, average >= 50 ? 'Base aquecida' : 'Priorizar nutrição'],
     ['Sem contato', noContact, 'Leads capturados sem diagnóstico'],
   ];
@@ -512,6 +527,7 @@ function renderHome() {
   $('focusList').innerHTML = focus.length ? focus.map(focusCard).join('') : '<div class="empty">Nenhum lead na fila.</div>';
   $('recentList').innerHTML = rows.slice(0, 10).map(focusCard).join('') || '<div class="empty">Nenhum lead encontrado.</div>';
   document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
+  bindAdminActions();
 }
 function priorityScore(record) {
   return (record.status === 'captured' ? 35 : 0) + (record.score || 0) + (revenueMatch(record.faturamento, 'high') ? 25 : 0) + (dateMatch(record.updatedAt, '7') ? 10 : 0);
@@ -522,11 +538,12 @@ function focusCard(record) {
       <div>
         <strong>${escapeHtml(record.nome || 'Lead sem nome')}</strong>
         <div class="lead-sub">${escapeHtml(record.empresa || record.email || '-')}</div>
-        <div style="margin-top:8px"><span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${scorePill(record)}</div>
+        <div style="margin-top:8px"><span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${scorePill(record)} ${commercialPill(record)}</div>
       </div>
       <div style="text-align:right">
         <strong>${escapeHtml(record.score || '-')}</strong>
         <div class="muted">${escapeHtml(record.faturamento || '-')}</div>
+        <button class="icon" data-admin="delete" data-id="${escapeHtml(record.leadId)}" style="margin-top:8px" type="button">Excluir</button>
       </div>
     </div>
   `;
@@ -541,18 +558,25 @@ function renderTable() {
       <td>${escapeHtml(record.empresa || '-')}</td>
       <td><span class="score">${escapeHtml(record.score || '-')}</span> ${scorePill(record)}</td>
       <td><span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span></td>
+      <td>${commercialPill(record)}</td>
       <td>${escapeHtml(record.faturamento || '-')}</td>
       <td>${escapeHtml(record.localizacao || '-')}</td>
       <td>${escapeHtml(formatDate(record.updatedAt))}</td>
-      <td><button class="icon" data-open="${escapeHtml(record.leadId)}">Abrir</button> <button class="icon" data-copy="${escapeHtml(record.leadId)}">Copiar</button></td>
+      <td>
+        <button class="icon" data-open="${escapeHtml(record.leadId)}">Abrir</button>
+        <button class="icon" data-admin="mark_converted" data-id="${escapeHtml(record.leadId)}">Convertido</button>
+        <button class="icon" data-admin="mark_sold" data-id="${escapeHtml(record.leadId)}">Vendido</button>
+        <button class="icon" data-admin="delete" data-id="${escapeHtml(record.leadId)}">Excluir</button>
+      </td>
     </tr>
-  `).join('') : '<tr><td colspan="9" class="empty">Nenhum lead encontrado.</td></tr>';
+  `).join('') : '<tr><td colspan="10" class="empty">Nenhum lead encontrado.</td></tr>';
   document.querySelectorAll('[data-check]').forEach((element) => element.addEventListener('change', () => {
     element.checked ? state.selected.add(element.dataset.check) : state.selected.delete(element.dataset.check);
     renderAll();
   }));
   document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
   document.querySelectorAll('[data-copy]').forEach((element) => element.addEventListener('click', () => copyText(formatLeadText(state.records.find((record) => record.leadId === element.dataset.copy)))));
+  bindAdminActions();
   document.querySelectorAll('th[data-sort]').forEach((th) => {
     th.onclick = () => {
       const key = th.dataset.sort;
@@ -578,15 +602,19 @@ function renderKanban() {
         <div class="kanban-title"><span>${escapeHtml(title)}</span><span>${items.length}</span></div>
         ${items.slice(0, 60).map((record) => `
           <div class="mini" data-open="${escapeHtml(record.leadId)}">
-            <strong>${escapeHtml(record.nome || 'Lead sem nome')}</strong>
+            <div style="display:flex;justify-content:space-between;gap:8px">
+              <strong>${escapeHtml(record.nome || 'Lead sem nome')}</strong>
+              <button class="icon" data-admin="delete" data-id="${escapeHtml(record.leadId)}" type="button">Excluir</button>
+            </div>
             <div class="muted">${escapeHtml(record.empresa || record.email || '-')}</div>
-            <div style="margin-top:8px">${scorePill(record)} <span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span></div>
+            <div style="margin-top:8px">${scorePill(record)} <span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${commercialPill(record)}</div>
           </div>
         `).join('') || '<div class="empty">Vazio</div>'}
       </div>
     `;
   }).join('');
   document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
+  bindAdminActions();
 }
 function kanbanKey(record) {
   if (record.status !== 'completed') return 'captured';
@@ -599,12 +627,16 @@ function renderFunnel() {
   const completed = all.filter((record) => record.status === 'completed');
   const qualified = completed.filter((record) => record.score >= 50);
   const hot = completed.filter((record) => record.score >= 60);
+  const converted = all.filter(isConverted);
+  const sold = all.filter((record) => record.commercialStatus === 'sold');
   const highRevenue = all.filter((record) => revenueMatch(record.faturamento, 'high'));
   const steps = [
     ['Leads capturados', all.length],
     ['Diagnósticos concluídos', completed.length],
     ['Qualificados (score 50+)', qualified.length],
     ['Prioridade alta (score 60+)', hot.length],
+    ['Convertidos', converted.length],
+    ['Vendidos', sold.length],
     ['Alto faturamento', highRevenue.length],
   ];
   const max = Math.max(...steps.map((step) => step[1]), 1);
@@ -614,13 +646,14 @@ function renderFunnel() {
       <div class="funnel-bar"><div class="funnel-fill" style="width:${Math.max(7, value / max * 100)}%">${value}</div></div>
       <span class="muted">${index ? pct(value, steps[index - 1][1]) : '100'}%</span>
     </div>
-  `).join('');
+  `).join('') + `<div class="muted" style="margin-top:8px">Relação vendidos/convertidos: ${sold.length}/${converted.length} (${pct(sold.length, converted.length)}%)</div>`;
 }
 function renderInsights() {
   const rows = filteredRecords();
   $('insights').innerHTML = [
     insightRank('Regiões com mais leads', rank(rows, (record) => record.localizacao || 'Não informado')),
     insightRank('Faixas de faturamento', rank(rows, (record) => record.faturamento || 'Não informado')),
+    insightRank('Status comercial', rank(rows, (record) => labelCommercial(record))),
     insightRank('Níveis SCALE', rank(rows, (record) => record.nivel || 'Sem diagnóstico')),
     insightRank('Gargalos recorrentes', rank(rows, (record) => firstWords(record.gargalo) || 'Sem gargalo')),
   ].join('');
@@ -667,8 +700,13 @@ function openDrawer(id) {
     </div>
     <div class="actions">
       <button class="btn" onclick="copyLeadPrompt()">Copiar prompt LLM</button>
-      <button class="btn secondary" onclick="downloadLeadPdf()">Baixar PDF</button>
+      <button class="btn secondary" onclick="downloadLeadPdf()">Abrir PDF</button>
+      <button class="btn secondary" onclick="openQaPopup()">Ver perguntas/respostas</button>
       <button class="btn secondary" onclick="copyCurrent()">Copiar dados</button>
+      <button class="btn secondary" onclick="markCurrentLead('mark_converted')">Marcar convertido</button>
+      <button class="btn secondary" onclick="markCurrentLead('mark_sold')">Marcar vendido</button>
+      <button class="btn secondary" onclick="markCurrentLead('clear_commercial_status')">Limpar venda</button>
+      <button class="btn secondary" onclick="markCurrentLead('delete')">Excluir card</button>
       ${record.whatsapp ? `<a class="btn secondary" href="${escapeHtml(whatsappUrl(record.whatsapp))}" target="_blank" rel="noreferrer">WhatsApp</a>` : ''}
       ${record.email ? `<a class="btn secondary" href="mailto:${escapeHtml(record.email)}">Email</a>` : ''}
     </div>
@@ -681,6 +719,8 @@ function openDrawer(id) {
       ${fact('Região', record.localizacao)}
       ${fact('Score', record.score || '-')}
       ${fact('Nível', record.nivel || '-')}
+      ${fact('Status comercial', labelCommercial(record))}
+      ${fact('Vendido em', record.soldAt ? formatDate(record.soldAt) : '-')}
     </div>
     ${report.tipo ? `
       <div class="section"><h2>Gargalo crítico</h2><div class="copy">${escapeHtml(record.gargalo || 'Não informado')}</div></div>
@@ -688,8 +728,14 @@ function openDrawer(id) {
       <div class="section"><h2>Prioridades</h2><div class="copy">${escapeHtml(record.prioridades.map((item, index) => `${index + 1}. ${item}`).join('\n') || 'Não informado')}</div></div>
       <div class="section"><h2>Insights Masterboard</h2><div class="copy">${escapeHtml(report.setor_insights || 'Não informado')}</div></div>
     ` : '<div class="section"><div class="empty">Lead capturado, mas diagnóstico ainda não concluído.</div></div>'}
-    <div class="section"><h2>Histórico da conversa</h2><div class="copy">${escapeHtml(record.conversation || 'Não disponível')}</div></div>
-    <div class="section"><h2>Respostas do lead</h2><div class="copy">${escapeHtml(record.answers || 'Não disponível')}</div></div>
+    <div class="section">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px">
+        <h2>Perguntas e respostas</h2>
+        <button class="icon" onclick="openQaPopup()" type="button">Abrir completo</button>
+      </div>
+      ${renderQaCards(record, 6)}
+    </div>
+    <div class="section"><h2>Histórico bruto</h2><div class="copy">${escapeHtml(record.conversation || 'Não disponível')}</div></div>
   `;
   $('drawer').classList.add('open');
 }
@@ -699,7 +745,7 @@ function copyLeadPrompt() { copyText(formatLeadPrompt(state.records.find((record
 function downloadLeadPdf() {
   const record = state.records.find((item) => item.leadId === state.selectedLeadId);
   if (!record) return;
-  const printWindow = window.open('', '_blank', 'noopener,noreferrer,width=900,height=1100');
+  const printWindow = window.open('', '_blank', 'width=980,height=1100');
   if (!printWindow) {
     toast('Pop-up bloqueado. Permita pop-ups para baixar o PDF.');
     return;
@@ -707,7 +753,190 @@ function downloadLeadPdf() {
   printWindow.document.write(renderLeadPdfHtml(record));
   printWindow.document.close();
   printWindow.focus();
-  setTimeout(() => printWindow.print(), 400);
+  toast('Relatório aberto. Use o botão "Salvar PDF" na nova aba.');
+}
+function openQaPopup() {
+  const record = state.records.find((item) => item.leadId === state.selectedLeadId);
+  if (!record) return;
+  const qaWindow = window.open('', '_blank', 'width=980,height=1000');
+  if (!qaWindow) {
+    toast('Pop-up bloqueado. Permita pop-ups para abrir perguntas/respostas.');
+    return;
+  }
+  qaWindow.document.write(renderQaPopupHtml(record));
+  qaWindow.document.close();
+  qaWindow.focus();
+}
+function buildConversationTurns(record) {
+  const text = String(record.conversation || '').trim();
+  const turns = [];
+  const pattern = /(Lead|Archie):\s*([\s\S]*?)(?=\n\n(?:Lead|Archie):|$)/g;
+  let match;
+
+  while ((match = pattern.exec(text)) !== null) {
+    const role = match[1] === 'Lead' ? 'lead' : 'assistant';
+    const content = match[2].trim();
+    if (content) turns.push({ role, content });
+  }
+
+  return turns;
+}
+function buildQaPairs(record) {
+  const pairs = [];
+  let pendingQuestion = '';
+
+  buildConversationTurns(record).forEach((turn) => {
+    if (turn.role === 'assistant') {
+      pendingQuestion = turn.content;
+      return;
+    }
+
+    if (pendingQuestion) {
+      pairs.push({ question: pendingQuestion, answer: turn.content });
+      pendingQuestion = '';
+      return;
+    }
+
+    pairs.push({ question: 'Resposta espontânea do lead', answer: turn.content });
+  });
+
+  if (pairs.length) return pairs;
+
+  return String(record.answers || '')
+    .split(/\n{2,}/)
+    .map((answer) => answer.trim())
+    .filter(Boolean)
+    .map((answer, index) => ({ question: `Resposta ${index + 1}`, answer }));
+}
+function renderQaCards(record, limit = Infinity) {
+  const pairs = buildQaPairs(record);
+  const visible = pairs.slice(0, limit);
+  const hidden = Math.max(0, pairs.length - visible.length);
+
+  if (!visible.length) return '<div class="empty">Nenhuma pergunta ou resposta disponível.</div>';
+
+  return `
+    <div class="qa-list">
+      ${visible.map((pair, index) => `
+        <div class="qa-card">
+          <div class="qa-label">Pergunta ${index + 1}</div>
+          <div class="qa-text">${escapeHtml(pair.question)}</div>
+          <div class="qa-answer">
+            <div class="qa-label">Resposta do lead</div>
+            <div class="qa-text">${escapeHtml(pair.answer)}</div>
+          </div>
+        </div>
+      `).join('')}
+      ${hidden ? `<button class="icon" onclick="openQaPopup()" type="button">Ver mais ${hidden} resposta${hidden === 1 ? '' : 's'}</button>` : ''}
+    </div>
+  `;
+}
+function renderQaPopupHtml(record) {
+  const pairs = buildQaPairs(record);
+  const qaRows = pairs.map((pair, index) => `
+    <article class="qa-card">
+      <div class="eyebrow">Pergunta ${index + 1}</div>
+      <h2>${escapeHtml(pair.question)}</h2>
+      <div class="answer">
+        <div class="eyebrow">Resposta do lead</div>
+        <p>${escapeHtml(pair.answer)}</p>
+      </div>
+    </article>
+  `).join('');
+
+  return `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Perguntas e respostas · ${escapeHtml(record.empresa || record.nome || 'Lead')}</title>
+<style>
+body{background:#f6f4ef;color:#111;font-family:Arial,sans-serif;margin:0;line-height:1.55}
+.wrap{max-width:920px;margin:0 auto;padding:34px 22px 56px}.top{align-items:flex-start;display:flex;gap:18px;justify-content:space-between;margin-bottom:22px}
+.eyebrow{color:#9b7400;font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}h1{font-size:34px;letter-spacing:-.04em;margin:5px 0}h2{font-size:18px;letter-spacing:-.02em;line-height:1.3;margin:8px 0 0}
+.muted{color:#666;font-size:13px}.actions{display:flex;gap:8px;position:sticky;top:12px}.btn{background:#111;border:0;border-radius:10px;color:#fff;cursor:pointer;font-weight:800;padding:10px 13px}
+.btn.secondary{background:#fff;border:1px solid #ddd;color:#111}.qa-list{display:grid;gap:14px}.qa-card{background:#fff;border:1px solid #ddd;border-radius:16px;box-shadow:0 12px 28px rgba(0,0,0,.05);padding:18px}
+.answer{background:#f8f8f8;border-left:4px solid #FBBE0A;border-radius:12px;margin-top:14px;padding:14px}.answer p{margin:6px 0 0;white-space:pre-wrap}
+@media print{.actions{display:none}body{background:#fff}.wrap{padding:18px}.qa-card{break-inside:avoid;box-shadow:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Perguntas e respostas</div>
+      <h1>${escapeHtml(record.empresa || record.nome || 'Lead')}</h1>
+      <div class="muted">${escapeHtml(record.nome || '-')} · ${escapeHtml(record.email || '-')} · ${escapeHtml(formatDate(record.updatedAt))}</div>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="window.print()">Salvar PDF</button>
+      <button class="btn secondary" onclick="window.close()">Fechar</button>
+    </div>
+  </div>
+  <section class="qa-list">${qaRows || '<div class="qa-card">Nenhuma pergunta ou resposta disponível.</div>'}</section>
+</main>
+</body>
+</html>`;
+}
+function markCurrentLead(action) {
+  const record = state.records.find((item) => item.leadId === state.selectedLeadId);
+  if (!record) return;
+  patchDashboardRecord(record.leadId, action);
+}
+function bindAdminActions() {
+  document.querySelectorAll('[data-admin]').forEach((element) => element.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    patchDashboardRecord(element.dataset.id, element.dataset.admin);
+  }));
+}
+async function patchDashboardRecord(leadId, action) {
+  const messages = {
+    delete: 'Excluir este card do dashboard? O registro ficará preservado no histórico para restauração técnica.',
+    mark_converted: 'Marcar este lead como convertido?',
+    mark_sold: 'Marcar este lead como vendido?',
+    clear_commercial_status: 'Limpar o status comercial deste lead?',
+  };
+  if (messages[action] && !window.confirm(messages[action])) return;
+
+  try {
+    const response = await fetch(`/api/dashboard?token=${encodeURIComponent(state.token)}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({ leadId, action }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || 'Não foi possível atualizar o lead.');
+
+    upsertRecord(payload.record);
+    if (action === 'delete') {
+      state.selected.delete(leadId);
+      if (state.selectedLeadId === leadId) closeDrawer();
+    } else if (state.selectedLeadId === leadId) {
+      openDrawer(leadId);
+    }
+    renderAll();
+    toast(labelAdminAction(action));
+  } catch (error) {
+    toast(error.message);
+  }
+}
+function upsertRecord(record) {
+  const normalized = normalizeRecord(record);
+  const index = state.records.findIndex((item) => item.leadId === normalized.leadId);
+  if (index >= 0) state.records[index] = normalized;
+  else state.records.unshift(normalized);
+}
+function labelAdminAction(action) {
+  return {
+    delete: 'Card excluído',
+    mark_converted: 'Lead marcado como convertido',
+    mark_sold: 'Lead marcado como vendido',
+    clear_commercial_status: 'Status comercial limpo',
+  }[action] || 'Lead atualizado';
 }
 function fact(label, value) { return `<div class="fact"><div class="fact-label">${escapeHtml(label)}</div><div class="fact-value">${escapeHtml(value || '-')}</div></div>`; }
 function dimension(key, dim = {}) {
@@ -720,6 +949,19 @@ function dimension(key, dim = {}) {
       ${dim.gargalo ? `<div class="copy" style="color:var(--red);margin-top:8px">${escapeHtml(dim.gargalo)}</div>` : ''}
     </div>
   `;
+}
+function isConverted(record) {
+  return record.commercialStatus === 'converted' || record.commercialStatus === 'sold';
+}
+function labelCommercial(record) {
+  if (record.commercialStatus === 'sold') return 'Vendido';
+  if (record.commercialStatus === 'converted') return 'Convertido';
+  return 'Aberto';
+}
+function commercialPill(record) {
+  if (record.commercialStatus === 'sold') return '<span class="pill completed">Vendido</span>';
+  if (record.commercialStatus === 'converted') return '<span class="pill captured">Convertido</span>';
+  return '<span class="pill">Aberto</span>';
 }
 function scorePill(record) {
   if (!record.score) return '<span class="pill">Sem score</span>';
@@ -750,45 +992,82 @@ function formatLeadText(record) {
     `Região: ${record.localizacao || '-'}`,
     `Score: ${record.score || '-'}`,
     `Status: ${labelStatus(record.status)}`,
+    `Status comercial: ${labelCommercial(record)}`,
+    `Convertido em: ${record.convertedAt ? formatDate(record.convertedAt) : '-'}`,
+    `Vendido em: ${record.soldAt ? formatDate(record.soldAt) : '-'}`,
     `Gargalo: ${record.gargalo || '-'}`,
   ].join('\n');
 }
 function formatLeadPrompt(record) {
   if (!record) return '';
   const report = record.report || {};
-  const dims = Object.entries(report.dimensoes || {})
-    .map(([key, dim]) => `- **${key}**: ${dim.score ?? '-'} | ${dim.status || 'Sem status'}${dim.gargalo ? ` | Gargalo: ${dim.gargalo}` : ''}`)
-    .join('\n') || '- Sem dimensões disponíveis';
-  const priorities = (record.prioridades || []).map((item, index) => `${index + 1}. ${item}`).join('\n') || 'Sem prioridades disponíveis';
+  const dimensions = Object.entries(report.dimensoes || {});
+  const dimsTable = dimensions.length
+    ? dimensions
+      .map(([key, dim]) => `| ${key} | ${dim.score ?? '-'} | ${dim.status || 'Sem status'} | ${dim.gargalo || '-'} |`)
+      .join('\n')
+    : '| - | - | - | - |';
+  const priorities = (record.prioridades || [])
+    .map((item, index) => `${index + 1}. ${item}`)
+    .join('\n') || 'Sem prioridades disponíveis';
+  const scoreBand = !record.score ? 'Sem score' : record.score >= 60 ? 'Alta intenção / prioridade comercial' : record.score >= 40 ? 'Maturidade intermediária / nutrição consultiva' : 'Baixa maturidade / abordagem educativa';
+  const timeline = [
+    `- Criado em: ${formatDate(record.createdAt)}`,
+    `- Atualizado em: ${formatDate(record.updatedAt)}`,
+    `- Diagnóstico concluído em: ${formatDate(record.completedAt)}`,
+  ].join('\n');
 
-  return `# Briefing de Lead para Análise Comercial
+  return `# Briefing Comercial e Estratégico de Lead
 
-Você é um especialista em Sales Operations, Revenue Architecture e diagnóstico comercial B2B. Analise o lead abaixo e gere recomendações objetivas para abordagem, follow-up e priorização comercial.
+## Papel da LLM
+Atue como um especialista sênior em Sales Operations, Revenue Architecture, CRM, diagnóstico comercial B2B e estratégia de follow-up consultivo.
 
-## Objetivo da análise
-- Identificar o melhor ângulo de abordagem.
-- Sugerir uma mensagem inicial curta para WhatsApp ou e-mail.
-- Apontar riscos e oportunidades comerciais.
-- Recomendar próximos passos práticos para Fabio/Bernardo.
-- Manter linguagem executiva, direta e sem jargão excessivo.
+Sua resposta deve ajudar Fabio/Bernardo a decidir rapidamente:
+- Se este lead merece prioridade comercial.
+- Qual abordagem inicial tem maior chance de resposta.
+- Quais dores devem ser exploradas primeiro.
+- Como transformar o diagnóstico SCALE em uma conversa de negócio.
+- Qual próximo passo operacional deve ser executado.
+
+## Regras de resposta
+- Responda em Markdown bem estruturado.
+- Seja direto, executivo e prático.
+- Use linguagem consultiva, sem parecer automação genérica.
+- Não invente dados. Quando algo estiver ausente, marque como hipótese.
+- Diferencie fatos observados, hipóteses e recomendações.
+- Priorize ações que possam ser executadas em até 48 horas.
+- Considere que Masterboard/ScaleCo vende diagnóstico, estruturação e melhoria de gestão/comercial para empresas.
 
 ## Dados do lead
-- **Nome:** ${record.nome || '-'}
-- **Empresa:** ${record.empresa || '-'}
-- **Email:** ${record.email || '-'}
-- **WhatsApp:** ${record.whatsapp || '-'}
-- **Localização:** ${record.localizacao || '-'}
-- **Faturamento:** ${record.faturamento || '-'}
-- **Status:** ${labelStatus(record.status)}
-- **Lead ID:** ${record.leadId || '-'}
+| Campo | Valor |
+|---|---|
+| Nome | ${record.nome || '-'} |
+| Empresa | ${record.empresa || '-'} |
+| Email | ${record.email || '-'} |
+| WhatsApp | ${record.whatsapp || '-'} |
+| Localização | ${record.localizacao || '-'} |
+| Faturamento informado | ${record.faturamento || '-'} |
+| Status no dashboard | ${labelStatus(record.status)} |
+| Status comercial | ${labelCommercial(record)} |
+| Convertido em | ${record.convertedAt ? formatDate(record.convertedAt) : '-'} |
+| Vendido em | ${record.soldAt ? formatDate(record.soldAt) : '-'} |
+| Lead ID | ${record.leadId || '-'} |
+
+## Linha do tempo
+${timeline}
 
 ## Diagnóstico SCALE
-- **Score geral:** ${record.score || '-'}
-- **Nível:** ${record.nivel || '-'}
-- **Gargalo crítico:** ${record.gargalo || 'Não informado'}
+| Campo | Valor |
+|---|---|
+| Score geral | ${record.score || '-'} |
+| Faixa interpretativa | ${scoreBand} |
+| Nível | ${record.nivel || '-'} |
+| Gargalo crítico | ${record.gargalo || 'Não informado'} |
 
-### Dimensões
-${dims}
+### Dimensões avaliadas
+| Dimensão | Score | Status | Gargalo |
+|---|---:|---|---|
+${dimsTable}
 
 ## Prioridades sugeridas pelo diagnóstico
 ${priorities}
@@ -799,21 +1078,61 @@ ${report.parecer || 'Não disponível'}
 ## Inteligência Masterboard
 ${report.setor_insights || 'Não disponível'}
 
-${report.ecossistema_match ? `## Match de ecossistema\n${report.ecossistema_match}\n\n` : ''}## Histórico da conversa
+${report.ecossistema_match ? `## Match de ecossistema\n${report.ecossistema_match}\n\n` : ''}## Contexto bruto da conversa
 ${record.conversation || 'Não disponível'}
 
 ## Respostas do lead
 ${record.answers || 'Não disponível'}
 
 ## Entrega esperada
-Responda em Markdown com:
-1. **Resumo executivo em 5 linhas.**
-2. **Prioridade comercial:** Alta, Média ou Baixa, com justificativa.
-3. **Mensagem de WhatsApp pronta para envio.**
-4. **Mensagem de e-mail curta.**
-5. **3 perguntas para reunião de diagnóstico.**
-6. **Riscos de perda ou objeções prováveis.**
-7. **Próxima ação recomendada.**
+Gere uma resposta em Markdown com as seções abaixo:
+
+### 1. Resumo executivo
+- 5 bullets objetivos sobre quem é o lead, maturidade, dor provável e potencial comercial.
+
+### 2. Qualificação comercial
+Use uma tabela com:
+| Critério | Avaliação | Evidência | Implicação comercial |
+Inclua pelo menos: urgência, fit, potencial financeiro, maturidade de gestão, clareza da dor e facilidade de abordagem.
+
+### 3. Hipóteses principais
+Liste:
+- 3 dores prováveis.
+- 3 gatilhos de compra.
+- 3 objeções prováveis.
+- 3 sinais que Fabio/Bernardo devem validar na primeira conversa.
+
+### 4. Estratégia de abordagem
+Inclua:
+- Ângulo principal de abordagem.
+- Tom recomendado.
+- O que evitar mencionar.
+- Melhor CTA para a primeira mensagem.
+- Próxima ação recomendada para as próximas 24-48h.
+
+### 5. Mensagens prontas
+Crie:
+- 1 mensagem curta de WhatsApp, com tom humano e consultivo.
+- 1 follow-up de WhatsApp caso não responda.
+- 1 e-mail curto com assunto.
+- 1 mensagem de LinkedIn, se fizer sentido.
+
+### 6. Roteiro de reunião
+Crie 8 perguntas consultivas, organizadas por:
+- Contexto atual.
+- Gargalo comercial/gestão.
+- Impacto financeiro.
+- Prioridade e timing.
+
+### 7. Plano de follow-up
+Sugira uma cadência de 7 dias em tabela:
+| Dia | Canal | Objetivo | Mensagem/ação |
+
+### 8. Score final de prioridade
+Classifique como Alta, Média ou Baixa e justifique em até 4 linhas.
+
+### 9. Próximos passos para o CRM
+Liste campos ou tags úteis para registrar este lead, incluindo estágio sugerido, motivo da prioridade e observações comerciais.
 `;
 }
 function renderLeadPdfHtml(record) {
@@ -822,45 +1141,86 @@ function renderLeadPdfHtml(record) {
     .map(([key, dim]) => `<tr><td><strong>${escapeHtml(key)}</strong></td><td>${escapeHtml(dim.score ?? '-')}</td><td>${escapeHtml(dim.status || '-')}</td><td>${escapeHtml(dim.gargalo || '-')}</td></tr>`)
     .join('');
   const priorities = (record.prioridades || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+  const qaCards = buildQaPairs(record).map((pair, index) => `
+    <article class="qa-card">
+      <div class="label">Pergunta ${index + 1}</div>
+      <div class="question">${escapeHtml(pair.question)}</div>
+      <div class="answer"><strong>Resposta:</strong><br>${escapeHtml(pair.answer)}</div>
+    </article>
+  `).join('');
+
   return `<!doctype html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<title>${escapeHtml(record.nome || 'Lead')}</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Relatório · ${escapeHtml(record.empresa || record.nome || 'Lead')}</title>
 <style>
-body{font-family:Arial,sans-serif;color:#111;margin:32px;line-height:1.5}
-h1{margin:0 0 4px;font-size:28px}
-h2{border-top:1px solid #ddd;margin-top:22px;padding-top:16px;font-size:15px;text-transform:uppercase;letter-spacing:.08em}
-.muted{color:#666}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
-.box{border:1px solid #ddd;border-radius:10px;padding:10px}.label{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
-.value{font-weight:700;margin-top:4px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:8px;text-align:left;vertical-align:top}
-th{background:#f4f4f4}.pre{white-space:pre-wrap}.score{font-size:42px;font-weight:800;color:#C99703}
-@media print{body{margin:20px}}
+body{background:#f6f4ef;color:#111;font-family:Arial,sans-serif;margin:0;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding:32px 22px 56px}.top{align-items:flex-start;display:flex;gap:18px;justify-content:space-between;margin-bottom:20px}
+.actions{display:flex;gap:8px;position:sticky;top:12px;z-index:2}.btn{background:#111;border:0;border-radius:10px;color:#fff;cursor:pointer;font-weight:800;padding:10px 13px}.btn.secondary{background:#fff;border:1px solid #ddd;color:#111}
+.hero{background:#111;border-radius:22px;color:#fff;padding:26px}.eyebrow,.label{color:#9b7400;font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+h1{font-size:38px;letter-spacing:-.04em;line-height:1;margin:7px 0}h2{border-top:1px solid #ddd;font-size:15px;letter-spacing:.1em;margin:24px 0 12px;padding-top:18px;text-transform:uppercase}
+.hero .muted{color:#bbb}.muted{color:#666;font-size:13px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.box{background:#fff;border:1px solid #ddd;border-radius:14px;padding:12px}.value{font-weight:800;margin-top:4px;word-break:break-word}
+.score-row{align-items:center;display:grid;gap:18px;grid-template-columns:140px 1fr}.score{color:#C99703;font-size:54px;font-weight:900;letter-spacing:-.06em}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:8px;text-align:left;vertical-align:top}th{background:#f4f4f4}
+.pre{background:#fff;border:1px solid #ddd;border-radius:14px;padding:14px;white-space:pre-wrap}.qa-list{display:grid;gap:12px}.qa-card{background:#fff;border:1px solid #ddd;border-radius:16px;break-inside:avoid;padding:16px}.question{font-size:16px;font-weight:800;line-height:1.35;margin-top:6px}.answer{background:#f8f8f8;border-left:4px solid #FBBE0A;border-radius:12px;margin-top:12px;padding:12px;white-space:pre-wrap}
+@media print{body{background:#fff}.wrap{max-width:none;padding:18px}.actions{display:none}.hero,.box,.pre,.qa-card{box-shadow:none}h2{break-after:avoid}.qa-card,.box{break-inside:avoid}}
+@media(max-width:760px){.top{display:block}.actions{margin-top:12px}.grid{grid-template-columns:1fr}.score-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<h1>${escapeHtml(record.empresa || record.nome || 'Lead')}</h1>
-<div class="muted">Relatório do lead · Scale Diagnostic · ${escapeHtml(formatDate(new Date().toISOString()))}</div>
-<div class="grid">
-  <div class="box"><div class="label">Nome</div><div class="value">${escapeHtml(record.nome || '-')}</div></div>
-  <div class="box"><div class="label">Empresa</div><div class="value">${escapeHtml(record.empresa || '-')}</div></div>
-  <div class="box"><div class="label">Email</div><div class="value">${escapeHtml(record.email || '-')}</div></div>
-  <div class="box"><div class="label">WhatsApp</div><div class="value">${escapeHtml(record.whatsapp || '-')}</div></div>
-  <div class="box"><div class="label">Faturamento</div><div class="value">${escapeHtml(record.faturamento || '-')}</div></div>
-  <div class="box"><div class="label">Região</div><div class="value">${escapeHtml(record.localizacao || '-')}</div></div>
-</div>
-<h2>Diagnóstico</h2>
-<div class="score">${escapeHtml(record.score || '-')}</div>
-<p><strong>Nível:</strong> ${escapeHtml(record.nivel || '-')}</p>
-<p><strong>Gargalo crítico:</strong> ${escapeHtml(record.gargalo || 'Não informado')}</p>
-<h2>Dimensões SCALE</h2>
-<table><thead><tr><th>Dimensão</th><th>Score</th><th>Status</th><th>Gargalo</th></tr></thead><tbody>${dims || '<tr><td colspan="4">Sem dimensões disponíveis</td></tr>'}</tbody></table>
-<h2>Prioridades</h2>
-<ol>${priorities || '<li>Sem prioridades disponíveis</li>'}</ol>
-<h2>Parecer</h2><div class="pre">${escapeHtml(report.parecer || 'Não disponível')}</div>
-<h2>Inteligência Masterboard</h2><div class="pre">${escapeHtml(report.setor_insights || 'Não disponível')}</div>
-<h2>Histórico da conversa</h2><div class="pre">${escapeHtml(record.conversation || 'Não disponível')}</div>
-<h2>Respostas do lead</h2><div class="pre">${escapeHtml(record.answers || 'Não disponível')}</div>
+<main class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Relatório de lead · Scale Diagnostic</div>
+      <h1>${escapeHtml(record.empresa || record.nome || 'Lead')}</h1>
+      <div class="muted">Gerado em ${escapeHtml(formatDate(new Date().toISOString()))}</div>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="window.print()">Salvar PDF</button>
+      <button class="btn secondary" onclick="window.close()">Fechar</button>
+    </div>
+  </div>
+  <section class="hero">
+    <div class="eyebrow">Resumo</div>
+    <h1>${escapeHtml(record.nome || 'Lead sem nome')}</h1>
+    <div class="muted">${escapeHtml(record.email || '-')} · ${escapeHtml(record.whatsapp || '-')} · ${escapeHtml(record.localizacao || '-')}</div>
+    <div class="grid">
+      <div class="box"><div class="label">Faturamento</div><div class="value">${escapeHtml(record.faturamento || '-')}</div></div>
+      <div class="box"><div class="label">Status comercial</div><div class="value">${escapeHtml(labelCommercial(record))}</div></div>
+      <div class="box"><div class="label">Última interação</div><div class="value">${escapeHtml(formatDate(record.updatedAt))}</div></div>
+    </div>
+  </section>
+  <h2>Diagnóstico</h2>
+  <div class="score-row">
+    <div class="score">${escapeHtml(record.score || '-')}</div>
+    <div>
+      <p><strong>Nível:</strong> ${escapeHtml(record.nivel || '-')}</p>
+      <p><strong>Gargalo crítico:</strong> ${escapeHtml(record.gargalo || 'Não informado')}</p>
+      <p><strong>Convertido em:</strong> ${escapeHtml(record.convertedAt ? formatDate(record.convertedAt) : '-')} · <strong>Vendido em:</strong> ${escapeHtml(record.soldAt ? formatDate(record.soldAt) : '-')}</p>
+    </div>
+  </div>
+  <h2>Dados do lead</h2>
+  <div class="grid">
+    <div class="box"><div class="label">Nome</div><div class="value">${escapeHtml(record.nome || '-')}</div></div>
+    <div class="box"><div class="label">Empresa</div><div class="value">${escapeHtml(record.empresa || '-')}</div></div>
+    <div class="box"><div class="label">Email</div><div class="value">${escapeHtml(record.email || '-')}</div></div>
+    <div class="box"><div class="label">WhatsApp</div><div class="value">${escapeHtml(record.whatsapp || '-')}</div></div>
+    <div class="box"><div class="label">Faturamento</div><div class="value">${escapeHtml(record.faturamento || '-')}</div></div>
+    <div class="box"><div class="label">Região</div><div class="value">${escapeHtml(record.localizacao || '-')}</div></div>
+  </div>
+  <h2>Dimensões SCALE</h2>
+  <table><thead><tr><th>Dimensão</th><th>Score</th><th>Status</th><th>Gargalo</th></tr></thead><tbody>${dims || '<tr><td colspan="4">Sem dimensões disponíveis</td></tr>'}</tbody></table>
+  <h2>Prioridades</h2>
+  <ol>${priorities || '<li>Sem prioridades disponíveis</li>'}</ol>
+  <h2>Perguntas e respostas</h2>
+  <section class="qa-list">${qaCards || '<div class="qa-card">Nenhuma pergunta ou resposta disponível.</div>'}</section>
+  <h2>Parecer</h2><div class="pre">${escapeHtml(report.parecer || 'Não disponível')}</div>
+  <h2>Inteligência Masterboard</h2><div class="pre">${escapeHtml(report.setor_insights || 'Não disponível')}</div>
+  <h2>Histórico bruto</h2><div class="pre">${escapeHtml(record.conversation || 'Não disponível')}</div>
+</main>
 </body>
 </html>`;
 }
@@ -873,7 +1233,7 @@ async function copyText(text) {
   }
 }
 function downloadCsv(rows, filename) {
-  const cols = ['nome', 'empresa', 'email', 'whatsapp', 'faturamento', 'localizacao', 'score', 'nivel', 'status', 'gargalo', 'updatedAt'];
+  const cols = ['nome', 'empresa', 'email', 'whatsapp', 'faturamento', 'localizacao', 'score', 'nivel', 'status', 'commercialStatus', 'convertedAt', 'soldAt', 'gargalo', 'updatedAt'];
   const csv = [cols.join(',')]
     .concat(rows.map((record) => cols.map((col) => `"${String(record[col] ?? '').replace(/"/g, '""')}"`).join(',')))
     .join('\n');

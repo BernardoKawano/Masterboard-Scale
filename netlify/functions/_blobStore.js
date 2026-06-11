@@ -46,6 +46,10 @@ async function saveRecordPatch(patch) {
   return { record, durationMs };
 }
 
+async function updateDashboardRecord(patch) {
+  return saveRecordPatch(patch);
+}
+
 async function listDashboardRecords() {
   const startedAt = Date.now();
   const store = getDiagnosticsStore();
@@ -73,4 +77,5 @@ module.exports = {
   connectBlobLambda,
   listDashboardRecords,
   saveRecordPatch,
+  updateDashboardRecord,
 };
