@@ -7,33 +7,159 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Dashboard · Scale Diagnostic</title>
 <style>
-:root{--bg:#070707;--card:#111;--card2:#181818;--line:rgba(255,255,255,.09);--muted:#8b8b8b;--text:#fff;--yellow:#FBBE0A;--yellow2:#C99703;--green:#22C55E;--orange:#F59E0B;--red:#EF4444;--blue:#60A5FA}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 8%,rgba(251,190,10,.15),transparent 30%),radial-gradient(circle at 90% 0,rgba(201,151,3,.12),transparent 28%),var(--bg);color:var(--text);font-family:Arial,sans-serif}button,input,select{font:inherit}.shell{width:min(1480px,calc(100vw - 28px));margin:0 auto;padding:24px 0 46px}.card{background:rgba(17,17,17,.9);border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,.28)}.auth{max-width:520px;margin:12vh auto 0;padding:30px}.kicker{color:var(--yellow);font-size:10px;font-weight:900;letter-spacing:.2em;text-transform:uppercase}.muted{color:var(--muted);font-size:12px;line-height:1.5}h1{font-size:clamp(30px,4vw,48px);letter-spacing:-.04em;line-height:.98;margin:6px 0}.label{display:block;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.15em;margin:0 0 7px;text-transform:uppercase}.control{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;color:var(--text);outline:none;padding:12px}.control:focus{border-color:rgba(251,190,10,.65);box-shadow:0 0 0 3px rgba(251,190,10,.08)}.btn{align-items:center;background:var(--yellow);border:0;border-radius:12px;color:#000;cursor:pointer;display:inline-flex;font-weight:900;gap:8px;justify-content:center;min-height:42px;padding:10px 14px}.btn:hover{background:var(--yellow2)}.btn.secondary{background:rgba(255,255,255,.045);border:1px solid var(--line);color:var(--text)}.btn.secondary:hover{background:rgba(255,255,255,.08)}.icon{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:9px;color:#d8d8d8;cursor:pointer;font-size:11px;font-weight:900;min-height:32px;padding:6px 9px}.icon:hover{border-color:rgba(251,190,10,.45);color:var(--yellow)}.topbar{align-items:flex-start;display:flex;gap:18px;justify-content:space-between;margin-bottom:18px}.brand{align-items:center;display:flex;gap:14px}.brand img{width:176px}.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}.metrics{display:grid;gap:12px;grid-template-columns:repeat(6,minmax(0,1fr));margin-bottom:16px}.metric{min-height:112px;padding:16px}.metric-label{color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.metric-value{font-size:32px;font-weight:900;letter-spacing:-.05em;margin-top:8px}.metric-hint{color:var(--muted);font-size:11px;line-height:1.4;margin-top:8px}.workspace{align-items:start;display:grid;gap:16px;grid-template-columns:286px 1fr}.filters{padding:16px;position:sticky;top:14px}.filter-group{border-top:1px solid var(--line);padding:14px 0}.filter-group:first-child{border-top:0;padding-top:0}.stack{display:grid;gap:10px}.main{min-width:0}.commandbar{align-items:center;display:grid;gap:10px;grid-template-columns:minmax(260px,1fr) auto;margin-bottom:12px}.tabs{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;display:inline-flex;gap:4px;padding:4px}.tab{background:transparent;border:0;border-radius:10px;color:#bdbdbd;cursor:pointer;font-size:12px;font-weight:900;padding:9px 12px}.tab.active{background:var(--yellow);color:#000}.bulkbar{align-items:center;background:rgba(251,190,10,.09);border:1px solid rgba(251,190,10,.28);border-radius:14px;display:none;gap:10px;justify-content:space-between;margin-bottom:12px;padding:10px 12px}.bulkbar.visible{display:flex}.panel{display:none}.panel.active{display:block}.table-card{overflow:hidden}.table-scroll{max-height:calc(100vh - 330px);overflow:auto}table{border-collapse:separate;border-spacing:0;min-width:1120px;width:100%}th,td{border-bottom:1px solid var(--line);font-size:12px;padding:12px;text-align:left;vertical-align:middle}th{background:rgba(17,17,17,.98);color:var(--muted);cursor:pointer;font-size:10px;font-weight:900;letter-spacing:.13em;position:sticky;text-transform:uppercase;top:0;z-index:2}th:first-child,td:first-child{left:0;position:sticky;z-index:3}td:first-child{background:rgba(17,17,17,.98)}tr:hover td{background:rgba(251,190,10,.035)}.lead-name{font-size:14px;font-weight:900}.lead-sub{color:var(--muted);font-size:11px;margin-top:3px}.pill{border:1px solid var(--line);border-radius:999px;color:#ccc;display:inline-flex;font-size:10px;font-weight:900;letter-spacing:.12em;padding:5px 8px;text-transform:uppercase;white-space:nowrap}.pill.completed{border-color:rgba(34,197,94,.36);color:var(--green)}.pill.started{border-color:rgba(245,158,11,.36);color:var(--orange)}.pill.captured{border-color:rgba(251,190,10,.36);color:var(--yellow)}.pill.error{border-color:rgba(239,68,68,.36);color:var(--red)}.pill.hot{border-color:rgba(239,68,68,.36);color:var(--red)}.pill.warm{border-color:rgba(245,158,11,.36);color:var(--orange)}.pill.cold{border-color:rgba(96,165,250,.36);color:var(--blue)}.score{font-weight:900}.kanban{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(220px,1fr));overflow-x:auto;padding-bottom:6px}.kanban-col{min-height:260px;padding:12px}.kanban-title{align-items:center;display:flex;font-size:12px;font-weight:900;justify-content:space-between;letter-spacing:.08em;margin-bottom:10px;text-transform:uppercase}.mini{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;cursor:pointer;margin-bottom:8px;padding:12px}.mini:hover{border-color:rgba(251,190,10,.35)}.funnel{display:grid;gap:12px}.funnel-step{align-items:center;display:grid;gap:12px;grid-template-columns:210px 1fr 92px}.funnel-bar{background:rgba(255,255,255,.06);border-radius:999px;height:34px;overflow:hidden}.funnel-fill{align-items:center;background:linear-gradient(90deg,var(--yellow),var(--yellow2));color:#000;display:flex;font-size:12px;font-weight:900;height:100%;min-width:34px;padding:0 12px}.insights{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}.insight{padding:16px}.rank{display:grid;gap:10px}.rank-row{display:grid;gap:8px;grid-template-columns:1fr auto}.rank-bar{background:rgba(255,255,255,.06);border-radius:999px;height:6px;margin-top:6px;overflow:hidden}.rank-bar span{background:var(--yellow);display:block;height:100%}.drawer{background:rgba(10,10,10,.96);border-left:1px solid var(--line);bottom:0;box-shadow:-24px 0 80px rgba(0,0,0,.38);max-width:580px;overflow:auto;padding:24px;position:fixed;right:0;top:0;transform:translateX(106%);transition:transform .22s ease;width:min(580px,100vw);z-index:20}.drawer.open{transform:translateX(0)}.drawer-head{align-items:flex-start;display:flex;gap:14px;justify-content:space-between;margin-bottom:18px}.detail-grid{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr))}.fact{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:13px;padding:12px}.fact-label{color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.13em;text-transform:uppercase}.fact-value{font-size:13px;font-weight:800;margin-top:6px;word-break:break-word}.section{border-top:1px solid var(--line);margin-top:18px;padding-top:18px}.section h2{color:var(--muted);font-size:11px;letter-spacing:.18em;margin:0 0 12px;text-transform:uppercase}.copy{color:#d8d8d8;font-size:13px;line-height:1.65;white-space:pre-wrap}.dimension{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:13px;margin-bottom:9px;padding:12px}.dimension-top{display:flex;justify-content:space-between}.bar{background:rgba(255,255,255,.08);border-radius:999px;height:5px;margin:9px 0;overflow:hidden}.bar span{background:var(--yellow);display:block;height:100%}.toast{background:var(--yellow);border-radius:12px;bottom:20px;color:#000;display:none;font-size:13px;font-weight:900;left:50%;padding:12px 14px;position:fixed;transform:translateX(-50%);z-index:40}.toast.visible{display:block}.empty{color:var(--muted);padding:34px;text-align:center}.error{color:var(--red);margin-top:12px}.hidden{display:none!important}@media(max-width:1180px){.metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.workspace{grid-template-columns:1fr}.filters{position:static}.kanban{grid-template-columns:repeat(2,minmax(220px,1fr))}}@media(max-width:760px){.shell{width:min(100vw - 18px,1480px);padding-top:14px}.topbar{align-items:stretch;flex-direction:column}.actions{justify-content:stretch}.actions .btn{flex:1}.brand{align-items:flex-start;flex-direction:column}.brand img{width:150px}.metrics,.insights,.detail-grid{grid-template-columns:1fr}.commandbar{grid-template-columns:1fr}.tabs{overflow-x:auto;width:100%}.tab{flex:1;white-space:nowrap}.kanban{grid-template-columns:1fr}.funnel-step{grid-template-columns:1fr}}
-</style>
-<style>
-/* Iteration 2: make the dashboard feel like separate compact workspaces. */
-.workspace{grid-template-columns:1fr}
-.filters{position:static;margin-bottom:14px}
-.filters .stack{align-items:end;display:grid;grid-template-columns:1.25fr repeat(5,minmax(130px,1fr)) auto;gap:10px}
-.filter-group{border-top:0;padding:0}
-.main-shell{display:grid;gap:14px}
-.tabs{width:100%;justify-content:flex-start;overflow:auto}
-.tab{min-width:112px}
-.overview-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
-.overview-list{display:grid;gap:8px;max-height:360px;overflow:auto;padding-right:4px}
-.focus-card{align-items:center;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;cursor:pointer;display:grid;gap:10px;grid-template-columns:1fr auto;padding:12px}
-.focus-card:hover{border-color:rgba(251,190,10,.38)}
-.section-title{align-items:center;display:flex;justify-content:space-between;margin-bottom:12px}
-.section-title h2{font-size:12px;letter-spacing:.16em;margin:0;text-transform:uppercase;color:var(--muted)}
-.compact-note{color:var(--muted);font-size:11px}
-.drawer .section{margin-top:12px;padding-top:12px}
-.drawer .section .copy{max-height:180px;overflow:auto;padding-right:4px}
-.drawer .section:nth-of-type(3) .copy{max-height:120px}
-.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}
-.metric{min-height:96px}
-.table-scroll{max-height:calc(100vh - 380px)}
-@media(max-width:1180px){.filters .stack{grid-template-columns:repeat(2,minmax(0,1fr))}.overview-grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:760px){.filters .stack,.metrics{grid-template-columns:1fr}.tab{min-width:96px}.overview-list{max-height:none}}
+:root {
+  --bg: #070707;
+  --panel: #111111;
+  --panel-2: #181818;
+  --line: rgba(255,255,255,0.09);
+  --text: #ffffff;
+  --muted: #8b8b8b;
+  --muted-2: #cfcfcf;
+  --yellow: #FBBE0A;
+  --yellow-2: #C99703;
+  --green: #22C55E;
+  --orange: #F59E0B;
+  --red: #EF4444;
+  --blue: #60A5FA;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(251,190,10,0.15), transparent 30%),
+    radial-gradient(circle at 88% 0%, rgba(201,151,3,0.12), transparent 28%),
+    var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+button, input, select { font: inherit; }
+button { color: inherit; }
+
+.shell { width: min(1440px, calc(100vw - 28px)); margin: 0 auto; padding: 22px 0 44px; }
+.card { background: rgba(17,17,17,0.92); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 24px 80px rgba(0,0,0,0.24); }
+.kicker { color: var(--yellow); font-size: 10px; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; }
+.muted { color: var(--muted); font-size: 12px; line-height: 1.5; }
+h1 { font-size: clamp(30px, 4vw, 48px); letter-spacing: -0.04em; line-height: 1; margin: 6px 0; }
+h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; text-transform: uppercase; }
+.label { color: var(--muted); display: block; font-size: 10px; font-weight: 900; letter-spacing: 0.15em; margin: 0 0 7px; text-transform: uppercase; }
+.control { width: 100%; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; color: var(--text); outline: none; padding: 11px 12px; }
+.control:focus { border-color: rgba(251,190,10,0.65); box-shadow: 0 0 0 3px rgba(251,190,10,0.08); }
+.btn { align-items: center; background: var(--yellow); border: 0; border-radius: 12px; color: #000; cursor: pointer; display: inline-flex; font-weight: 900; gap: 8px; justify-content: center; min-height: 40px; padding: 9px 13px; text-decoration: none; }
+.btn:hover { background: var(--yellow-2); }
+.btn.secondary { background: rgba(255,255,255,0.045); border: 1px solid var(--line); color: var(--text); }
+.btn.secondary:hover { background: rgba(255,255,255,0.08); }
+.icon { background: rgba(255,255,255,0.045); border: 1px solid var(--line); border-radius: 9px; color: #d8d8d8; cursor: pointer; font-size: 11px; font-weight: 900; min-height: 31px; padding: 6px 9px; }
+.icon:hover { border-color: rgba(251,190,10,0.45); color: var(--yellow); }
+
+.auth { max-width: 520px; margin: 12vh auto 0; padding: 30px; }
+.topbar { align-items: flex-start; display: flex; gap: 18px; justify-content: space-between; margin-bottom: 16px; }
+.brand { align-items: center; display: flex; gap: 14px; }
+.brand img { width: 174px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+
+.nav { display: grid; gap: 10px; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-bottom: 14px; }
+.nav-btn { background: rgba(255,255,255,0.045); border: 1px solid var(--line); border-radius: 15px; cursor: pointer; padding: 14px; text-align: left; }
+.nav-btn strong { display: block; font-size: 14px; margin-bottom: 5px; }
+.nav-btn span { color: var(--muted); font-size: 11px; }
+.nav-btn.active, .nav-btn:hover { background: rgba(251,190,10,0.10); border-color: rgba(251,190,10,0.35); }
+
+.metrics { display: grid; gap: 10px; grid-template-columns: repeat(6, minmax(0, 1fr)); margin-bottom: 14px; }
+.metric { min-height: 92px; padding: 14px; }
+.metric-label { color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; }
+.metric-value { font-size: 30px; font-weight: 900; letter-spacing: -0.05em; margin-top: 6px; }
+.metric-hint { color: var(--muted); font-size: 11px; line-height: 1.4; margin-top: 6px; }
+
+.filters { display: grid; gap: 10px; grid-template-columns: minmax(240px, 1.4fr) repeat(5, minmax(128px, 1fr)) auto; margin-bottom: 14px; }
+.bulkbar { align-items: center; background: rgba(251,190,10,0.09); border: 1px solid rgba(251,190,10,0.28); border-radius: 14px; display: none; gap: 10px; justify-content: space-between; margin-bottom: 12px; padding: 10px 12px; }
+.bulkbar.visible { display: flex; }
+
+.page { display: none; }
+.page.active { display: block; }
+.home-grid { display: grid; gap: 14px; grid-template-columns: 1.1fr 0.9fr; }
+.nav-cards { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.big-card { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 18px; cursor: pointer; min-height: 150px; padding: 18px; }
+.big-card:hover { border-color: rgba(251,190,10,0.38); transform: translateY(-1px); }
+.big-card-title { font-size: 22px; font-weight: 900; letter-spacing: -0.02em; margin: 8px 0; }
+.list-stack { display: grid; gap: 8px; max-height: 390px; overflow: auto; padding-right: 4px; }
+.focus-card { align-items: center; background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; display: grid; gap: 10px; grid-template-columns: 1fr auto; padding: 12px; }
+.focus-card:hover { border-color: rgba(251,190,10,0.35); }
+
+.table-card { overflow: hidden; }
+.table-scroll { max-height: calc(100vh - 360px); overflow: auto; }
+table { border-collapse: separate; border-spacing: 0; min-width: 1100px; width: 100%; }
+th, td { border-bottom: 1px solid var(--line); font-size: 12px; padding: 11px 12px; text-align: left; vertical-align: middle; }
+th { background: rgba(17,17,17,0.98); color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 900; letter-spacing: 0.13em; position: sticky; text-transform: uppercase; top: 0; z-index: 2; }
+th:first-child, td:first-child { left: 0; position: sticky; z-index: 3; }
+td:first-child { background: rgba(17,17,17,0.98); }
+tr:hover td { background: rgba(251,190,10,0.035); }
+.lead-name { font-size: 14px; font-weight: 900; }
+.lead-sub { color: var(--muted); font-size: 11px; margin-top: 3px; }
+
+.pill { border: 1px solid var(--line); border-radius: 999px; color: #ccc; display: inline-flex; font-size: 10px; font-weight: 900; letter-spacing: 0.12em; padding: 5px 8px; text-transform: uppercase; white-space: nowrap; }
+.pill.completed { border-color: rgba(34,197,94,0.36); color: var(--green); }
+.pill.started { border-color: rgba(245,158,11,0.36); color: var(--orange); }
+.pill.captured { border-color: rgba(251,190,10,0.36); color: var(--yellow); }
+.pill.error { border-color: rgba(239,68,68,0.36); color: var(--red); }
+.pill.hot { border-color: rgba(239,68,68,0.36); color: var(--red); }
+.pill.warm { border-color: rgba(245,158,11,0.36); color: var(--orange); }
+.pill.cold { border-color: rgba(96,165,250,0.36); color: var(--blue); }
+.score { font-weight: 900; }
+
+.kanban { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(220px, 1fr)); overflow-x: auto; padding-bottom: 6px; }
+.kanban-col { min-height: 260px; padding: 12px; }
+.kanban-title { align-items: center; display: flex; font-size: 12px; font-weight: 900; justify-content: space-between; letter-spacing: 0.08em; margin-bottom: 10px; text-transform: uppercase; }
+.mini { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; margin-bottom: 8px; padding: 12px; }
+.mini:hover { border-color: rgba(251,190,10,0.35); }
+
+.funnel { display: grid; gap: 12px; }
+.funnel-step { align-items: center; display: grid; gap: 12px; grid-template-columns: 210px 1fr 92px; }
+.funnel-bar { background: rgba(255,255,255,0.06); border-radius: 999px; height: 34px; overflow: hidden; }
+.funnel-fill { align-items: center; background: linear-gradient(90deg,var(--yellow),var(--yellow-2)); color: #000; display: flex; font-size: 12px; font-weight: 900; height: 100%; min-width: 34px; padding: 0 12px; }
+.insights { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.insight { padding: 16px; }
+.rank { display: grid; gap: 10px; }
+.rank-row { display: grid; gap: 8px; grid-template-columns: 1fr auto; }
+.rank-bar { background: rgba(255,255,255,0.06); border-radius: 999px; height: 6px; margin-top: 6px; overflow: hidden; }
+.rank-bar span { background: var(--yellow); display: block; height: 100%; }
+
+.drawer { background: rgba(10,10,10,0.96); border-left: 1px solid var(--line); bottom: 0; box-shadow: -24px 0 80px rgba(0,0,0,0.38); max-width: 600px; overflow: auto; padding: 22px; position: fixed; right: 0; top: 0; transform: translateX(106%); transition: transform 0.22s ease; width: min(600px, 100vw); z-index: 20; }
+.drawer.open { transform: translateX(0); }
+.drawer-head { align-items: flex-start; display: flex; gap: 14px; justify-content: space-between; margin-bottom: 16px; }
+.detail-grid { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.fact { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 13px; padding: 12px; }
+.fact-label { color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: 0.13em; text-transform: uppercase; }
+.fact-value { font-size: 13px; font-weight: 800; margin-top: 6px; word-break: break-word; }
+.section { border-top: 1px solid var(--line); margin-top: 13px; padding-top: 13px; }
+.section h2 { margin-bottom: 10px; }
+.copy { color: #d8d8d8; font-size: 13px; line-height: 1.65; max-height: 190px; overflow: auto; white-space: pre-wrap; }
+.dimension { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 13px; margin-bottom: 9px; padding: 12px; }
+.dimension-top { display: flex; justify-content: space-between; }
+.bar { background: rgba(255,255,255,0.08); border-radius: 999px; height: 5px; margin: 9px 0; overflow: hidden; }
+.bar span { background: var(--yellow); display: block; height: 100%; }
+.toast { background: var(--yellow); border-radius: 12px; bottom: 20px; color: #000; display: none; font-size: 13px; font-weight: 900; left: 50%; padding: 12px 14px; position: fixed; transform: translateX(-50%); z-index: 40; }
+.toast.visible { display: block; }
+.empty { color: var(--muted); padding: 30px; text-align: center; }
+.error { color: var(--red); margin-top: 12px; }
+
+@media (max-width: 1180px) {
+  .nav, .metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-grid, .insights { grid-template-columns: 1fr; }
+  .kanban { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+}
+@media (max-width: 760px) {
+  .shell { width: min(100vw - 18px, 1440px); padding-top: 14px; }
+  .topbar { align-items: stretch; flex-direction: column; }
+  .actions { justify-content: stretch; }
+  .actions .btn, .actions .btn.secondary { flex: 1; }
+  .brand { align-items: flex-start; flex-direction: column; }
+  .brand img { width: 150px; }
+  .nav, .metrics, .filters, .nav-cards, .detail-grid { grid-template-columns: 1fr; }
+  .kanban { grid-template-columns: 1fr; }
+  .funnel-step { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -67,131 +193,78 @@
       </div>
     </div>
 
+    <nav class="nav" id="nav">
+      <button class="nav-btn active" data-view="home" type="button"><strong>Principal</strong><span>Resumo e atalhos</span></button>
+      <button class="nav-btn" data-view="leads" type="button"><strong>Leads</strong><span>Lista pesquisável</span></button>
+      <button class="nav-btn" data-view="kanban" type="button"><strong>Kanban</strong><span>Por prioridade</span></button>
+      <button class="nav-btn" data-view="pipeline" type="button"><strong>Funil</strong><span>Conversão</span></button>
+      <button class="nav-btn" data-view="insights" type="button"><strong>Insights</strong><span>Região e padrões</span></button>
+    </nav>
+
     <div class="metrics" id="metrics"></div>
 
-    <div class="workspace">
-      <aside class="filters card">
-        <div class="stack">
-          <div>
-            <div class="kicker">Filtros</div>
-            <div class="muted">Busca e qualificação em tempo real.</div>
+    <section class="page active" id="homePage">
+      <div class="home-grid">
+        <div class="nav-cards" id="homeCards"></div>
+        <div class="card" style="padding:16px">
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px">
+            <h2>Fila de foco</h2>
+            <span class="muted">Quentes, recentes e sem contato</span>
           </div>
-          <div class="filter-group">
-            <label class="label" for="statusFilter">Status</label>
-            <select id="statusFilter" class="control">
-              <option value="all">Todos</option>
-              <option value="completed">Diagnóstico concluído</option>
-              <option value="captured">Lead capturado</option>
-              <option value="started">Iniciado</option>
-              <option value="error">Erro</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label class="label" for="scoreFilter">Score</label>
-            <select id="scoreFilter" class="control">
-              <option value="all">Todos</option>
-              <option value="hot">Quente: 60+</option>
-              <option value="warm">Morno: 40-59</option>
-              <option value="cold">Frio: abaixo de 40</option>
-              <option value="none">Sem diagnóstico</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label class="label" for="dateFilter">Data</label>
-            <select id="dateFilter" class="control">
-              <option value="all">Todo período</option>
-              <option value="today">Hoje</option>
-              <option value="7">Últimos 7 dias</option>
-              <option value="30">Últimos 30 dias</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label class="label" for="regionFilter">Região</label>
-            <input id="regionFilter" class="control" type="search" placeholder="Cidade ou estado">
-          </div>
-          <div class="filter-group">
-            <label class="label" for="revenueFilter">Faturamento</label>
-            <select id="revenueFilter" class="control">
-              <option value="all">Todos</option>
-              <option value="high">R$20M+</option>
-              <option value="mid">R$1M-R$20M</option>
-              <option value="low">Até R$1M</option>
-            </select>
-          </div>
-          <button class="btn secondary" id="clearButton" type="button">Limpar filtros</button>
+          <div class="list-stack" id="focusList"></div>
         </div>
-      </aside>
+      </div>
+      <div class="card" style="padding:16px;margin-top:14px">
+        <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px">
+          <h2>Últimos leads</h2>
+          <span class="muted">Clique para abrir o detalhe</span>
+        </div>
+        <div class="list-stack" id="recentList"></div>
+      </div>
+    </section>
 
-      <section class="main">
-        <div class="commandbar">
-          <input id="searchInput" class="control" type="search" placeholder="Buscar por nome, empresa, email, telefone, cidade, score ou gargalo">
-          <div class="tabs" id="tabs">
-            <button class="tab active" data-view="overview" type="button">Resumo</button>
-            <button class="tab" data-view="table" type="button">Leads</button>
-            <button class="tab" data-view="pipeline" type="button">Funil</button>
-            <button class="tab" data-view="insights" type="button">Insights</button>
-          </div>
+    <section class="page" id="leadsPage">
+      <div class="filters">
+        <input id="searchInput" class="control" type="search" placeholder="Buscar por nome, empresa, email, telefone, cidade, score ou gargalo">
+        <select id="statusFilter" class="control"><option value="all">Todos status</option><option value="completed">Diagnóstico concluído</option><option value="captured">Lead capturado</option><option value="started">Iniciado</option><option value="error">Erro</option></select>
+        <select id="scoreFilter" class="control"><option value="all">Todos scores</option><option value="hot">Quente: 60+</option><option value="warm">Morno: 40-59</option><option value="cold">Frio: abaixo de 40</option><option value="none">Sem diagnóstico</option></select>
+        <select id="dateFilter" class="control"><option value="all">Todo período</option><option value="today">Hoje</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select>
+        <input id="regionFilter" class="control" type="search" placeholder="Região">
+        <select id="revenueFilter" class="control"><option value="all">Todo faturamento</option><option value="high">R$20M+</option><option value="mid">R$1M-R$20M</option><option value="low">Até R$1M</option></select>
+        <button class="btn secondary" id="clearButton" type="button">Limpar</button>
+      </div>
+      <div class="bulkbar" id="bulkbar">
+        <strong id="bulkCount">0 selecionados</strong>
+        <div class="actions">
+          <button class="icon" id="exportSelectedButton" type="button">Exportar</button>
+          <button class="icon" id="clearSelectionButton" type="button">Limpar seleção</button>
         </div>
+      </div>
+      <div class="table-card card">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th data-sort="select"><input id="selectAll" type="checkbox"></th>
+                <th data-sort="nome">Lead</th>
+                <th data-sort="empresa">Empresa</th>
+                <th data-sort="score">Score</th>
+                <th data-sort="status">Status</th>
+                <th data-sort="faturamento">Faturamento</th>
+                <th data-sort="localizacao">Região</th>
+                <th data-sort="updatedAt">Última interação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-        <div class="bulkbar" id="bulkbar">
-          <strong id="bulkCount">0 selecionados</strong>
-          <div class="actions">
-            <button class="icon" id="exportSelectedButton" type="button">Exportar</button>
-            <button class="icon" id="clearSelectionButton" type="button">Limpar seleção</button>
-          </div>
-        </div>
-
-        <div class="main-shell panel active" id="overviewView">
-          <div class="overview-grid">
-            <div class="card" style="padding:16px">
-              <div class="section-title">
-                <h2>Fila de foco</h2>
-                <span class="compact-note">Quentes, recentes e sem contato</span>
-              </div>
-              <div class="overview-list" id="focusList"></div>
-            </div>
-            <div class="card" style="padding:16px">
-              <div class="section-title">
-                <h2>Funil rápido</h2>
-                <span class="compact-note">Leitura executiva</span>
-              </div>
-              <div class="funnel" id="quickFunnel"></div>
-            </div>
-          </div>
-          <div class="card" style="padding:16px">
-            <div class="section-title">
-              <h2>Últimos leads</h2>
-              <span class="compact-note">Clique para abrir detalhes</span>
-            </div>
-            <div class="overview-list" id="recentList"></div>
-          </div>
-        </div>
-        <div class="panel" id="tableView">
-          <div class="table-card card">
-            <div class="table-scroll">
-              <table>
-                <thead>
-                  <tr>
-                    <th data-sort="select"><input id="selectAll" type="checkbox"></th>
-                    <th data-sort="nome">Lead</th>
-                    <th data-sort="empresa">Empresa</th>
-                    <th data-sort="score">Score</th>
-                    <th data-sort="status">Status</th>
-                    <th data-sort="faturamento">Faturamento</th>
-                    <th data-sort="localizacao">Região</th>
-                    <th data-sort="updatedAt">Última interação</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <div class="panel" id="pipelineView"><div class="card" style="padding:18px"><div class="funnel" id="funnel"></div></div></div>
-        <div class="panel" id="insightsView"><div class="insights" id="insights"></div></div>
-      </section>
-    </div>
+    <section class="page" id="kanbanPage"><div class="kanban" id="kanban"></div></section>
+    <section class="page" id="pipelinePage"><div class="card" style="padding:18px"><div class="funnel" id="funnel"></div></div></section>
+    <section class="page" id="insightsPage"><div class="insights" id="insights"></div></section>
   </section>
 </main>
 
@@ -199,77 +272,635 @@
 <div class="toast" id="toast">Copiado</div>
 
 <script>
-const state={token:'',records:[],selected:new Set(),selectedLeadId:'',query:'',status:'all',score:'all',date:'all',region:'',revenue:'all',sort:{key:'updatedAt',dir:'desc'},view:'overview'};
-const params=new URLSearchParams(window.location.search);state.token=params.get('token')||'';
-state.view=params.get('view')||'overview';
-const $=(id)=>document.getElementById(id);
+const state = {
+  token: '',
+  records: [],
+  selected: new Set(),
+  selectedLeadId: '',
+  query: '',
+  status: 'all',
+  score: 'all',
+  date: 'all',
+  region: '',
+  revenue: 'all',
+  sort: { key: 'updatedAt', dir: 'desc' },
+  view: 'home',
+};
+const params = new URLSearchParams(window.location.search);
+state.token = params.get('token') || '';
+state.view = params.get('view') || 'home';
+const $ = (id) => document.getElementById(id);
 
-$('tokenButton').addEventListener('click',()=>{const token=$('tokenInput').value.trim();if(!token)return;state.token=token;window.history.replaceState({},'',`/dashboard.html?token=${encodeURIComponent(token)}`);loadDashboard()});
-$('refreshButton').addEventListener('click',loadDashboard);
-$('clearButton').addEventListener('click',clearFilters);
-$('exportFilteredButton').addEventListener('click',()=>downloadCsv(filteredRecords(),'leads-filtrados.csv'));
-$('exportSelectedButton').addEventListener('click',()=>downloadCsv(selectedRecords(),'leads-selecionados.csv'));
-$('copySelectedButton').addEventListener('click',()=>copyText(selectedRecords().map(formatLeadText).join('\n\n')||'Nenhum lead selecionado'));
-$('clearSelectionButton').addEventListener('click',()=>{state.selected.clear();renderAll()});
-$('searchInput').addEventListener('input',(e)=>{state.query=e.target.value.trim().toLowerCase();renderAll()});
-$('statusFilter').addEventListener('change',(e)=>{state.status=e.target.value;renderAll()});
-$('scoreFilter').addEventListener('change',(e)=>{state.score=e.target.value;renderAll()});
-$('dateFilter').addEventListener('change',(e)=>{state.date=e.target.value;renderAll()});
-$('regionFilter').addEventListener('input',(e)=>{state.region=e.target.value.trim().toLowerCase();renderAll()});
-$('revenueFilter').addEventListener('change',(e)=>{state.revenue=e.target.value;renderAll()});
-$('tabs').addEventListener('click',(e)=>{const btn=e.target.closest('.tab');if(!btn)return;setView(btn.dataset.view)});
-$('selectAll').addEventListener('change',(e)=>{filteredRecords().forEach(r=>e.target.checked?state.selected.add(r.leadId):state.selected.delete(r.leadId));renderAll()});
-document.addEventListener('keydown',(e)=>{if(e.key==='/'&&!['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName)){e.preventDefault();$('searchInput').focus()}if(e.key==='Escape')closeDrawer()});
+$('tokenButton').addEventListener('click', () => {
+  const token = $('tokenInput').value.trim();
+  if (!token) return;
+  state.token = token;
+  window.history.replaceState({}, '', `/dashboard.html?token=${encodeURIComponent(token)}`);
+  loadDashboard();
+});
+$('refreshButton').addEventListener('click', loadDashboard);
+$('exportFilteredButton').addEventListener('click', () => downloadCsv(filteredRecords(), 'leads-filtrados.csv'));
+$('copySelectedButton').addEventListener('click', () => copyText(selectedRecords().map(formatLeadText).join('\n\n') || 'Nenhum lead selecionado'));
+$('nav').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-view]');
+  if (button) setView(button.dataset.view);
+});
+$('clearButton').addEventListener('click', clearFilters);
+$('exportSelectedButton').addEventListener('click', () => downloadCsv(selectedRecords(), 'leads-selecionados.csv'));
+$('clearSelectionButton').addEventListener('click', () => { state.selected.clear(); renderAll(); });
+$('searchInput').addEventListener('input', (event) => { state.query = event.target.value.trim().toLowerCase(); renderAll(); });
+$('statusFilter').addEventListener('change', (event) => { state.status = event.target.value; renderAll(); });
+$('scoreFilter').addEventListener('change', (event) => { state.score = event.target.value; renderAll(); });
+$('dateFilter').addEventListener('change', (event) => { state.date = event.target.value; renderAll(); });
+$('regionFilter').addEventListener('input', (event) => { state.region = event.target.value.trim().toLowerCase(); renderAll(); });
+$('revenueFilter').addEventListener('change', (event) => { state.revenue = event.target.value; renderAll(); });
+$('selectAll').addEventListener('change', (event) => {
+  filteredRecords().forEach((record) => event.target.checked ? state.selected.add(record.leadId) : state.selected.delete(record.leadId));
+  renderAll();
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === '/' && !['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+    event.preventDefault();
+    setView('leads');
+    $('searchInput').focus();
+  }
+  if (event.key === 'Escape') closeDrawer();
+});
 
-setView(state.view,false);
-if(state.token)loadDashboard();else showAuth();
+setView(state.view, false);
+if (state.token) loadDashboard();
+else showAuth();
 
-async function loadDashboard(){if(!state.token)return showAuth();showApp();setLoading();try{const res=await fetch(`/api/dashboard?token=${encodeURIComponent(state.token)}`,{headers:{Accept:'application/json'},cache:'no-store'});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||'Não foi possível carregar.');state.records=Array.isArray(data.records)?data.records.map(normalizeRecord):[];$('generatedAt').textContent=`Atualizado em ${formatDate(data.generatedAt)} · ${data.listDurationMs||0}ms · ${state.records.length} registros`;renderAll()}catch(err){$('authError').textContent=err.message;showAuth()}}
-function showAuth(){$('auth').hidden=false;$('app').hidden=true}
-function showApp(){$('auth').hidden=true;$('app').hidden=false;$('authError').textContent=''}
-function setLoading(){$('metrics').innerHTML='';$('tableBody').innerHTML='<tr><td colspan="9" class="empty">Carregando...</td></tr>'}
+async function loadDashboard() {
+  if (!state.token) return showAuth();
+  showApp();
+  setLoading();
+  try {
+    const response = await fetch(`/api/dashboard?token=${encodeURIComponent(state.token)}`, {
+      headers: { Accept: 'application/json' },
+      cache: 'no-store',
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || 'Não foi possível carregar.');
+    state.records = Array.isArray(payload.records) ? payload.records.map(normalizeRecord) : [];
+    $('generatedAt').textContent = `Atualizado em ${formatDate(payload.generatedAt)} · ${payload.listDurationMs || 0}ms · ${state.records.length} registros`;
+    renderAll();
+  } catch (error) {
+    $('authError').textContent = error.message;
+    showAuth();
+  }
+}
 
-function normalizeRecord(record){const form=record.formData||{},report=record.report||{};const score=Number(report.score_geral||0);return{...record,nome:report.nome||form.nome||'',empresa:report.empresa||'',email:report.email||form.email||'',whatsapp:report.whatsapp||form.whatsapp||'',faturamento:report.faturamento||form.faturamento||'',localizacao:report.localizacao||form.localizacao||'',score,nivel:report.nivel||'',gargalo:report.gargalo_critico||'',prioridades:Array.isArray(report.prioridades)?report.prioridades:[],status:record.status||'captured',updatedAt:record.updatedAt||record.createdAt||'',createdAt:record.createdAt||'',completedAt:record.completedAt||''}}
-function clearFilters(){state.query='';state.status='all';state.score='all';state.date='all';state.region='';state.revenue='all';$('searchInput').value='';$('statusFilter').value='all';$('scoreFilter').value='all';$('dateFilter').value='all';$('regionFilter').value='';$('revenueFilter').value='all';renderAll()}
-function setView(view,updateUrl=true){state.view=['overview','table','pipeline','insights'].includes(view)?view:'overview';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.view===state.view));document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));const panel=$(`${state.view}View`);if(panel)panel.classList.add('active');if(updateUrl){const url=new URL(window.location.href);url.searchParams.set('view',state.view);window.history.replaceState({},'',url.toString())}renderAll()}
-function renderAll(){renderMetrics();renderBulkbar();if(state.view==='overview')renderOverview();if(state.view==='table')renderTable();if(state.view==='pipeline')renderFunnel();if(state.view==='insights')renderInsights()}
-function filteredRecords(){return state.records.filter(r=>{if(state.status!=='all'&&r.status!==state.status)return false;if(state.score!=='all'&&!scoreMatch(r))return false;if(state.date!=='all'&&!dateMatch(r.updatedAt,state.date))return false;if(state.region&&!String(r.localizacao).toLowerCase().includes(state.region))return false;if(state.revenue!=='all'&&!revenueMatch(r.faturamento,state.revenue))return false;if(!state.query)return true;return[r.leadId,r.nome,r.empresa,r.email,r.whatsapp,r.faturamento,r.localizacao,r.nivel,r.gargalo].some(v=>String(v||'').toLowerCase().includes(state.query))}).sort(sorter)}
-function selectedRecords(){return state.records.filter(r=>state.selected.has(r.leadId))}
-function sorter(a,b){const key=state.sort.key;const dir=state.sort.dir==='asc'?1:-1;let av=key==='score'?a.score:a[key]||'',bv=key==='score'?b.score:b[key]||'';return String(av).localeCompare(String(bv),undefined,{numeric:true})*dir}
-function scoreMatch(r){if(state.score==='none')return!r.score;if(state.score==='hot')return r.score>=60;if(state.score==='warm')return r.score>=40&&r.score<60;if(state.score==='cold')return r.score>0&&r.score<40;return true}
-function dateMatch(value,range){const d=new Date(value);if(Number.isNaN(d.getTime()))return false;const now=new Date();if(range==='today')return d.toDateString()===now.toDateString();const days=Number(range);return(now-d)<=days*86400000}
-function revenueMatch(value,kind){const s=String(value||'').toLowerCase();if(kind==='high')return /20m|40m|80m/.test(s);if(kind==='mid')return /1m|5m|20m/.test(s)&&!/até/.test(s);if(kind==='low')return /até/.test(s);return true}
+function showAuth() { $('auth').hidden = false; $('app').hidden = true; }
+function showApp() { $('auth').hidden = true; $('app').hidden = false; $('authError').textContent = ''; }
+function setLoading() { $('metrics').innerHTML = ''; $('tableBody').innerHTML = '<tr><td colspan="9" class="empty">Carregando...</td></tr>'; }
+function setView(view, updateUrl = true) {
+  state.view = ['home', 'leads', 'kanban', 'pipeline', 'insights'].includes(view) ? view : 'home';
+  document.querySelectorAll('.nav-btn').forEach((button) => button.classList.toggle('active', button.dataset.view === state.view));
+  document.querySelectorAll('.page').forEach((page) => page.classList.remove('active'));
+  $(`${state.view}Page`).classList.add('active');
+  if (updateUrl) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('view', state.view);
+    window.history.replaceState({}, '', url.toString());
+  }
+  renderAll();
+}
 
-function renderMetrics(){const all=state.records,visible=filteredRecords(),today=all.filter(r=>dateMatch(r.createdAt||r.updatedAt,'today')).length,week=all.filter(r=>dateMatch(r.createdAt||r.updatedAt,'7')).length,month=all.filter(r=>dateMatch(r.createdAt||r.updatedAt,'30')).length,completed=all.filter(r=>r.status==='completed'),qualified=completed.filter(r=>r.score>=50),avg=completed.length?Math.round(completed.reduce((s,r)=>s+r.score,0)/completed.length):0,noContact=all.filter(r=>r.status==='captured').length;const cards=[['Leads',all.length,`${visible.length} visíveis`],['Novos hoje',today,`${week} na semana · ${month} no mês`],['Diagnósticos',completed.length,`${pct(completed.length,all.length)}% do total`],['Qualificados',qualified.length,`${pct(qualified.length,completed.length)}% dos concluídos`],['Score médio',avg,avg>=50?'Base aquecida':'Priorizar nutrição'],['Sem contato',noContact,'Leads capturados sem diagnóstico']];$('metrics').innerHTML=cards.map(([l,v,h])=>`<div class="metric card"><div class="metric-label">${escapeHtml(l)}</div><div class="metric-value">${escapeHtml(v)}</div><div class="metric-hint">${escapeHtml(h)}</div></div>`).join('')}
-function renderBulkbar(){const count=state.selected.size;$('bulkbar').classList.toggle('visible',count>0);$('bulkCount').textContent=`${count} selecionado${count===1?'':'s'}`}
-function renderOverview(){const rows=filteredRecords();const focus=[...rows].sort((a,b)=>priorityScore(b)-priorityScore(a)).slice(0,12);$('focusList').innerHTML=focus.length?focus.map(focusCard).join(''):'<div class="empty">Nenhum lead na fila.</div>';$('recentList').innerHTML=rows.slice(0,10).map(focusCard).join('')||'<div class="empty">Nenhum lead encontrado.</div>';renderFunnelInto('quickFunnel',rows);document.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openDrawer(el.dataset.open)))}
-function priorityScore(r){return(r.status==='captured'?35:0)+(r.score||0)+(revenueMatch(r.faturamento,'high')?25:0)+(dateMatch(r.updatedAt,'7')?10:0)}
-function focusCard(r){return`<div class="focus-card" data-open="${escapeHtml(r.leadId)}"><div><strong>${escapeHtml(r.nome||'Lead sem nome')}</strong><div class="lead-sub">${escapeHtml(r.empresa||r.email||'-')}</div><div style="margin-top:8px"><span class="pill ${escapeHtml(r.status)}">${labelStatus(r.status)}</span> ${scorePill(r)}</div></div><div style="text-align:right"><strong>${escapeHtml(r.score||'-')}</strong><div class="muted">${escapeHtml(r.faturamento||'-')}</div></div></div>`}
-function renderTable(){const rows=filteredRecords();$('selectAll').checked=rows.length>0&&rows.every(r=>state.selected.has(r.leadId));$('tableBody').innerHTML=rows.length?rows.map(r=>`<tr><td><input type="checkbox" data-check="${escapeHtml(r.leadId)}" ${state.selected.has(r.leadId)?'checked':''}></td><td><div class="lead-name">${escapeHtml(r.nome||'Lead sem nome')}</div><div class="lead-sub">${escapeHtml(r.email||r.leadId)}</div></td><td>${escapeHtml(r.empresa||'-')}</td><td><span class="score">${escapeHtml(r.score||'-')}</span> ${scorePill(r)}</td><td><span class="pill ${escapeHtml(r.status)}">${labelStatus(r.status)}</span></td><td>${escapeHtml(r.faturamento||'-')}</td><td>${escapeHtml(r.localizacao||'-')}</td><td>${escapeHtml(formatDate(r.updatedAt))}</td><td><span class="row-actions"><button class="icon" data-open="${escapeHtml(r.leadId)}">Abrir</button><button class="icon" data-copy="${escapeHtml(r.leadId)}">Copiar</button></span></td></tr>`).join(''):'<tr><td colspan="9" class="empty">Nenhum lead encontrado.</td></tr>';document.querySelectorAll('[data-check]').forEach(el=>el.addEventListener('change',()=>{el.checked?state.selected.add(el.dataset.check):state.selected.delete(el.dataset.check);renderAll()}));document.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openDrawer(el.dataset.open)));document.querySelectorAll('[data-copy]').forEach(el=>el.addEventListener('click',()=>copyText(formatLeadText(state.records.find(r=>r.leadId===el.dataset.copy)))));document.querySelectorAll('th[data-sort]').forEach(th=>th.onclick=()=>{const k=th.dataset.sort;if(k==='select')return;state.sort.dir=state.sort.key===k&&state.sort.dir==='desc'?'asc':'desc';state.sort.key=k;renderTable()})}
-function renderKanban(){const stages=[['captured','Novo / sem diagnóstico'],['cold','Diagnóstico crítico'],['warm','Em desenvolvimento'],['hot','Prioridade alta']];const rows=filteredRecords();$('kanban').innerHTML=stages.map(([key,title])=>{const items=rows.filter(r=>kanbanKey(r)===key);return`<div class="kanban-col card"><div class="kanban-title"><span>${escapeHtml(title)}</span><span>${items.length}</span></div>${items.slice(0,40).map(r=>`<div class="mini" data-open="${escapeHtml(r.leadId)}"><strong>${escapeHtml(r.nome||'Lead sem nome')}</strong><div class="muted">${escapeHtml(r.empresa||r.email||'-')}</div><div style="margin-top:8px">${scorePill(r)} <span class="pill ${escapeHtml(r.status)}">${labelStatus(r.status)}</span></div></div>`).join('')||'<div class="empty">Vazio</div>'}</div>`}).join('');document.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openDrawer(el.dataset.open)))}
-function kanbanKey(r){if(r.status!=='completed')return'captured';if(r.score>=60)return'hot';if(r.score>=40)return'warm';return'cold'}
-function renderFunnel(){renderFunnelInto('funnel',filteredRecords())}
-function renderFunnelInto(targetId,rows){const all=rows,completed=all.filter(r=>r.status==='completed'),qualified=completed.filter(r=>r.score>=50),hot=completed.filter(r=>r.score>=60),highRev=all.filter(r=>revenueMatch(r.faturamento,'high'));const steps=[['Leads capturados',all.length],['Diagnósticos concluídos',completed.length],['Qualificados (score 50+)',qualified.length],['Prioridade alta (score 60+)',hot.length],['Alto faturamento',highRev.length]];const max=Math.max(...steps.map(s=>s[1]),1);$(targetId).innerHTML=steps.map(([label,value],i)=>`<div class="funnel-step"><strong>${escapeHtml(label)}</strong><div class="funnel-bar"><div class="funnel-fill" style="width:${Math.max(7,value/max*100)}%">${value}</div></div><span class="muted">${i?pct(value,steps[i-1][1]):'100'}%</span></div>`).join('')}
-function renderInsights(){const rows=filteredRecords();$('insights').innerHTML=[insightRank('Regiões com mais leads',rank(rows,r=>r.localizacao||'Não informado')),insightRank('Faixas de faturamento',rank(rows,r=>r.faturamento||'Não informado')),insightRank('Níveis SCALE',rank(rows,r=>r.nivel||'Sem diagnóstico')),insightRank('Gargalos recorrentes',rank(rows,r=>firstWords(r.gargalo)||'Sem gargalo'))].join('')}
-function insightRank(title,items){const max=Math.max(...items.map(i=>i.count),1);return`<div class="insight card"><div class="metric-label">${escapeHtml(title)}</div><div class="rank" style="margin-top:14px">${items.slice(0,8).map(i=>`<div class="rank-row"><div><strong>${escapeHtml(i.label)}</strong><div class="rank-bar"><span style="width:${i.count/max*100}%"></span></div></div><span>${i.count}</span></div>`).join('')||'<div class="empty">Sem dados</div>'}</div></div>`}
-function rank(rows,fn){const map=new Map();rows.forEach(r=>{const k=fn(r);map.set(k,(map.get(k)||0)+1)});return[...map.entries()].map(([label,count])=>({label,count})).sort((a,b)=>b.count-a.count)}
-function firstWords(text){return String(text||'').split(/\s+/).slice(0,6).join(' ')}
+function normalizeRecord(record) {
+  const form = record.formData || {};
+  const report = record.report || {};
+  return {
+    ...record,
+    nome: report.nome || form.nome || '',
+    empresa: report.empresa || '',
+    email: report.email || form.email || '',
+    whatsapp: report.whatsapp || form.whatsapp || '',
+    faturamento: report.faturamento || form.faturamento || '',
+    localizacao: report.localizacao || form.localizacao || '',
+    score: Number(report.score_geral || 0),
+    nivel: report.nivel || '',
+    gargalo: report.gargalo_critico || '',
+    prioridades: Array.isArray(report.prioridades) ? report.prioridades : [],
+    status: record.status || 'captured',
+    updatedAt: record.updatedAt || record.createdAt || '',
+    createdAt: record.createdAt || '',
+    completedAt: record.completedAt || '',
+  };
+}
 
-function openDrawer(id){const r=state.records.find(x=>x.leadId===id);if(!r)return;state.selectedLeadId=id;const report=r.report||{};$('drawer').innerHTML=`<div class="drawer-head"><div><div class="kicker">${escapeHtml(labelStatus(r.status))}</div><h1 style="font-size:34px">${escapeHtml(r.empresa||r.nome||'Lead')}</h1><div class="muted">${escapeHtml(formatDate(r.updatedAt))}</div></div><button class="icon" onclick="closeDrawer()">Fechar</button></div><div class="actions"><button class="btn" onclick="copyCurrent()">Copiar tudo</button>${r.whatsapp?`<a class="btn secondary" href="${escapeHtml(whatsappUrl(r.whatsapp))}" target="_blank" rel="noreferrer">WhatsApp</a>`:''}${r.email?`<a class="btn secondary" href="mailto:${escapeHtml(r.email)}">Email</a>`:''}</div><div class="detail-grid" style="margin-top:18px">${fact('Nome',r.nome)}${fact('Empresa',r.empresa)}${fact('Email',r.email)}${fact('WhatsApp',r.whatsapp)}${fact('Faturamento',r.faturamento)}${fact('Região',r.localizacao)}${fact('Score',r.score||'-')}${fact('Nível',r.nivel||'-')}</div>${report.tipo?`<div class="section"><h2>Gargalo crítico</h2><div class="copy">${escapeHtml(r.gargalo||'Não informado')}</div></div><div class="section"><h2>Dimensões SCALE</h2>${Object.entries(report.dimensoes||{}).map(([k,d])=>dimension(k,d)).join('')}</div><div class="section"><h2>Prioridades</h2><div class="copy">${escapeHtml(r.prioridades.map((p,i)=>`${i+1}. ${p}`).join('\n')||'Não informado')}</div></div><div class="section"><h2>Insights Masterboard</h2><div class="copy">${escapeHtml(report.setor_insights||'Não informado')}</div></div>`:'<div class="section"><div class="empty">Lead capturado, mas diagnóstico ainda não concluído.</div></div>'}<div class="section"><h2>Histórico da conversa</h2><div class="copy">${escapeHtml(r.conversation||'Não disponível')}</div></div><div class="section"><h2>Respostas do lead</h2><div class="copy">${escapeHtml(r.answers||'Não disponível')}</div></div>`;$('drawer').classList.add('open')}
-function closeDrawer(){$('drawer').classList.remove('open')}
-function copyCurrent(){copyText(formatLeadText(state.records.find(r=>r.leadId===state.selectedLeadId)))}
-function fact(label,value){return`<div class="fact"><div class="fact-label">${escapeHtml(label)}</div><div class="fact-value">${escapeHtml(value||'-')}</div></div>`}
-function dimension(key,d={}){const score=Number(d.score||0);return`<div class="dimension"><div class="dimension-top"><strong>${escapeHtml(key)}</strong><strong>${score}</strong></div><div class="bar"><span style="width:${Math.max(0,Math.min(100,score))}%"></span></div><div class="copy">${escapeHtml(d.status||'Não informado')}</div>${d.gargalo?`<div class="copy" style="color:var(--red);margin-top:8px">${escapeHtml(d.gargalo)}</div>`:''}</div>`}
-function scorePill(r){if(!r.score)return'<span class="pill">Sem score</span>';if(r.score>=60)return'<span class="pill hot">Quente</span>';if(r.score>=40)return'<span class="pill warm">Morno</span>';return'<span class="pill cold">Frio</span>'}
-function labelStatus(s){return{captured:'Capturado',started:'Iniciado',completed:'Concluído',error:'Erro'}[s]||'Desconhecido'}
-function pct(a,b){return b?Math.round(a/b*100):0}
-function formatDate(v){if(!v)return'-';const d=new Date(v);if(Number.isNaN(d.getTime()))return v;return d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}
-function whatsappUrl(phone){const digits=String(phone||'').replace(/\D/g,'');return`https://wa.me/${digits.startsWith('55')?digits:`55${digits}`}`}
-function formatLeadText(r){if(!r)return'';return[`Nome: ${r.nome||'-'}`,`Empresa: ${r.empresa||'-'}`,`Email: ${r.email||'-'}`,`WhatsApp: ${r.whatsapp||'-'}`,`Faturamento: ${r.faturamento||'-'}`,`Região: ${r.localizacao||'-'}`,`Score: ${r.score||'-'}`,`Status: ${labelStatus(r.status)}`,`Gargalo: ${r.gargalo||'-'}`].join('\n')}
-async function copyText(text){try{await navigator.clipboard.writeText(text);toast('Copiado')}catch{toast('Não foi possível copiar')}}
-function downloadCsv(rows,filename){const cols=['nome','empresa','email','whatsapp','faturamento','localizacao','score','nivel','status','gargalo','updatedAt'];const csv=[cols.join(',')].concat(rows.map(r=>cols.map(c=>`"${String(r[c]??'').replace(/"/g,'""')}"`).join(','))).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast('Exportação gerada')}
-function toast(msg){$('toast').textContent=msg;$('toast').classList.add('visible');setTimeout(()=>$('toast').classList.remove('visible'),1800)}
-function escapeHtml(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+function clearFilters() {
+  state.query = '';
+  state.status = 'all';
+  state.score = 'all';
+  state.date = 'all';
+  state.region = '';
+  state.revenue = 'all';
+  $('searchInput').value = '';
+  $('statusFilter').value = 'all';
+  $('scoreFilter').value = 'all';
+  $('dateFilter').value = 'all';
+  $('regionFilter').value = '';
+  $('revenueFilter').value = 'all';
+  renderAll();
+}
+
+function renderAll() {
+  renderMetrics();
+  renderBulkbar();
+  if (state.view === 'home') renderHome();
+  if (state.view === 'leads') renderTable();
+  if (state.view === 'kanban') renderKanban();
+  if (state.view === 'pipeline') renderFunnel();
+  if (state.view === 'insights') renderInsights();
+}
+
+function filteredRecords() {
+  return state.records.filter((record) => {
+    if (state.status !== 'all' && record.status !== state.status) return false;
+    if (state.score !== 'all' && !scoreMatch(record)) return false;
+    if (state.date !== 'all' && !dateMatch(record.updatedAt, state.date)) return false;
+    if (state.region && !String(record.localizacao).toLowerCase().includes(state.region)) return false;
+    if (state.revenue !== 'all' && !revenueMatch(record.faturamento, state.revenue)) return false;
+    if (!state.query) return true;
+    return [record.leadId, record.nome, record.empresa, record.email, record.whatsapp, record.faturamento, record.localizacao, record.nivel, record.gargalo]
+      .some((value) => String(value || '').toLowerCase().includes(state.query));
+  }).sort(sorter);
+}
+function selectedRecords() { return state.records.filter((record) => state.selected.has(record.leadId)); }
+function sorter(a, b) {
+  const key = state.sort.key;
+  const dir = state.sort.dir === 'asc' ? 1 : -1;
+  const av = key === 'score' ? a.score : a[key] || '';
+  const bv = key === 'score' ? b.score : b[key] || '';
+  return String(av).localeCompare(String(bv), undefined, { numeric: true }) * dir;
+}
+function scoreMatch(record) {
+  if (state.score === 'none') return !record.score;
+  if (state.score === 'hot') return record.score >= 60;
+  if (state.score === 'warm') return record.score >= 40 && record.score < 60;
+  if (state.score === 'cold') return record.score > 0 && record.score < 40;
+  return true;
+}
+function dateMatch(value, range) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return false;
+  const now = new Date();
+  if (range === 'today') return date.toDateString() === now.toDateString();
+  return (now - date) <= Number(range) * 86400000;
+}
+function revenueMatch(value, kind) {
+  const text = String(value || '').toLowerCase();
+  if (kind === 'high') return /20m|40m|80m/.test(text);
+  if (kind === 'mid') return /1m|5m|20m/.test(text) && !/até/.test(text);
+  if (kind === 'low') return /até/.test(text);
+  return true;
+}
+
+function renderMetrics() {
+  const all = state.records;
+  const visible = filteredRecords();
+  const today = all.filter((record) => dateMatch(record.createdAt || record.updatedAt, 'today')).length;
+  const week = all.filter((record) => dateMatch(record.createdAt || record.updatedAt, '7')).length;
+  const month = all.filter((record) => dateMatch(record.createdAt || record.updatedAt, '30')).length;
+  const completed = all.filter((record) => record.status === 'completed');
+  const qualified = completed.filter((record) => record.score >= 50);
+  const average = completed.length ? Math.round(completed.reduce((sum, record) => sum + record.score, 0) / completed.length) : 0;
+  const noContact = all.filter((record) => record.status === 'captured').length;
+  const cards = [
+    ['Leads', all.length, `${visible.length} visíveis`],
+    ['Novos hoje', today, `${week} na semana · ${month} no mês`],
+    ['Diagnósticos', completed.length, `${pct(completed.length, all.length)}% do total`],
+    ['Qualificados', qualified.length, `${pct(qualified.length, completed.length)}% dos concluídos`],
+    ['Score médio', average, average >= 50 ? 'Base aquecida' : 'Priorizar nutrição'],
+    ['Sem contato', noContact, 'Leads capturados sem diagnóstico'],
+  ];
+  $('metrics').innerHTML = cards.map(([label, value, hint]) => `
+    <div class="metric card">
+      <div class="metric-label">${escapeHtml(label)}</div>
+      <div class="metric-value">${escapeHtml(value)}</div>
+      <div class="metric-hint">${escapeHtml(hint)}</div>
+    </div>
+  `).join('');
+}
+function renderBulkbar() {
+  const count = state.selected.size;
+  $('bulkbar').classList.toggle('visible', count > 0);
+  $('bulkCount').textContent = `${count} selecionado${count === 1 ? '' : 's'}`;
+}
+function renderHome() {
+  const rows = filteredRecords();
+  const completed = rows.filter((record) => record.status === 'completed').length;
+  const hot = rows.filter((record) => record.score >= 60).length;
+  const noContact = rows.filter((record) => record.status === 'captured').length;
+  const cards = [
+    ['leads', 'Leads', 'Lista completa com busca, filtros e exportação.', rows.length],
+    ['kanban', 'Kanban', 'Fila por prioridade e diagnóstico.', hot],
+    ['pipeline', 'Funil', 'Conversão do lead ao diagnóstico qualificado.', completed],
+    ['insights', 'Insights', 'Regiões, faturamento e padrões de gargalo.', noContact],
+  ];
+  $('homeCards').innerHTML = cards.map(([view, title, copy, value]) => `
+    <button class="big-card" data-home-view="${view}" type="button">
+      <div class="kicker">${escapeHtml(title)}</div>
+      <div class="big-card-title">${escapeHtml(value)}</div>
+      <div class="muted">${escapeHtml(copy)}</div>
+    </button>
+  `).join('');
+  document.querySelectorAll('[data-home-view]').forEach((button) => button.addEventListener('click', () => setView(button.dataset.homeView)));
+
+  const focus = [...rows].sort((a, b) => priorityScore(b) - priorityScore(a)).slice(0, 12);
+  $('focusList').innerHTML = focus.length ? focus.map(focusCard).join('') : '<div class="empty">Nenhum lead na fila.</div>';
+  $('recentList').innerHTML = rows.slice(0, 10).map(focusCard).join('') || '<div class="empty">Nenhum lead encontrado.</div>';
+  document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
+}
+function priorityScore(record) {
+  return (record.status === 'captured' ? 35 : 0) + (record.score || 0) + (revenueMatch(record.faturamento, 'high') ? 25 : 0) + (dateMatch(record.updatedAt, '7') ? 10 : 0);
+}
+function focusCard(record) {
+  return `
+    <div class="focus-card" data-open="${escapeHtml(record.leadId)}">
+      <div>
+        <strong>${escapeHtml(record.nome || 'Lead sem nome')}</strong>
+        <div class="lead-sub">${escapeHtml(record.empresa || record.email || '-')}</div>
+        <div style="margin-top:8px"><span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${scorePill(record)}</div>
+      </div>
+      <div style="text-align:right">
+        <strong>${escapeHtml(record.score || '-')}</strong>
+        <div class="muted">${escapeHtml(record.faturamento || '-')}</div>
+      </div>
+    </div>
+  `;
+}
+function renderTable() {
+  const rows = filteredRecords();
+  $('selectAll').checked = rows.length > 0 && rows.every((record) => state.selected.has(record.leadId));
+  $('tableBody').innerHTML = rows.length ? rows.map((record) => `
+    <tr>
+      <td><input type="checkbox" data-check="${escapeHtml(record.leadId)}" ${state.selected.has(record.leadId) ? 'checked' : ''}></td>
+      <td><div class="lead-name">${escapeHtml(record.nome || 'Lead sem nome')}</div><div class="lead-sub">${escapeHtml(record.email || record.leadId)}</div></td>
+      <td>${escapeHtml(record.empresa || '-')}</td>
+      <td><span class="score">${escapeHtml(record.score || '-')}</span> ${scorePill(record)}</td>
+      <td><span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span></td>
+      <td>${escapeHtml(record.faturamento || '-')}</td>
+      <td>${escapeHtml(record.localizacao || '-')}</td>
+      <td>${escapeHtml(formatDate(record.updatedAt))}</td>
+      <td><button class="icon" data-open="${escapeHtml(record.leadId)}">Abrir</button> <button class="icon" data-copy="${escapeHtml(record.leadId)}">Copiar</button></td>
+    </tr>
+  `).join('') : '<tr><td colspan="9" class="empty">Nenhum lead encontrado.</td></tr>';
+  document.querySelectorAll('[data-check]').forEach((element) => element.addEventListener('change', () => {
+    element.checked ? state.selected.add(element.dataset.check) : state.selected.delete(element.dataset.check);
+    renderAll();
+  }));
+  document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
+  document.querySelectorAll('[data-copy]').forEach((element) => element.addEventListener('click', () => copyText(formatLeadText(state.records.find((record) => record.leadId === element.dataset.copy)))));
+  document.querySelectorAll('th[data-sort]').forEach((th) => {
+    th.onclick = () => {
+      const key = th.dataset.sort;
+      if (key === 'select') return;
+      state.sort.dir = state.sort.key === key && state.sort.dir === 'desc' ? 'asc' : 'desc';
+      state.sort.key = key;
+      renderTable();
+    };
+  });
+}
+function renderKanban() {
+  const stages = [
+    ['captured', 'Novo / sem diagnóstico'],
+    ['cold', 'Diagnóstico crítico'],
+    ['warm', 'Em desenvolvimento'],
+    ['hot', 'Prioridade alta'],
+  ];
+  const rows = filteredRecords();
+  $('kanban').innerHTML = stages.map(([key, title]) => {
+    const items = rows.filter((record) => kanbanKey(record) === key);
+    return `
+      <div class="kanban-col card">
+        <div class="kanban-title"><span>${escapeHtml(title)}</span><span>${items.length}</span></div>
+        ${items.slice(0, 60).map((record) => `
+          <div class="mini" data-open="${escapeHtml(record.leadId)}">
+            <strong>${escapeHtml(record.nome || 'Lead sem nome')}</strong>
+            <div class="muted">${escapeHtml(record.empresa || record.email || '-')}</div>
+            <div style="margin-top:8px">${scorePill(record)} <span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span></div>
+          </div>
+        `).join('') || '<div class="empty">Vazio</div>'}
+      </div>
+    `;
+  }).join('');
+  document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
+}
+function kanbanKey(record) {
+  if (record.status !== 'completed') return 'captured';
+  if (record.score >= 60) return 'hot';
+  if (record.score >= 40) return 'warm';
+  return 'cold';
+}
+function renderFunnel() {
+  const all = filteredRecords();
+  const completed = all.filter((record) => record.status === 'completed');
+  const qualified = completed.filter((record) => record.score >= 50);
+  const hot = completed.filter((record) => record.score >= 60);
+  const highRevenue = all.filter((record) => revenueMatch(record.faturamento, 'high'));
+  const steps = [
+    ['Leads capturados', all.length],
+    ['Diagnósticos concluídos', completed.length],
+    ['Qualificados (score 50+)', qualified.length],
+    ['Prioridade alta (score 60+)', hot.length],
+    ['Alto faturamento', highRevenue.length],
+  ];
+  const max = Math.max(...steps.map((step) => step[1]), 1);
+  $('funnel').innerHTML = steps.map(([label, value], index) => `
+    <div class="funnel-step">
+      <strong>${escapeHtml(label)}</strong>
+      <div class="funnel-bar"><div class="funnel-fill" style="width:${Math.max(7, value / max * 100)}%">${value}</div></div>
+      <span class="muted">${index ? pct(value, steps[index - 1][1]) : '100'}%</span>
+    </div>
+  `).join('');
+}
+function renderInsights() {
+  const rows = filteredRecords();
+  $('insights').innerHTML = [
+    insightRank('Regiões com mais leads', rank(rows, (record) => record.localizacao || 'Não informado')),
+    insightRank('Faixas de faturamento', rank(rows, (record) => record.faturamento || 'Não informado')),
+    insightRank('Níveis SCALE', rank(rows, (record) => record.nivel || 'Sem diagnóstico')),
+    insightRank('Gargalos recorrentes', rank(rows, (record) => firstWords(record.gargalo) || 'Sem gargalo')),
+  ].join('');
+}
+function insightRank(title, items) {
+  const max = Math.max(...items.map((item) => item.count), 1);
+  return `
+    <div class="insight card">
+      <div class="metric-label">${escapeHtml(title)}</div>
+      <div class="rank" style="margin-top:14px">
+        ${items.slice(0, 8).map((item) => `
+          <div class="rank-row">
+            <div><strong>${escapeHtml(item.label)}</strong><div class="rank-bar"><span style="width:${item.count / max * 100}%"></span></div></div>
+            <span>${item.count}</span>
+          </div>
+        `).join('') || '<div class="empty">Sem dados</div>'}
+      </div>
+    </div>
+  `;
+}
+function rank(rows, fn) {
+  const map = new Map();
+  rows.forEach((record) => {
+    const key = fn(record);
+    map.set(key, (map.get(key) || 0) + 1);
+  });
+  return [...map.entries()].map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
+}
+function firstWords(text) { return String(text || '').split(/\s+/).slice(0, 6).join(' '); }
+
+function openDrawer(id) {
+  const record = state.records.find((item) => item.leadId === id);
+  if (!record) return;
+  state.selectedLeadId = id;
+  const report = record.report || {};
+  $('drawer').innerHTML = `
+    <div class="drawer-head">
+      <div>
+        <div class="kicker">${escapeHtml(labelStatus(record.status))}</div>
+        <h1 style="font-size:34px">${escapeHtml(record.empresa || record.nome || 'Lead')}</h1>
+        <div class="muted">${escapeHtml(formatDate(record.updatedAt))}</div>
+      </div>
+      <button class="icon" onclick="closeDrawer()">Fechar</button>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="copyLeadPrompt()">Copiar prompt LLM</button>
+      <button class="btn secondary" onclick="downloadLeadPdf()">Baixar PDF</button>
+      <button class="btn secondary" onclick="copyCurrent()">Copiar dados</button>
+      ${record.whatsapp ? `<a class="btn secondary" href="${escapeHtml(whatsappUrl(record.whatsapp))}" target="_blank" rel="noreferrer">WhatsApp</a>` : ''}
+      ${record.email ? `<a class="btn secondary" href="mailto:${escapeHtml(record.email)}">Email</a>` : ''}
+    </div>
+    <div class="detail-grid" style="margin-top:18px">
+      ${fact('Nome', record.nome)}
+      ${fact('Empresa', record.empresa)}
+      ${fact('Email', record.email)}
+      ${fact('WhatsApp', record.whatsapp)}
+      ${fact('Faturamento', record.faturamento)}
+      ${fact('Região', record.localizacao)}
+      ${fact('Score', record.score || '-')}
+      ${fact('Nível', record.nivel || '-')}
+    </div>
+    ${report.tipo ? `
+      <div class="section"><h2>Gargalo crítico</h2><div class="copy">${escapeHtml(record.gargalo || 'Não informado')}</div></div>
+      <div class="section"><h2>Dimensões SCALE</h2>${Object.entries(report.dimensoes || {}).map(([key, dim]) => dimension(key, dim)).join('')}</div>
+      <div class="section"><h2>Prioridades</h2><div class="copy">${escapeHtml(record.prioridades.map((item, index) => `${index + 1}. ${item}`).join('\n') || 'Não informado')}</div></div>
+      <div class="section"><h2>Insights Masterboard</h2><div class="copy">${escapeHtml(report.setor_insights || 'Não informado')}</div></div>
+    ` : '<div class="section"><div class="empty">Lead capturado, mas diagnóstico ainda não concluído.</div></div>'}
+    <div class="section"><h2>Histórico da conversa</h2><div class="copy">${escapeHtml(record.conversation || 'Não disponível')}</div></div>
+    <div class="section"><h2>Respostas do lead</h2><div class="copy">${escapeHtml(record.answers || 'Não disponível')}</div></div>
+  `;
+  $('drawer').classList.add('open');
+}
+function closeDrawer() { $('drawer').classList.remove('open'); }
+function copyCurrent() { copyText(formatLeadText(state.records.find((record) => record.leadId === state.selectedLeadId))); }
+function copyLeadPrompt() { copyText(formatLeadPrompt(state.records.find((record) => record.leadId === state.selectedLeadId))); }
+function downloadLeadPdf() {
+  const record = state.records.find((item) => item.leadId === state.selectedLeadId);
+  if (!record) return;
+  const printWindow = window.open('', '_blank', 'noopener,noreferrer,width=900,height=1100');
+  if (!printWindow) {
+    toast('Pop-up bloqueado. Permita pop-ups para baixar o PDF.');
+    return;
+  }
+  printWindow.document.write(renderLeadPdfHtml(record));
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => printWindow.print(), 400);
+}
+function fact(label, value) { return `<div class="fact"><div class="fact-label">${escapeHtml(label)}</div><div class="fact-value">${escapeHtml(value || '-')}</div></div>`; }
+function dimension(key, dim = {}) {
+  const score = Number(dim.score || 0);
+  return `
+    <div class="dimension">
+      <div class="dimension-top"><strong>${escapeHtml(key)}</strong><strong>${score}</strong></div>
+      <div class="bar"><span style="width:${Math.max(0, Math.min(100, score))}%"></span></div>
+      <div class="copy">${escapeHtml(dim.status || 'Não informado')}</div>
+      ${dim.gargalo ? `<div class="copy" style="color:var(--red);margin-top:8px">${escapeHtml(dim.gargalo)}</div>` : ''}
+    </div>
+  `;
+}
+function scorePill(record) {
+  if (!record.score) return '<span class="pill">Sem score</span>';
+  if (record.score >= 60) return '<span class="pill hot">Quente</span>';
+  if (record.score >= 40) return '<span class="pill warm">Morno</span>';
+  return '<span class="pill cold">Frio</span>';
+}
+function labelStatus(status) { return { captured: 'Capturado', started: 'Iniciado', completed: 'Concluído', error: 'Erro' }[status] || 'Desconhecido'; }
+function pct(a, b) { return b ? Math.round(a / b * 100) : 0; }
+function formatDate(value) {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+function whatsappUrl(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  return `https://wa.me/${digits.startsWith('55') ? digits : `55${digits}`}`;
+}
+function formatLeadText(record) {
+  if (!record) return '';
+  return [
+    `Nome: ${record.nome || '-'}`,
+    `Empresa: ${record.empresa || '-'}`,
+    `Email: ${record.email || '-'}`,
+    `WhatsApp: ${record.whatsapp || '-'}`,
+    `Faturamento: ${record.faturamento || '-'}`,
+    `Região: ${record.localizacao || '-'}`,
+    `Score: ${record.score || '-'}`,
+    `Status: ${labelStatus(record.status)}`,
+    `Gargalo: ${record.gargalo || '-'}`,
+  ].join('\n');
+}
+function formatLeadPrompt(record) {
+  if (!record) return '';
+  const report = record.report || {};
+  const dims = Object.entries(report.dimensoes || {})
+    .map(([key, dim]) => `- **${key}**: ${dim.score ?? '-'} | ${dim.status || 'Sem status'}${dim.gargalo ? ` | Gargalo: ${dim.gargalo}` : ''}`)
+    .join('\n') || '- Sem dimensões disponíveis';
+  const priorities = (record.prioridades || []).map((item, index) => `${index + 1}. ${item}`).join('\n') || 'Sem prioridades disponíveis';
+
+  return `# Briefing de Lead para Análise Comercial
+
+Você é um especialista em Sales Operations, Revenue Architecture e diagnóstico comercial B2B. Analise o lead abaixo e gere recomendações objetivas para abordagem, follow-up e priorização comercial.
+
+## Objetivo da análise
+- Identificar o melhor ângulo de abordagem.
+- Sugerir uma mensagem inicial curta para WhatsApp ou e-mail.
+- Apontar riscos e oportunidades comerciais.
+- Recomendar próximos passos práticos para Fabio/Bernardo.
+- Manter linguagem executiva, direta e sem jargão excessivo.
+
+## Dados do lead
+- **Nome:** ${record.nome || '-'}
+- **Empresa:** ${record.empresa || '-'}
+- **Email:** ${record.email || '-'}
+- **WhatsApp:** ${record.whatsapp || '-'}
+- **Localização:** ${record.localizacao || '-'}
+- **Faturamento:** ${record.faturamento || '-'}
+- **Status:** ${labelStatus(record.status)}
+- **Lead ID:** ${record.leadId || '-'}
+
+## Diagnóstico SCALE
+- **Score geral:** ${record.score || '-'}
+- **Nível:** ${record.nivel || '-'}
+- **Gargalo crítico:** ${record.gargalo || 'Não informado'}
+
+### Dimensões
+${dims}
+
+## Prioridades sugeridas pelo diagnóstico
+${priorities}
+
+## Parecer do Archie
+${report.parecer || 'Não disponível'}
+
+## Inteligência Masterboard
+${report.setor_insights || 'Não disponível'}
+
+${report.ecossistema_match ? `## Match de ecossistema\n${report.ecossistema_match}\n\n` : ''}## Histórico da conversa
+${record.conversation || 'Não disponível'}
+
+## Respostas do lead
+${record.answers || 'Não disponível'}
+
+## Entrega esperada
+Responda em Markdown com:
+1. **Resumo executivo em 5 linhas.**
+2. **Prioridade comercial:** Alta, Média ou Baixa, com justificativa.
+3. **Mensagem de WhatsApp pronta para envio.**
+4. **Mensagem de e-mail curta.**
+5. **3 perguntas para reunião de diagnóstico.**
+6. **Riscos de perda ou objeções prováveis.**
+7. **Próxima ação recomendada.**
+`;
+}
+function renderLeadPdfHtml(record) {
+  const report = record.report || {};
+  const dims = Object.entries(report.dimensoes || {})
+    .map(([key, dim]) => `<tr><td><strong>${escapeHtml(key)}</strong></td><td>${escapeHtml(dim.score ?? '-')}</td><td>${escapeHtml(dim.status || '-')}</td><td>${escapeHtml(dim.gargalo || '-')}</td></tr>`)
+    .join('');
+  const priorities = (record.prioridades || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+  return `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>${escapeHtml(record.nome || 'Lead')}</title>
+<style>
+body{font-family:Arial,sans-serif;color:#111;margin:32px;line-height:1.5}
+h1{margin:0 0 4px;font-size:28px}
+h2{border-top:1px solid #ddd;margin-top:22px;padding-top:16px;font-size:15px;text-transform:uppercase;letter-spacing:.08em}
+.muted{color:#666}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+.box{border:1px solid #ddd;border-radius:10px;padding:10px}.label{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.value{font-weight:700;margin-top:4px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:8px;text-align:left;vertical-align:top}
+th{background:#f4f4f4}.pre{white-space:pre-wrap}.score{font-size:42px;font-weight:800;color:#C99703}
+@media print{body{margin:20px}}
+</style>
+</head>
+<body>
+<h1>${escapeHtml(record.empresa || record.nome || 'Lead')}</h1>
+<div class="muted">Relatório do lead · Scale Diagnostic · ${escapeHtml(formatDate(new Date().toISOString()))}</div>
+<div class="grid">
+  <div class="box"><div class="label">Nome</div><div class="value">${escapeHtml(record.nome || '-')}</div></div>
+  <div class="box"><div class="label">Empresa</div><div class="value">${escapeHtml(record.empresa || '-')}</div></div>
+  <div class="box"><div class="label">Email</div><div class="value">${escapeHtml(record.email || '-')}</div></div>
+  <div class="box"><div class="label">WhatsApp</div><div class="value">${escapeHtml(record.whatsapp || '-')}</div></div>
+  <div class="box"><div class="label">Faturamento</div><div class="value">${escapeHtml(record.faturamento || '-')}</div></div>
+  <div class="box"><div class="label">Região</div><div class="value">${escapeHtml(record.localizacao || '-')}</div></div>
+</div>
+<h2>Diagnóstico</h2>
+<div class="score">${escapeHtml(record.score || '-')}</div>
+<p><strong>Nível:</strong> ${escapeHtml(record.nivel || '-')}</p>
+<p><strong>Gargalo crítico:</strong> ${escapeHtml(record.gargalo || 'Não informado')}</p>
+<h2>Dimensões SCALE</h2>
+<table><thead><tr><th>Dimensão</th><th>Score</th><th>Status</th><th>Gargalo</th></tr></thead><tbody>${dims || '<tr><td colspan="4">Sem dimensões disponíveis</td></tr>'}</tbody></table>
+<h2>Prioridades</h2>
+<ol>${priorities || '<li>Sem prioridades disponíveis</li>'}</ol>
+<h2>Parecer</h2><div class="pre">${escapeHtml(report.parecer || 'Não disponível')}</div>
+<h2>Inteligência Masterboard</h2><div class="pre">${escapeHtml(report.setor_insights || 'Não disponível')}</div>
+<h2>Histórico da conversa</h2><div class="pre">${escapeHtml(record.conversation || 'Não disponível')}</div>
+<h2>Respostas do lead</h2><div class="pre">${escapeHtml(record.answers || 'Não disponível')}</div>
+</body>
+</html>`;
+}
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast('Copiado');
+  } catch {
+    toast('Não foi possível copiar');
+  }
+}
+function downloadCsv(rows, filename) {
+  const cols = ['nome', 'empresa', 'email', 'whatsapp', 'faturamento', 'localizacao', 'score', 'nivel', 'status', 'gargalo', 'updatedAt'];
+  const csv = [cols.join(',')]
+    .concat(rows.map((record) => cols.map((col) => `"${String(record[col] ?? '').replace(/"/g, '""')}"`).join(',')))
+    .join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  toast('Exportação gerada');
+}
+function toast(message) {
+  $('toast').textContent = message;
+  $('toast').classList.add('visible');
+  setTimeout(() => $('toast').classList.remove('visible'), 1800);
+}
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 </script>
 </body>
 </html>
