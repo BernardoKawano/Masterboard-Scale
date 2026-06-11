@@ -6,3 +6,8 @@
   from = "/api/diagnostic"
   to = "/.netlify/functions/diagnostic"
   status = 200
+
+[[redirects]]
+  from = "/api/dashboard"
+  to = "/.netlify/functions/dashboard"
+  status = 200

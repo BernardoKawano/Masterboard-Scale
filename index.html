@@ -2146,12 +2146,20 @@ const DEMO_CHAT_REPLIES = [
   JSON.stringify(DEMO_REPORT),
 ];
 
+function createLeadId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return window.crypto.randomUUID();
+  }
+  return `lead_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
 // ── MODO DEMO: ?demo=showoff — mostra tela showoff + relatório sem API ──
 (function() {
   const p = new URLSearchParams(window.location.search);
   if (p.get('demo') === 'chat') {
     demoChatMode = true;
     formData = {
+      leadId: 'demo-chat',
       nome: 'Bernardo Kawano',
       email: 'bernardo@masterboard.com.br',
       whatsapp: '(11) 99999-9999',
@@ -2206,6 +2214,7 @@ const DEMO_CHAT_REPLIES = [
   const p = new URLSearchParams(window.location.search);
   if (p.get('start') === '1') {
     formData = {
+      leadId: p.get('leadId') || createLeadId(),
       nome: p.get('nome') || '',
       email: p.get('email') || '',
       whatsapp: p.get('whatsapp') || '',
@@ -2352,13 +2361,14 @@ function submitForm() {
   }
 
   const localizacao = document.getElementById('f-localizacao').value.trim();
+  const leadId = createLeadId();
 
-  formData = { nome, email, whatsapp, faturamento, localizacao };
+  formData = { leadId, nome, email, whatsapp, faturamento, localizacao };
 
   captureLead(formData);
 
   // Redireciona na mesma aba — compatível com todos os browsers/mobile
-  const params = new URLSearchParams({ nome, email, whatsapp, faturamento, localizacao, start: '1' });
+  const params = new URLSearchParams({ leadId, nome, email, whatsapp, faturamento, localizacao, start: '1' });
   window.location.href = '/?' + params.toString();
 }
  

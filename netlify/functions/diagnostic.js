@@ -1,3 +1,11 @@
+const {
+  createCapturedPatch,
+  createCompletedPatch,
+  createErrorPatch,
+  createStartedPatch,
+} = require('./_records');
+const { saveRecordPatch } = require('./_blobStore');
+
 exports.handler = async function (event) {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
@@ -134,12 +142,14 @@ Após as 7 perguntas e com email já confirmado no formulário, responda APENAS 
 
 TOM: Direto, frases curtas, sem elogios. Nunca use as palavras "mentoria" ou "consultoria" nas respostas do Archie.`;
 
+  let body;
   try {
-    const body = JSON.parse(event.body);
+    body = JSON.parse(event.body || '{}');
     const { messages, formData } = body;
 
     // Handle lead capture (form submitted, chat not started)
     if (messages && messages.length === 1 && messages[0].content === '__lead_capture__') {
+      await persistDashboardRecord(createCapturedPatch(formData), 'lead_capture');
       if (formData && formData.email) {
         await sendLeadCapture(formData);
       }
@@ -173,6 +183,8 @@ TOM: Direto, frases curtas, sem elogios. Nunca use as palavras "mentoria" ou "co
       // FALLBACK iOS/Safari: dispara lead capture aqui também,
       // pois o Safari cancela a requisição anterior antes de navegar.
       if (messages.length === 1 && messages[0].content === 'olá' && formData.email) {
+        persistDashboardRecord(createStartedPatch(formData, messages), 'diagnostic_started')
+          .catch(e => console.error('Dashboard started fallback:', e.message));
         sendLeadCapture(formData).catch(e => console.error('Lead capture fallback:', e.message));
       }
     }
@@ -234,6 +246,8 @@ TOM: Direto, frases curtas, sem elogios. Nunca use as palavras "mentoria" ou "co
           report.conversation = conversation;
           report.answers = answers;
 
+          await persistDashboardRecord(createCompletedPatch(formData, report, messages), 'diagnostic_completed');
+
           const clientReport = { ...report };
           delete clientReport.conversation;
           delete clientReport.answers;
@@ -253,12 +267,24 @@ TOM: Direto, frases curtas, sem elogios. Nunca use as palavras "mentoria" ou "co
     };
   } catch (err) {
     console.error('Erro geral:', err.message);
+    if (body?.formData) {
+      await persistDashboardRecord(createErrorPatch(body.formData, err), 'diagnostic_error');
+    }
     return {
       statusCode: 500,
       body: JSON.stringify({ reply: "Erro interno. Tente novamente." }),
     };
   }
 };
+
+async function persistDashboardRecord(patch, stage) {
+  try {
+    return await saveRecordPatch(patch);
+  } catch (e) {
+    console.error(`[dashboard_metric] write_failed stage=${stage} leadId=${patch?.leadId || 'unknown'} error=${e.message}`);
+    return null;
+  }
+}
 
 async function sendLeadCapture(data) {
   const RESEND_KEY = process.env.RESEND_API_KEY;
