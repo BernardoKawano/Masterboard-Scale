@@ -9,6 +9,7 @@ const {
   getRecordKey,
   mergeRecord,
   normalizeFormData,
+  normalizeLocation,
   summarizeRecord,
 } = require('../netlify/functions/_records');
 
@@ -60,11 +61,21 @@ test('normaliza dados do formulario', () => {
   assert.equal(normalized.nome, 'Ana Founder');
   assert.equal(normalized.email, 'ana@example.com');
   assert.equal(normalized.whatsapp, '(11) 99999-9999');
+  assert.equal(normalized.localizacao, 'São Paulo, SP');
 });
 
 test('gera chave previsivel para Netlify Blobs', () => {
   assert.equal(getRecordKey('lead_abc123'), 'leads/lead_abc123.json');
   assert.equal(getRecordKey('lead/abc 123'), 'leads/lead_abc_123.json');
+});
+
+test('normaliza variacoes de cidade e estado para agrupamento', () => {
+  assert.equal(normalizeLocation('Maringá, PR'), 'Maringá, PR');
+  assert.equal(normalizeLocation('Maringá / PR'), 'Maringá, PR');
+  assert.equal(normalizeLocation('Maringá/PR'), 'Maringá, PR');
+  assert.equal(normalizeLocation('Curitiba PR'), 'Curitiba, PR');
+  assert.equal(normalizeLocation('Curitiba, Paraná'), 'Curitiba, PR');
+  assert.equal(normalizeLocation('Maringá'), 'Maringá');
 });
 
 test('mescla captura, inicio e conclusao sem perder createdAt', () => {
@@ -114,7 +125,7 @@ test('resume registro para listagem do dashboard', () => {
     email: 'ana@example.com',
     whatsapp: '(11) 99999-9999',
     faturamento: 'R$1M-R$5M/ano',
-    localizacao: 'Sao Paulo - SP',
+    localizacao: 'São Paulo, SP',
     score_geral: 42,
     nivel: 'Em Desenvolvimento',
     gargalo_critico: 'Aquisicao depende de relacionamento direto.',

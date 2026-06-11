@@ -19,6 +19,128 @@ function cleanString(value) {
   return String(value).trim();
 }
 
+const STATE_ALIASES = {
+  ac: 'AC',
+  acre: 'AC',
+  al: 'AL',
+  alagoas: 'AL',
+  ap: 'AP',
+  amapa: 'AP',
+  am: 'AM',
+  amazonas: 'AM',
+  ba: 'BA',
+  bahia: 'BA',
+  ce: 'CE',
+  ceara: 'CE',
+  df: 'DF',
+  distrito_federal: 'DF',
+  es: 'ES',
+  espirito_santo: 'ES',
+  go: 'GO',
+  goias: 'GO',
+  ma: 'MA',
+  maranhao: 'MA',
+  mt: 'MT',
+  mato_grosso: 'MT',
+  ms: 'MS',
+  mato_grosso_do_sul: 'MS',
+  mg: 'MG',
+  minas_gerais: 'MG',
+  pa: 'PA',
+  para: 'PA',
+  pb: 'PB',
+  paraiba: 'PB',
+  pr: 'PR',
+  parana: 'PR',
+  pe: 'PE',
+  pernambuco: 'PE',
+  pi: 'PI',
+  piaui: 'PI',
+  rj: 'RJ',
+  rio_de_janeiro: 'RJ',
+  rn: 'RN',
+  rio_grande_do_norte: 'RN',
+  rs: 'RS',
+  rio_grande_do_sul: 'RS',
+  ro: 'RO',
+  rondonia: 'RO',
+  rr: 'RR',
+  roraima: 'RR',
+  sc: 'SC',
+  santa_catarina: 'SC',
+  sp: 'SP',
+  sao_paulo: 'SP',
+  se: 'SE',
+  sergipe: 'SE',
+  to: 'TO',
+  tocantins: 'TO',
+};
+
+const CITY_ALIASES = {
+  curitiba: 'Curitiba',
+  maringa: 'Maringá',
+  sao_paulo: 'São Paulo',
+};
+
+function normalizeKey(value) {
+  return cleanString(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function titleCaseCity(value) {
+  const connectors = new Set(['da', 'de', 'di', 'do', 'das', 'dos', 'e']);
+  return cleanString(value)
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word, index) => (index > 0 && connectors.has(word) ? word : word.charAt(0).toUpperCase() + word.slice(1)))
+    .join(' ');
+}
+
+function normalizeState(value) {
+  return STATE_ALIASES[normalizeKey(value)] || '';
+}
+
+function canonicalCity(value) {
+  const cleaned = cleanString(value).replace(/\s+/g, ' ');
+  return CITY_ALIASES[normalizeKey(cleaned)] || titleCaseCity(cleaned);
+}
+
+function normalizeLocation(value) {
+  const raw = cleanString(value);
+  if (!raw) return '';
+
+  const cleaned = raw
+    .replace(/[–—-]/g, ',')
+    .replace(/\s*\/\s*/g, ',')
+    .replace(/\s*,\s*/g, ', ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const parts = cleaned.split(',').map((part) => part.trim()).filter(Boolean);
+
+  if (parts.length >= 2) {
+    const state = normalizeState(parts.at(-1));
+    const city = canonicalCity(parts.slice(0, -1).join(' '));
+    return state ? `${city}, ${state}` : canonicalCity(cleaned);
+  }
+
+  const key = normalizeKey(cleaned);
+  const stateAlias = Object.keys(STATE_ALIASES)
+    .sort((a, b) => b.length - a.length)
+    .find((alias) => key.endsWith(`_${alias}`));
+
+  if (stateAlias) {
+    const cityKey = key.slice(0, -(stateAlias.length + 1)).replace(/_/g, ' ');
+    return `${canonicalCity(cityKey)}, ${STATE_ALIASES[stateAlias]}`;
+  }
+
+  return canonicalCity(cleaned);
+}
+
 function createLeadId() {
   if (typeof randomUUID === 'function') return randomUUID();
   return `lead_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
@@ -31,7 +153,7 @@ function normalizeFormData(formData = {}) {
     email: cleanString(formData.email).toLowerCase(),
     whatsapp: cleanString(formData.whatsapp),
     faturamento: cleanString(formData.faturamento),
-    localizacao: cleanString(formData.localizacao),
+    localizacao: normalizeLocation(formData.localizacao),
   };
 }
 
@@ -80,7 +202,7 @@ function sanitizeReport(report = {}) {
     email: cleanString(clientReport.email).toLowerCase(),
     whatsapp: cleanString(clientReport.whatsapp),
     faturamento: cleanString(clientReport.faturamento),
-    localizacao: cleanString(clientReport.localizacao),
+    localizacao: normalizeLocation(clientReport.localizacao),
     score_geral: Number(clientReport.score_geral ?? 0),
     nivel: cleanString(clientReport.nivel),
     dimensoes: clientReport.dimensoes || {},
@@ -302,6 +424,7 @@ module.exports = {
   getRecordKey,
   mergeRecord,
   normalizeFormData,
+  normalizeLocation,
   sanitizeReport,
   summarizeRecord,
 };

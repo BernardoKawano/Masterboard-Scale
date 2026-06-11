@@ -221,8 +221,8 @@ tr:hover td { background: rgba(251,190,10,0.035); }
       </div>
       <div class="card" style="padding:16px;margin-top:14px">
         <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px">
-          <h2>Últimos leads</h2>
-          <span class="muted">Clique para abrir o detalhe</span>
+          <h2>Últimos leads que chegaram</h2>
+          <span class="muted">Ordenado por data de chegada, não por atualização</span>
         </div>
         <div class="list-stack" id="recentList"></div>
       </div>
@@ -258,6 +258,7 @@ tr:hover td { background: rgba(251,190,10,0.035); }
                 <th data-sort="commercialStatus">Comercial</th>
                 <th data-sort="faturamento">Faturamento</th>
                 <th data-sort="localizacao">Região</th>
+                <th data-sort="createdAt">Chegada</th>
                 <th data-sort="updatedAt">Última interação</th>
                 <th>Ações</th>
               </tr>
@@ -289,7 +290,7 @@ const state = {
   date: 'all',
   region: '',
   revenue: 'all',
-  sort: { key: 'updatedAt', dir: 'desc' },
+  sort: { key: 'createdAt', dir: 'desc' },
   view: 'home',
 };
 const params = new URLSearchParams(window.location.search);
@@ -359,7 +360,7 @@ async function loadDashboard() {
 
 function showAuth() { $('auth').hidden = false; $('app').hidden = true; }
 function showApp() { $('auth').hidden = true; $('app').hidden = false; $('authError').textContent = ''; }
-function setLoading() { $('metrics').innerHTML = ''; $('tableBody').innerHTML = '<tr><td colspan="10" class="empty">Carregando...</td></tr>'; }
+function setLoading() { $('metrics').innerHTML = ''; $('tableBody').innerHTML = '<tr><td colspan="11" class="empty">Carregando...</td></tr>'; }
 function setView(view, updateUrl = true) {
   state.view = ['home', 'leads', 'kanban', 'pipeline', 'insights'].includes(view) ? view : 'home';
   document.querySelectorAll('.nav-btn').forEach((button) => button.classList.toggle('active', button.dataset.view === state.view));
@@ -376,6 +377,7 @@ function setView(view, updateUrl = true) {
 function normalizeRecord(record) {
   const form = record.formData || {};
   const report = record.report || {};
+  const rawLocalizacao = report.localizacao || form.localizacao || '';
   return {
     ...record,
     nome: report.nome || form.nome || '',
@@ -383,7 +385,8 @@ function normalizeRecord(record) {
     email: report.email || form.email || '',
     whatsapp: report.whatsapp || form.whatsapp || '',
     faturamento: report.faturamento || form.faturamento || '',
-    localizacao: report.localizacao || form.localizacao || '',
+    rawLocalizacao,
+    localizacao: normalizeLocation(rawLocalizacao),
     score: Number(report.score_geral || 0),
     nivel: report.nivel || '',
     gargalo: report.gargalo_critico || '',
@@ -397,6 +400,66 @@ function normalizeRecord(record) {
     soldAt: record.soldAt || '',
     deletedAt: record.deletedAt || '',
   };
+}
+
+const STATE_ALIASES = {
+  ac: 'AC', acre: 'AC', al: 'AL', alagoas: 'AL', ap: 'AP', amapa: 'AP', am: 'AM', amazonas: 'AM',
+  ba: 'BA', bahia: 'BA', ce: 'CE', ceara: 'CE', df: 'DF', distrito_federal: 'DF', es: 'ES', espirito_santo: 'ES',
+  go: 'GO', goias: 'GO', ma: 'MA', maranhao: 'MA', mt: 'MT', mato_grosso: 'MT', ms: 'MS', mato_grosso_do_sul: 'MS',
+  mg: 'MG', minas_gerais: 'MG', pa: 'PA', para: 'PA', pb: 'PB', paraiba: 'PB', pr: 'PR', parana: 'PR',
+  pe: 'PE', pernambuco: 'PE', pi: 'PI', piaui: 'PI', rj: 'RJ', rio_de_janeiro: 'RJ', rn: 'RN',
+  rio_grande_do_norte: 'RN', rs: 'RS', rio_grande_do_sul: 'RS', ro: 'RO', rondonia: 'RO', rr: 'RR',
+  roraima: 'RR', sc: 'SC', santa_catarina: 'SC', sp: 'SP', sao_paulo: 'SP', se: 'SE', sergipe: 'SE', to: 'TO', tocantins: 'TO',
+};
+const CITY_ALIASES = { curitiba: 'Curitiba', maringa: 'Maringá', sao_paulo: 'São Paulo' };
+function normalizeKey(value) {
+  return String(value || '')
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+function titleCaseCity(value) {
+  const connectors = new Set(['da', 'de', 'di', 'do', 'das', 'dos', 'e']);
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word, index) => (index > 0 && connectors.has(word) ? word : word.charAt(0).toUpperCase() + word.slice(1)))
+    .join(' ');
+}
+function normalizeState(value) { return STATE_ALIASES[normalizeKey(value)] || ''; }
+function canonicalCity(value) {
+  const cleaned = String(value || '').trim().replace(/\s+/g, ' ');
+  return CITY_ALIASES[normalizeKey(cleaned)] || titleCaseCity(cleaned);
+}
+function normalizeLocation(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  const cleaned = raw
+    .replace(/[–—-]/g, ',')
+    .replace(/\s*\/\s*/g, ',')
+    .replace(/\s*,\s*/g, ', ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const parts = cleaned.split(',').map((part) => part.trim()).filter(Boolean);
+  if (parts.length >= 2) {
+    const state = normalizeState(parts.at(-1));
+    const city = canonicalCity(parts.slice(0, -1).join(' '));
+    return state ? `${city}, ${state}` : canonicalCity(cleaned);
+  }
+  const key = normalizeKey(cleaned);
+  const stateAlias = Object.keys(STATE_ALIASES)
+    .sort((a, b) => b.length - a.length)
+    .find((alias) => key.endsWith(`_${alias}`));
+  if (stateAlias) {
+    const cityKey = key.slice(0, -(stateAlias.length + 1)).replace(/_/g, ' ');
+    return `${canonicalCity(cityKey)}, ${STATE_ALIASES[stateAlias]}`;
+  }
+  return canonicalCity(cleaned);
 }
 
 function clearFilters() {
@@ -430,12 +493,12 @@ function filteredRecords() {
     if (record.deletedAt) return false;
     if (state.status !== 'all' && record.status !== state.status) return false;
     if (state.score !== 'all' && !scoreMatch(record)) return false;
-    if (state.date !== 'all' && !dateMatch(record.updatedAt, state.date)) return false;
-    if (state.region && !String(record.localizacao).toLowerCase().includes(state.region)) return false;
+    if (state.date !== 'all' && !dateMatch(arrivalDate(record), state.date)) return false;
+    if (state.region && !normalizeKey(record.localizacao).includes(normalizeKey(state.region))) return false;
     if (state.revenue !== 'all' && !revenueMatch(record.faturamento, state.revenue)) return false;
     if (!state.query) return true;
     return [record.leadId, record.nome, record.empresa, record.email, record.whatsapp, record.faturamento, record.localizacao, record.nivel, record.gargalo, labelCommercial(record)]
-      .some((value) => String(value || '').toLowerCase().includes(state.query));
+      .some((value) => normalizeKey(value).includes(normalizeKey(state.query)));
   }).sort(sorter);
 }
 function selectedRecords() { return state.records.filter((record) => !record.deletedAt && state.selected.has(record.leadId)); }
@@ -480,8 +543,10 @@ function renderMetrics() {
   const noContact = all.filter((record) => record.status === 'captured').length;
   const converted = all.filter(isConverted).length;
   const sold = all.filter((record) => record.commercialStatus === 'sold').length;
+  const latestArrival = sortByArrival(all)[0];
   const cards = [
     ['Leads', all.length, `${visible.length} visíveis`],
+    ['Último lead', latestArrival ? formatDate(arrivalDate(latestArrival)) : '-', latestArrival ? (latestArrival.empresa || latestArrival.nome || latestArrival.email || 'Lead recebido') : 'Nenhum lead recebido'],
     ['Novos hoje', today, `${week} na semana · ${month} no mês`],
     ['Diagnósticos', completed.length, `${pct(completed.length, all.length)}% do total`],
     ['Qualificados', qualified.length, `${pct(qualified.length, completed.length)}% dos concluídos`],
@@ -524,20 +589,22 @@ function renderHome() {
   document.querySelectorAll('[data-home-view]').forEach((button) => button.addEventListener('click', () => setView(button.dataset.homeView)));
 
   const focus = [...rows].sort((a, b) => priorityScore(b) - priorityScore(a)).slice(0, 12);
+  const recentArrivals = sortByArrival(rows).slice(0, 10);
   $('focusList').innerHTML = focus.length ? focus.map(focusCard).join('') : '<div class="empty">Nenhum lead na fila.</div>';
-  $('recentList').innerHTML = rows.slice(0, 10).map(focusCard).join('') || '<div class="empty">Nenhum lead encontrado.</div>';
+  $('recentList').innerHTML = recentArrivals.map((record) => focusCard(record, true)).join('') || '<div class="empty">Nenhum lead encontrado.</div>';
   document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
   bindAdminActions();
 }
 function priorityScore(record) {
   return (record.status === 'captured' ? 35 : 0) + (record.score || 0) + (revenueMatch(record.faturamento, 'high') ? 25 : 0) + (dateMatch(record.updatedAt, '7') ? 10 : 0);
 }
-function focusCard(record) {
+function focusCard(record, showArrival = false) {
   return `
     <div class="focus-card" data-open="${escapeHtml(record.leadId)}">
       <div>
         <strong>${escapeHtml(record.nome || 'Lead sem nome')}</strong>
         <div class="lead-sub">${escapeHtml(record.empresa || record.email || '-')}</div>
+        ${showArrival ? `<div class="lead-sub">Chegou em ${escapeHtml(formatDate(arrivalDate(record)))}</div>` : ''}
         <div style="margin-top:8px"><span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${scorePill(record)} ${commercialPill(record)}</div>
       </div>
       <div style="text-align:right">
@@ -561,6 +628,7 @@ function renderTable() {
       <td>${commercialPill(record)}</td>
       <td>${escapeHtml(record.faturamento || '-')}</td>
       <td>${escapeHtml(record.localizacao || '-')}</td>
+      <td>${escapeHtml(formatDate(arrivalDate(record)))}</td>
       <td>${escapeHtml(formatDate(record.updatedAt))}</td>
       <td>
         <button class="icon" data-open="${escapeHtml(record.leadId)}">Abrir</button>
@@ -569,7 +637,7 @@ function renderTable() {
         <button class="icon" data-admin="delete" data-id="${escapeHtml(record.leadId)}">Excluir</button>
       </td>
     </tr>
-  `).join('') : '<tr><td colspan="10" class="empty">Nenhum lead encontrado.</td></tr>';
+  `).join('') : '<tr><td colspan="11" class="empty">Nenhum lead encontrado.</td></tr>';
   document.querySelectorAll('[data-check]').forEach((element) => element.addEventListener('change', () => {
     element.checked ? state.selected.add(element.dataset.check) : state.selected.delete(element.dataset.check);
     renderAll();
@@ -971,6 +1039,12 @@ function scorePill(record) {
 }
 function labelStatus(status) { return { captured: 'Capturado', started: 'Iniciado', completed: 'Concluído', error: 'Erro' }[status] || 'Desconhecido'; }
 function pct(a, b) { return b ? Math.round(a / b * 100) : 0; }
+function arrivalDate(record) {
+  return record.createdAt || record.updatedAt || '';
+}
+function sortByArrival(records) {
+  return [...records].sort((a, b) => String(arrivalDate(b)).localeCompare(String(arrivalDate(a))));
+}
 function formatDate(value) {
   if (!value) return '-';
   const date = new Date(value);
@@ -1233,7 +1307,7 @@ async function copyText(text) {
   }
 }
 function downloadCsv(rows, filename) {
-  const cols = ['nome', 'empresa', 'email', 'whatsapp', 'faturamento', 'localizacao', 'score', 'nivel', 'status', 'commercialStatus', 'convertedAt', 'soldAt', 'gargalo', 'updatedAt'];
+  const cols = ['nome', 'empresa', 'email', 'whatsapp', 'faturamento', 'localizacao', 'score', 'nivel', 'status', 'commercialStatus', 'createdAt', 'convertedAt', 'soldAt', 'gargalo', 'updatedAt'];
   const csv = [cols.join(',')]
     .concat(rows.map((record) => cols.map((col) => `"${String(record[col] ?? '').replace(/"/g, '""')}"`).join(',')))
     .join('\n');
