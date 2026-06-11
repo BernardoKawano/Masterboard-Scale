@@ -80,11 +80,8 @@ function buildMetrics(summaries) {
   const totals = summaries.reduce((acc, item) => {
     acc.total += 1;
     acc[item.status] = (acc[item.status] || 0) + 1;
-    if (item.commercialStatus === 'converted') acc.converted += 1;
-    if (item.commercialStatus === 'sold') {
-      acc.converted += 1;
-      acc.sold += 1;
-    }
+    if (item.commercialStatus === 'converted' || item.commercialStatus === 'sold') acc.won += 1;
+    if (item.commercialStatus === 'lost') acc.lost += 1;
     if (item.status === 'completed' && item.score_geral > 0) {
       acc.scoreSum += item.score_geral;
       acc.scoreCount += 1;
@@ -96,11 +93,12 @@ function buildMetrics(summaries) {
     started: 0,
     completed: 0,
     error: 0,
-    converted: 0,
-    sold: 0,
+    won: 0,
+    lost: 0,
     scoreSum: 0,
     scoreCount: 0,
   });
+  const closed = totals.won + totals.lost;
 
   return {
     total: totals.total,
@@ -108,10 +106,10 @@ function buildMetrics(summaries) {
     started: totals.started,
     completed: totals.completed,
     error: totals.error,
-    converted: totals.converted,
-    sold: totals.sold,
-    conversionRate: totals.total ? Math.round((totals.converted / totals.total) * 100) : 0,
-    soldRate: totals.converted ? Math.round((totals.sold / totals.converted) * 100) : 0,
+    won: totals.won,
+    lost: totals.lost,
+    pendingOutcome: totals.total - closed,
+    winRate: closed ? Math.round((totals.won / closed) * 100) : 0,
     averageScore: totals.scoreCount ? Math.round(totals.scoreSum / totals.scoreCount) : 0,
   };
 }

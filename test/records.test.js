@@ -119,6 +119,7 @@ test('resume registro para listagem do dashboard', () => {
     completedAt: '2026-06-11T12:08:00.000Z',
     convertedAt: '',
     soldAt: '',
+    lostAt: '',
     deletedAt: '',
     nome: 'Ana Founder',
     empresa: 'Empresa Alpha',
@@ -134,19 +135,38 @@ test('resume registro para listagem do dashboard', () => {
 
 test('acoes administrativas preservam diagnostico e registram status comercial', () => {
   const completed = createCompletedPatch(formData, report, messages, new Date('2026-06-11T12:08:00.000Z'));
-  const converted = createAdminPatch('lead_abc123', 'mark_converted', new Date('2026-06-11T12:10:00.000Z'));
-  const sold = createAdminPatch('lead_abc123', 'mark_sold', new Date('2026-06-11T12:12:00.000Z'));
+  const won = createAdminPatch('lead_abc123', 'mark_won', new Date('2026-06-11T12:10:00.000Z'));
+  const lost = createAdminPatch('lead_abc123', 'mark_lost', new Date('2026-06-11T12:12:00.000Z'));
   const deleted = createAdminPatch('lead_abc123', 'delete', new Date('2026-06-11T12:14:00.000Z'));
 
-  const convertedRecord = mergeRecord(completed, converted);
-  const soldRecord = mergeRecord(convertedRecord, sold);
-  const deletedRecord = mergeRecord(soldRecord, deleted);
+  const wonRecord = mergeRecord(completed, won);
+  const lostRecord = mergeRecord(wonRecord, lost);
+  const deletedRecord = mergeRecord(lostRecord, deleted);
 
   assert.equal(deletedRecord.status, 'completed');
   assert.equal(deletedRecord.report.empresa, 'Empresa Alpha');
-  assert.equal(deletedRecord.commercialStatus, 'sold');
-  assert.equal(deletedRecord.convertedAt, '2026-06-11T12:10:00.000Z');
-  assert.equal(deletedRecord.soldAt, '2026-06-11T12:12:00.000Z');
+  assert.equal(wonRecord.commercialStatus, 'sold');
+  assert.equal(wonRecord.convertedAt, '2026-06-11T12:10:00.000Z');
+  assert.equal(wonRecord.soldAt, '2026-06-11T12:10:00.000Z');
+  assert.equal(deletedRecord.commercialStatus, 'lost');
+  assert.equal(deletedRecord.convertedAt, '');
+  assert.equal(deletedRecord.soldAt, '');
+  assert.equal(deletedRecord.lostAt, '2026-06-11T12:12:00.000Z');
   assert.equal(deletedRecord.deletedAt, '2026-06-11T12:14:00.000Z');
   assert.equal(deletedRecord.events.at(-1).type, 'dashboard_deleted');
+});
+
+test('acoes antigas de convertido e vendido continuam significando ganho', () => {
+  const completed = createCompletedPatch(formData, report, messages, new Date('2026-06-11T12:08:00.000Z'));
+  const converted = createAdminPatch('lead_abc123', 'mark_converted', new Date('2026-06-11T12:10:00.000Z'));
+  const sold = createAdminPatch('lead_abc123', 'mark_sold', new Date('2026-06-11T12:12:00.000Z'));
+
+  const convertedRecord = mergeRecord(completed, converted);
+  const soldRecord = mergeRecord(convertedRecord, sold);
+
+  assert.equal(convertedRecord.commercialStatus, 'sold');
+  assert.equal(convertedRecord.soldAt, '2026-06-11T12:10:00.000Z');
+  assert.equal(soldRecord.commercialStatus, 'sold');
+  assert.equal(soldRecord.convertedAt, '2026-06-11T12:10:00.000Z');
+  assert.equal(soldRecord.soldAt, '2026-06-11T12:12:00.000Z');
 });

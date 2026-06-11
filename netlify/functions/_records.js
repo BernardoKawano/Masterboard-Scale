@@ -303,25 +303,27 @@ function createAdminPatch(leadId, action, now = new Date()) {
     };
   }
 
-  if (action === 'mark_converted') {
-    return {
-      leadId: normalizedLeadId,
-      updatedAt: at,
-      commercialStatus: 'converted',
-      convertedAt: at,
-      soldAt: '',
-      events: [{ type: 'dashboard_marked_converted', at }],
-    };
-  }
-
-  if (action === 'mark_sold') {
+  if (action === 'mark_converted' || action === 'mark_sold' || action === 'mark_won') {
     return {
       leadId: normalizedLeadId,
       updatedAt: at,
       commercialStatus: 'sold',
       convertedAt: at,
       soldAt: at,
-      events: [{ type: 'dashboard_marked_sold', at }],
+      lostAt: '',
+      events: [{ type: 'dashboard_marked_won', at }],
+    };
+  }
+
+  if (action === 'mark_lost') {
+    return {
+      leadId: normalizedLeadId,
+      updatedAt: at,
+      commercialStatus: 'lost',
+      convertedAt: '',
+      soldAt: '',
+      lostAt: at,
+      events: [{ type: 'dashboard_marked_lost', at }],
     };
   }
 
@@ -332,6 +334,7 @@ function createAdminPatch(leadId, action, now = new Date()) {
       commercialStatus: '',
       convertedAt: '',
       soldAt: '',
+      lostAt: '',
       events: [{ type: 'dashboard_cleared_commercial_status', at }],
     };
   }
@@ -376,6 +379,8 @@ function mergeRecord(existing, patch) {
     updatedAt: patch.updatedAt || timestamp(),
     completedAt: patch.completedAt || existing.completedAt,
     convertedAt: nextConvertedAt,
+    soldAt: Object.prototype.hasOwnProperty.call(patch, 'soldAt') ? patch.soldAt : existing.soldAt,
+    lostAt: Object.prototype.hasOwnProperty.call(patch, 'lostAt') ? patch.lostAt : existing.lostAt,
     formData: mergeFormData(existing.formData, patch.formData),
     events: [...(existing.events || []), ...(patch.events || [])],
   };
@@ -394,6 +399,7 @@ function summarizeRecord(record) {
     completedAt: record.completedAt || '',
     convertedAt: record.convertedAt || '',
     soldAt: record.soldAt || '',
+    lostAt: record.lostAt || '',
     deletedAt: record.deletedAt || '',
     nome: report.nome || form.nome || '',
     empresa: report.empresa || '',

@@ -226,6 +226,13 @@ tr:hover td { background: rgba(251,190,10,0.035); }
         </div>
         <div class="list-stack" id="recentList"></div>
       </div>
+      <div class="card" style="padding:16px;margin-top:14px">
+        <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px">
+          <h2>Resultado comercial</h2>
+          <span class="muted">Quem deu certo e quem não deu</span>
+        </div>
+        <div class="home-grid" id="outcomeList"></div>
+      </div>
     </section>
 
     <section class="page" id="leadsPage">
@@ -255,7 +262,7 @@ tr:hover td { background: rgba(251,190,10,0.035); }
                 <th data-sort="empresa">Empresa</th>
                 <th data-sort="score">Score</th>
                 <th data-sort="status">Status</th>
-                <th data-sort="commercialStatus">Comercial</th>
+                <th data-sort="commercialStatus">Resultado</th>
                 <th data-sort="faturamento">Faturamento</th>
                 <th data-sort="localizacao">Região</th>
                 <th data-sort="createdAt">Chegada</th>
@@ -398,6 +405,7 @@ function normalizeRecord(record) {
     completedAt: record.completedAt || '',
     convertedAt: record.convertedAt || '',
     soldAt: record.soldAt || '',
+    lostAt: record.lostAt || '',
     deletedAt: record.deletedAt || '',
   };
 }
@@ -541,8 +549,10 @@ function renderMetrics() {
   const qualified = completed.filter((record) => record.score >= 50);
   const average = completed.length ? Math.round(completed.reduce((sum, record) => sum + record.score, 0) / completed.length) : 0;
   const noContact = all.filter((record) => record.status === 'captured').length;
-  const converted = all.filter(isConverted).length;
-  const sold = all.filter((record) => record.commercialStatus === 'sold').length;
+  const won = all.filter(isWon).length;
+  const lost = all.filter(isLost).length;
+  const closed = won + lost;
+  const pendingOutcome = all.length - closed;
   const latestArrival = sortByArrival(all)[0];
   const cards = [
     ['Leads', all.length, `${visible.length} visíveis`],
@@ -550,8 +560,9 @@ function renderMetrics() {
     ['Novos hoje', today, `${week} na semana · ${month} no mês`],
     ['Diagnósticos', completed.length, `${pct(completed.length, all.length)}% do total`],
     ['Qualificados', qualified.length, `${pct(qualified.length, completed.length)}% dos concluídos`],
-    ['Convertidos', converted, `${pct(converted, all.length)}% dos leads`],
-    ['Vendidos', sold, `${pct(sold, converted)}% dos convertidos`],
+    ['Deram certo', won, `${pct(won, closed)}% dos encerrados`],
+    ['Não deram certo', lost, `${pct(lost, closed)}% dos encerrados`],
+    ['Sem resultado', pendingOutcome, 'Ainda aberto ou não marcado'],
     ['Score médio', average, average >= 50 ? 'Base aquecida' : 'Priorizar nutrição'],
     ['Sem contato', noContact, 'Leads capturados sem diagnóstico'],
   ];
@@ -590,8 +601,20 @@ function renderHome() {
 
   const focus = [...rows].sort((a, b) => priorityScore(b) - priorityScore(a)).slice(0, 12);
   const recentArrivals = sortByArrival(rows).slice(0, 10);
+  const won = rows.filter(isWon).slice(0, 8);
+  const lost = rows.filter(isLost).slice(0, 8);
   $('focusList').innerHTML = focus.length ? focus.map(focusCard).join('') : '<div class="empty">Nenhum lead na fila.</div>';
   $('recentList').innerHTML = recentArrivals.map((record) => focusCard(record, true)).join('') || '<div class="empty">Nenhum lead encontrado.</div>';
+  $('outcomeList').innerHTML = `
+    <div>
+      <div class="metric-label" style="margin-bottom:10px">Deram certo</div>
+      <div class="list-stack">${won.map((record) => focusCard(record, false)).join('') || '<div class="empty">Nenhum ganho marcado.</div>'}</div>
+    </div>
+    <div>
+      <div class="metric-label" style="margin-bottom:10px">Não deram certo</div>
+      <div class="list-stack">${lost.map((record) => focusCard(record, false)).join('') || '<div class="empty">Nenhuma perda marcada.</div>'}</div>
+    </div>
+  `;
   document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
   bindAdminActions();
 }
@@ -632,8 +655,8 @@ function renderTable() {
       <td>${escapeHtml(formatDate(record.updatedAt))}</td>
       <td>
         <button class="icon" data-open="${escapeHtml(record.leadId)}">Abrir</button>
-        <button class="icon" data-admin="mark_converted" data-id="${escapeHtml(record.leadId)}">Convertido</button>
-        <button class="icon" data-admin="mark_sold" data-id="${escapeHtml(record.leadId)}">Vendido</button>
+        <button class="icon" data-admin="mark_won" data-id="${escapeHtml(record.leadId)}">Deu certo</button>
+        <button class="icon" data-admin="mark_lost" data-id="${escapeHtml(record.leadId)}">Não deu</button>
         <button class="icon" data-admin="delete" data-id="${escapeHtml(record.leadId)}">Excluir</button>
       </td>
     </tr>
@@ -695,16 +718,18 @@ function renderFunnel() {
   const completed = all.filter((record) => record.status === 'completed');
   const qualified = completed.filter((record) => record.score >= 50);
   const hot = completed.filter((record) => record.score >= 60);
-  const converted = all.filter(isConverted);
-  const sold = all.filter((record) => record.commercialStatus === 'sold');
+  const won = all.filter(isWon);
+  const lost = all.filter(isLost);
+  const pendingOutcome = all.filter((record) => !isWon(record) && !isLost(record));
   const highRevenue = all.filter((record) => revenueMatch(record.faturamento, 'high'));
   const steps = [
     ['Leads capturados', all.length],
     ['Diagnósticos concluídos', completed.length],
     ['Qualificados (score 50+)', qualified.length],
     ['Prioridade alta (score 60+)', hot.length],
-    ['Convertidos', converted.length],
-    ['Vendidos', sold.length],
+    ['Deram certo', won.length],
+    ['Não deram certo', lost.length],
+    ['Sem resultado', pendingOutcome.length],
     ['Alto faturamento', highRevenue.length],
   ];
   const max = Math.max(...steps.map((step) => step[1]), 1);
@@ -714,14 +739,14 @@ function renderFunnel() {
       <div class="funnel-bar"><div class="funnel-fill" style="width:${Math.max(7, value / max * 100)}%">${value}</div></div>
       <span class="muted">${index ? pct(value, steps[index - 1][1]) : '100'}%</span>
     </div>
-  `).join('') + `<div class="muted" style="margin-top:8px">Relação vendidos/convertidos: ${sold.length}/${converted.length} (${pct(sold.length, converted.length)}%)</div>`;
+  `).join('') + `<div class="muted" style="margin-top:8px">Relação deu certo/não deu: ${won.length}/${lost.length} · Taxa de acerto: ${pct(won.length, won.length + lost.length)}%</div>`;
 }
 function renderInsights() {
   const rows = filteredRecords();
   $('insights').innerHTML = [
     insightRank('Regiões com mais leads', rank(rows, (record) => record.localizacao || 'Não informado')),
     insightRank('Faixas de faturamento', rank(rows, (record) => record.faturamento || 'Não informado')),
-    insightRank('Status comercial', rank(rows, (record) => labelCommercial(record))),
+    insightRank('Resultado comercial', rank(rows, (record) => labelCommercial(record))),
     insightRank('Níveis SCALE', rank(rows, (record) => record.nivel || 'Sem diagnóstico')),
     insightRank('Gargalos recorrentes', rank(rows, (record) => firstWords(record.gargalo) || 'Sem gargalo')),
   ].join('');
@@ -771,9 +796,9 @@ function openDrawer(id) {
       <button class="btn secondary" onclick="downloadLeadPdf()">Abrir PDF</button>
       <button class="btn secondary" onclick="openQaPopup()">Ver perguntas/respostas</button>
       <button class="btn secondary" onclick="copyCurrent()">Copiar dados</button>
-      <button class="btn secondary" onclick="markCurrentLead('mark_converted')">Marcar convertido</button>
-      <button class="btn secondary" onclick="markCurrentLead('mark_sold')">Marcar vendido</button>
-      <button class="btn secondary" onclick="markCurrentLead('clear_commercial_status')">Limpar venda</button>
+      <button class="btn secondary" onclick="markCurrentLead('mark_won')">Marcar deu certo</button>
+      <button class="btn secondary" onclick="markCurrentLead('mark_lost')">Marcar não deu</button>
+      <button class="btn secondary" onclick="markCurrentLead('clear_commercial_status')">Limpar resultado</button>
       <button class="btn secondary" onclick="markCurrentLead('delete')">Excluir card</button>
       ${record.whatsapp ? `<a class="btn secondary" href="${escapeHtml(whatsappUrl(record.whatsapp))}" target="_blank" rel="noreferrer">WhatsApp</a>` : ''}
       ${record.email ? `<a class="btn secondary" href="mailto:${escapeHtml(record.email)}">Email</a>` : ''}
@@ -787,8 +812,8 @@ function openDrawer(id) {
       ${fact('Região', record.localizacao)}
       ${fact('Score', record.score || '-')}
       ${fact('Nível', record.nivel || '-')}
-      ${fact('Status comercial', labelCommercial(record))}
-      ${fact('Vendido em', record.soldAt ? formatDate(record.soldAt) : '-')}
+      ${fact('Resultado comercial', labelCommercial(record))}
+      ${fact('Resultado em', outcomeDate(record) ? formatDate(outcomeDate(record)) : '-')}
     </div>
     ${report.tipo ? `
       <div class="section"><h2>Gargalo crítico</h2><div class="copy">${escapeHtml(record.gargalo || 'Não informado')}</div></div>
@@ -961,9 +986,11 @@ function bindAdminActions() {
 async function patchDashboardRecord(leadId, action) {
   const messages = {
     delete: 'Excluir este card do dashboard? O registro ficará preservado no histórico para restauração técnica.',
-    mark_converted: 'Marcar este lead como convertido?',
-    mark_sold: 'Marcar este lead como vendido?',
-    clear_commercial_status: 'Limpar o status comercial deste lead?',
+    mark_converted: 'Marcar este lead como deu certo?',
+    mark_sold: 'Marcar este lead como deu certo?',
+    mark_won: 'Marcar este lead como deu certo?',
+    mark_lost: 'Marcar este lead como não deu certo?',
+    clear_commercial_status: 'Limpar o resultado comercial deste lead?',
   };
   if (messages[action] && !window.confirm(messages[action])) return;
 
@@ -1001,9 +1028,11 @@ function upsertRecord(record) {
 function labelAdminAction(action) {
   return {
     delete: 'Card excluído',
-    mark_converted: 'Lead marcado como convertido',
-    mark_sold: 'Lead marcado como vendido',
-    clear_commercial_status: 'Status comercial limpo',
+    mark_converted: 'Lead marcado como deu certo',
+    mark_sold: 'Lead marcado como deu certo',
+    mark_won: 'Lead marcado como deu certo',
+    mark_lost: 'Lead marcado como não deu certo',
+    clear_commercial_status: 'Resultado comercial limpo',
   }[action] || 'Lead atualizado';
 }
 function fact(label, value) { return `<div class="fact"><div class="fact-label">${escapeHtml(label)}</div><div class="fact-value">${escapeHtml(value || '-')}</div></div>`; }
@@ -1018,18 +1047,26 @@ function dimension(key, dim = {}) {
     </div>
   `;
 }
-function isConverted(record) {
+function isWon(record) {
   return record.commercialStatus === 'converted' || record.commercialStatus === 'sold';
 }
+function isLost(record) {
+  return record.commercialStatus === 'lost';
+}
+function outcomeDate(record) {
+  if (isLost(record)) return record.lostAt || record.updatedAt;
+  if (isWon(record)) return record.soldAt || record.convertedAt || record.updatedAt;
+  return '';
+}
 function labelCommercial(record) {
-  if (record.commercialStatus === 'sold') return 'Vendido';
-  if (record.commercialStatus === 'converted') return 'Convertido';
-  return 'Aberto';
+  if (isWon(record)) return 'Deu certo';
+  if (isLost(record)) return 'Não deu certo';
+  return 'Sem resultado';
 }
 function commercialPill(record) {
-  if (record.commercialStatus === 'sold') return '<span class="pill completed">Vendido</span>';
-  if (record.commercialStatus === 'converted') return '<span class="pill captured">Convertido</span>';
-  return '<span class="pill">Aberto</span>';
+  if (isWon(record)) return '<span class="pill completed">Deu certo</span>';
+  if (isLost(record)) return '<span class="pill error">Não deu</span>';
+  return '<span class="pill">Sem resultado</span>';
 }
 function scorePill(record) {
   if (!record.score) return '<span class="pill">Sem score</span>';
@@ -1066,9 +1103,8 @@ function formatLeadText(record) {
     `Região: ${record.localizacao || '-'}`,
     `Score: ${record.score || '-'}`,
     `Status: ${labelStatus(record.status)}`,
-    `Status comercial: ${labelCommercial(record)}`,
-    `Convertido em: ${record.convertedAt ? formatDate(record.convertedAt) : '-'}`,
-    `Vendido em: ${record.soldAt ? formatDate(record.soldAt) : '-'}`,
+    `Resultado comercial: ${labelCommercial(record)}`,
+    `Resultado em: ${outcomeDate(record) ? formatDate(outcomeDate(record)) : '-'}`,
     `Gargalo: ${record.gargalo || '-'}`,
   ].join('\n');
 }
@@ -1122,9 +1158,8 @@ Sua resposta deve ajudar Fabio/Bernardo a decidir rapidamente:
 | Localização | ${record.localizacao || '-'} |
 | Faturamento informado | ${record.faturamento || '-'} |
 | Status no dashboard | ${labelStatus(record.status)} |
-| Status comercial | ${labelCommercial(record)} |
-| Convertido em | ${record.convertedAt ? formatDate(record.convertedAt) : '-'} |
-| Vendido em | ${record.soldAt ? formatDate(record.soldAt) : '-'} |
+| Resultado comercial | ${labelCommercial(record)} |
+| Resultado em | ${outcomeDate(record) ? formatDate(outcomeDate(record)) : '-'} |
 | Lead ID | ${record.leadId || '-'} |
 
 ## Linha do tempo
@@ -1263,7 +1298,7 @@ table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:8p
     <div class="muted">${escapeHtml(record.email || '-')} · ${escapeHtml(record.whatsapp || '-')} · ${escapeHtml(record.localizacao || '-')}</div>
     <div class="grid">
       <div class="box"><div class="label">Faturamento</div><div class="value">${escapeHtml(record.faturamento || '-')}</div></div>
-      <div class="box"><div class="label">Status comercial</div><div class="value">${escapeHtml(labelCommercial(record))}</div></div>
+      <div class="box"><div class="label">Resultado comercial</div><div class="value">${escapeHtml(labelCommercial(record))}</div></div>
       <div class="box"><div class="label">Última interação</div><div class="value">${escapeHtml(formatDate(record.updatedAt))}</div></div>
     </div>
   </section>
@@ -1273,7 +1308,7 @@ table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:8p
     <div>
       <p><strong>Nível:</strong> ${escapeHtml(record.nivel || '-')}</p>
       <p><strong>Gargalo crítico:</strong> ${escapeHtml(record.gargalo || 'Não informado')}</p>
-      <p><strong>Convertido em:</strong> ${escapeHtml(record.convertedAt ? formatDate(record.convertedAt) : '-')} · <strong>Vendido em:</strong> ${escapeHtml(record.soldAt ? formatDate(record.soldAt) : '-')}</p>
+      <p><strong>Resultado comercial:</strong> ${escapeHtml(labelCommercial(record))} · <strong>Resultado em:</strong> ${escapeHtml(outcomeDate(record) ? formatDate(outcomeDate(record)) : '-')}</p>
     </div>
   </div>
   <h2>Dados do lead</h2>
@@ -1307,7 +1342,7 @@ async function copyText(text) {
   }
 }
 function downloadCsv(rows, filename) {
-  const cols = ['nome', 'empresa', 'email', 'whatsapp', 'faturamento', 'localizacao', 'score', 'nivel', 'status', 'commercialStatus', 'createdAt', 'convertedAt', 'soldAt', 'gargalo', 'updatedAt'];
+  const cols = ['nome', 'empresa', 'email', 'whatsapp', 'faturamento', 'localizacao', 'score', 'nivel', 'status', 'commercialStatus', 'createdAt', 'convertedAt', 'soldAt', 'lostAt', 'gargalo', 'updatedAt'];
   const csv = [cols.join(',')]
     .concat(rows.map((record) => cols.map((col) => `"${String(record[col] ?? '').replace(/"/g, '""')}"`).join(',')))
     .join('\n');
