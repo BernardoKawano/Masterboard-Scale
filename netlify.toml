@@ -11,3 +11,8 @@
   from = "/api/dashboard"
   to = "/.netlify/functions/dashboard"
   status = 200
+
+[[redirects]]
+  from = "/api/import-history"
+  to = "/.netlify/functions/import-history"
+  status = 200
