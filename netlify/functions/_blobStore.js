@@ -13,10 +13,7 @@ function connectBlobLambda(event) {
 function getDiagnosticsStore() {
   const { getStore } = require('@netlify/blobs');
 
-  return getStore({
-    name: STORE_NAME,
-    consistency: 'strong',
-  });
+  return getStore(STORE_NAME);
 }
 
 async function readRecord(store, leadId) {
