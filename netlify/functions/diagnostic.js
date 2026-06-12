@@ -26,18 +26,18 @@ APRESENTAÇÃO INICIAL:
 Quando receber "olá", responda APENAS com esta mensagem exata — nada mais, nada menos:
 Sou o Archie, o engine de diagnóstico da ScaleCo. Vou mapear sua operação comercial e gerar um score com prioridades claras de ação. Vamos começar?
 
-Qual é o nome da empresa, o que ela vende e qual o ticket médio por venda?
+O que a empresa vende e qual o ticket médio por venda?
 
 Isso é UMA única resposta com apresentação + pergunta 1. Nunca inclua a pergunta 2 aqui.
 
 CONTEXTO PRÉ-PREENCHIDO:
-O formulário já capturou: nome, email (se fornecido), WhatsApp, localização (cidade/estado) e faixa de faturamento anual.
-Não pergunte novamente nome, email, WhatsApp, localização ou faturamento anual.
+O formulário já capturou: nome, email, WhatsApp, empresa, site, cargo, faturamento anual, colaboradores, momento da empresa, objetivo principal e evento de interesse.
+Não pergunte novamente nome, email, WhatsApp, empresa, site, cargo, faturamento anual, colaboradores, momento, objetivo ou evento de interesse.
 
 AS 7 PERGUNTAS — UMA POR VEZ, NESSA ORDEM:
 
 1. CONTEXTO:
-"Qual é o nome da empresa, o que ela vende e qual o ticket médio por venda?"
+"O que a empresa vende e qual o ticket médio por venda?"
 
 2. S — Strategic Architecture:
 "Você consegue descrever em uma frase quem é seu cliente ideal?"
@@ -118,9 +118,9 @@ PENALIDADES AUTOMÁTICAS DE SCORE:
 - Resposta de 1 palavra para qualquer dimensão → essa dimensão = 0.
 
 INVESTIGAÇÃO SETORIAL (executa internamente antes de gerar o relatório):
-Com base no setor da empresa, porte (faturamento), localização capturada no formulário e respostas das 7 perguntas, identifique:
-1. Os 2 erros mais comuns que empresas desse setor/porte cometem na operação de receita. Seja específico, direto, e escreva como quem já viu isso dezenas de vezes. Tom: cirúrgico, sem suavizar.
-2. Uma frase vendedora sobre o que o ecossistema Masterboard pode oferecer para essa empresa, considerando setor e localização. NÃO cite nomes reais de empresas ou pessoas. Seja específico sobre o tipo de conexão (ex: "clientes corporativos no segmento de saúde em São Paulo", "parceiros de distribuição no interior de SP"). Tom: confiante, exclusivo, como quem tem acesso privilegiado.
+Com base no setor da empresa, porte (faturamento), cargo, colaboradores, momento/objetivo informados e respostas das 7 perguntas, identifique:
+1. Os 2 erros mais comuns que empresas desse setor/porte/cargo costumam cometer na operação de receita. Seja específico, direto, e escreva como quem já viu isso dezenas de vezes. Tom: cirúrgico, sem suavizar.
+2. Uma frase vendedora sobre o que o ecossistema Masterboard pode oferecer para essa empresa, considerando setor, porte, cargo, momento e objetivo informados. NÃO cite nomes reais de empresas ou pessoas. Seja específico sobre o tipo de conexão (ex: "clientes corporativos no segmento de saúde", "parceiros de distribuição", "pares de expansão internacional"). Tom: confiante, exclusivo, como quem tem acesso privilegiado.
 3. Uma tabela com 3 desafios prováveis, impactos diretos e possíveis conexões estratégicas. A tabela deve parecer uma leitura executiva de board, não uma lista genérica.
 
 CAMPOS NOVOS NO JSON DE RELATÓRIO:
@@ -167,8 +167,15 @@ TOM: Direto, frases curtas, sem elogios. Nunca use as palavras "mentoria" ou "co
       const contextParts = [];
       if (formData.nome) contextParts.push(`Nome: ${formData.nome}`);
       if (formData.email) contextParts.push(`Email: ${formData.email}`);
-      if (formData.whatsapp) contextParts.push(`WhatsApp: ${formData.whatsapp}`);
+      if (formData.whatsapp) contextParts.push(`WhatsApp: ${formData.telefone || formData.whatsapp}`);
+      if (formData.empresa) contextParts.push(`Empresa: ${formData.empresa}`);
+      if (formData.website) contextParts.push(`Site: ${formData.website}`);
+      if (formData.cargo) contextParts.push(`Cargo: ${formData.cargo}`);
       if (formData.faturamento) contextParts.push(`Faturamento anual: ${formData.faturamento}`);
+      if (formData.colaboradores) contextParts.push(`Colaboradores: ${formData.colaboradores}`);
+      if (formData.momento_label || formData.momento) contextParts.push(`Momento da empresa: ${formData.momento_label || formData.momento}`);
+      if (formData.objetivo) contextParts.push(`Objetivo principal: ${formData.objetivo}`);
+      if (formData.evento_interesse) contextParts.push(`Evento de interesse: ${formData.evento_interesse}`);
       if (formData.localizacao) contextParts.push(`Localização: ${formData.localizacao}`);
 
       if (contextParts.length > 0) {
@@ -224,8 +231,9 @@ TOM: Direto, frases curtas, sem elogios. Nunca use as palavras "mentoria" ou "co
         if (report.tipo === 'relatorio') {
           // Garantir dados via formData se não vieram no JSON
           if (!report.nome && formData?.nome) report.nome = formData.nome;
+          if (!report.empresa && formData?.empresa) report.empresa = formData.empresa;
           if (!report.email && formData?.email) report.email = formData.email;
-          if (!report.whatsapp && formData?.whatsapp) report.whatsapp = formData.whatsapp;
+          if (!report.whatsapp && formData?.whatsapp) report.whatsapp = formData.telefone || formData.whatsapp;
           if (!report.faturamento && formData?.faturamento) report.faturamento = formData.faturamento;
           if (!report.localizacao && formData?.localizacao) report.localizacao = formData.localizacao;
 
@@ -302,15 +310,22 @@ async function sendLeadCapture(data) {
     <div style="background:#1a1a1a;border-radius:8px;padding:20px;font-size:14px;color:#ccc;line-height:2.2;border:1px solid #2a2a2a;">
       <strong style="color:#FBBE0A;">Nome:</strong> ${data.nome}<br>
       <strong style="color:#FBBE0A;">Email:</strong> ${data.email}<br>
-      <strong style="color:#FBBE0A;">WhatsApp:</strong> ${data.whatsapp}<br>
+      <strong style="color:#FBBE0A;">WhatsApp:</strong> ${data.telefone || data.whatsapp}<br>
+      ${data.empresa ? `<strong style="color:#FBBE0A;">Empresa:</strong> ${data.empresa}<br>` : ''}
+      ${data.website ? `<strong style="color:#FBBE0A;">Site:</strong> ${data.website}<br>` : ''}
+      ${data.cargo ? `<strong style="color:#FBBE0A;">Cargo:</strong> ${data.cargo}<br>` : ''}
       ${data.localizacao ? `<strong style="color:#FBBE0A;">Localização:</strong> ${data.localizacao}<br>` : ''}
-      <strong style="color:#FBBE0A;">Faturamento:</strong> ${data.faturamento}
+      <strong style="color:#FBBE0A;">Faturamento:</strong> ${data.faturamento}<br>
+      ${data.colaboradores ? `<strong style="color:#FBBE0A;">Colaboradores:</strong> ${data.colaboradores}<br>` : ''}
+      ${data.momento_label || data.momento ? `<strong style="color:#FBBE0A;">Momento:</strong> ${data.momento_label || data.momento}<br>` : ''}
+      ${data.objetivo ? `<strong style="color:#FBBE0A;">Objetivo:</strong> ${data.objetivo}<br>` : ''}
+      ${data.evento_interesse ? `<strong style="color:#FBBE0A;">Evento de interesse:</strong> ${data.evento_interesse}` : ''}
     </div>
     <div style="margin-top:16px;padding:14px;background:#1a1500;border:1px solid #3a2900;border-radius:8px;font-size:13px;color:#aaa;">
       ⚠ Este lead iniciou o diagnóstico mas ainda não concluiu.
     </div>
     <div style="margin-top:20px;text-align:center;">
-      <a href="https://wa.me/55${(data.whatsapp || '').replace(/\D/g,'')}" style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;border-radius:8px;padding:12px 28px;font-weight:700;font-size:14px;">CHAMAR NO WHATSAPP</a>
+      <a href="https://wa.me/${(data.telefone || data.whatsapp || '').replace(/\D/g,'')}" style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;border-radius:8px;padding:12px 28px;font-weight:700;font-size:14px;">CHAMAR NO WHATSAPP</a>
     </div>
   </div>
   <div style="padding:16px;border-top:1px solid #222;text-align:center;font-size:11px;color:#555;">Masterboard × ScaleCo · diagnostic.scaleco.ai</div>
@@ -322,7 +337,7 @@ async function sendLeadCapture(data) {
     body: JSON.stringify({
       from: 'Archie · ScaleCo <noreply@scaleco.ai>',
       to: ['fabio@scaleco.ai', 'bernardo.kawano@masterboard.com.br'],
-      subject: `[Lead Cadastrado] ${data.nome} · ${data.faturamento}${data.localizacao ? ' · ' + data.localizacao : ''}`,
+      subject: `[Candidatura] ${data.nome} · ${data.empresa || 'Empresa não informada'} · ${data.faturamento}`,
       html
     }),
   });

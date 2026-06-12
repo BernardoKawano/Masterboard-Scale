@@ -167,12 +167,29 @@ function createLeadId() {
 }
 
 function normalizeFormData(formData = {}) {
+  const codigoPais = cleanString(formData.codigo_pais || formData.codigoPais);
+  const whatsapp = cleanString(formData.whatsapp);
+  const telefone = cleanString(formData.telefone) || [codigoPais, whatsapp].filter(Boolean).join(' ');
+
   return {
     leadId: cleanString(formData.leadId || formData.id),
+    intencao: cleanString(formData.intencao),
+    source: cleanString(formData.source),
     nome: cleanString(formData.nome),
     email: cleanString(formData.email).toLowerCase(),
-    whatsapp: cleanString(formData.whatsapp),
+    codigo_pais: codigoPais,
+    whatsapp,
+    telefone,
+    empresa: cleanString(formData.empresa),
+    website: cleanString(formData.website),
+    cargo: cleanString(formData.cargo),
     faturamento: cleanString(formData.faturamento),
+    colaboradores: cleanString(formData.colaboradores),
+    momento: cleanString(formData.momento),
+    momento_label: cleanString(formData.momento_label || formData.momentoLabel),
+    objetivo: cleanString(formData.objetivo),
+    evento_interesse: cleanString(formData.evento_interesse || formData.eventoInteresse),
+    lgpd: Boolean(formData.lgpd),
     localizacao: normalizeLocation(formData.localizacao),
   };
 }
@@ -422,7 +439,7 @@ function summarizeRecord(record) {
     lostAt: record.lostAt || '',
     deletedAt: record.deletedAt || '',
     nome: report.nome || form.nome || '',
-    empresa: report.empresa || '',
+    empresa: report.empresa || form.empresa || '',
     email: report.email || form.email || '',
     whatsapp: report.whatsapp || form.whatsapp || '',
     faturamento: report.faturamento || form.faturamento || '',

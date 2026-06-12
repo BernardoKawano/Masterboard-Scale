@@ -3,6 +3,16 @@
   functions = "netlify/functions"
 
 [[redirects]]
+  from = "/candidatura/"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/candidatura"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
   from = "/api/diagnostic"
   to = "/.netlify/functions/diagnostic"
   status = 200
