@@ -385,6 +385,10 @@ body::after {
   grid-column: 1 / -1;
 }
 
+.form-field.is-consent {
+  margin-top: 20px;
+}
+
 .form-label {
   display: block;
   font-size: 11px;
@@ -2271,39 +2275,11 @@ textarea.form-input {
         <label class="form-option"><input type="radio" name="colaboradores" value="De 10 a 50 colaboradores"><span>De 10 a 50 colaboradores</span></label>
         <label class="form-option"><input type="radio" name="colaboradores" value="Até 10 colaboradores"><span>Até 10 colaboradores</span></label>
       </div>
-    </section>
-
-    <section class="form-step" data-step="5">
-      <div class="form-kicker">Momento estratégico</div>
-      <h2 class="form-card-title">7. O que faria essa sala valer seu tempo agora?</h2>
-      <div class="form-grid">
-        <div class="form-field">
-          <label class="form-label" for="f-momento">Momento da empresa</label>
-          <div class="form-select-wrap">
-            <select id="f-momento" name="momento" class="form-input">
-              <option value="" selected>Selecione se quiser</option>
-              <option value="crescimento">Crescimento acelerado</option>
-              <option value="expansao">Expansão para novos mercados</option>
-              <option value="reposicionamento">Reposicionamento estratégico</option>
-              <option value="capital">Busca de capital ou M&A</option>
-              <option value="network">Rede certa para próximos passos</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="f-evento-interesse">Há algum evento de interesse específico?</label>
-          <input type="text" id="f-evento-interesse" name="evento_interesse" class="form-input" placeholder="Ex: Master #102 — Governança">
-        </div>
-        <div class="form-field is-wide">
-          <label class="form-label" for="f-objetivo">Objetivo principal</label>
-          <textarea id="f-objetivo" name="objetivo" class="form-input" placeholder="Ex: tomar decisões melhores com pares que vivem desafios parecidos."></textarea>
-        </div>
-        <div class="form-field is-wide">
-          <label class="form-check">
-            <input type="checkbox" id="f-lgpd" name="lgpd" required>
-            <span>Concordo com a <a href="/politica-de-privacidade/" target="_blank" rel="noopener">Política de Privacidade</a> e autorizo o contato da equipe Masterboard.</span>
-          </label>
-        </div>
+      <div class="form-field is-wide is-consent">
+        <label class="form-check">
+          <input type="checkbox" id="f-lgpd" name="lgpd" required>
+          <span>Concordo com a <a href="/politica-de-privacidade/" target="_blank" rel="noopener">Política de Privacidade</a> e autorizo o contato da equipe Masterboard.</span>
+        </label>
       </div>
     </section>
 
@@ -2382,7 +2358,7 @@ let isLoading = false;
 let msgCount = 0;
 let formData = {};
 let currentFormStep = 0;
-const FORM_TOTAL_STEPS = 6;
+const FORM_TOTAL_STEPS = 5;
 const CANDIDATURA_STORAGE_KEY = 'masterboard_candidatura_form';
 const MAX_MSGS = 14;
 let demoChatMode = false;
@@ -2435,7 +2411,7 @@ const DEMO_REPORT = {
 };
 
 const DEMO_CHAT_REPLIES = [
-  'Sou o Archie, o engine de diagnóstico da ScaleCo. Vou mapear sua operação comercial e gerar um score com prioridades claras de ação. Vamos começar?\n\nQual é o nome da empresa, o que ela vende e qual o ticket médio por venda?',
+  'Sou o Archie, o engine de diagnóstico da ScaleCo. Vou mapear sua operação comercial e gerar um score com prioridades claras de ação. Vamos começar?\n\nO que a empresa vende e qual o ticket médio por venda?',
   'Você consegue descrever em uma frase quem é seu cliente ideal?',
   'Como os clientes chegam até você hoje?',
   'Você consegue prever quanto vai faturar no próximo mês?',
@@ -2469,9 +2445,6 @@ function createLeadId() {
       cargo: 'Sócio ou Fundador',
       faturamento: 'R$1M–R$5M/ano',
       colaboradores: 'De 51 a 100 colaboradores',
-      momento: 'crescimento',
-      objetivo: 'tomar decisões melhores com pares que vivem desafios parecidos.',
-      evento_interesse: 'Master #102 — Governança',
       intencao: 'membro',
       source: 'candidatura-page',
       lgpd: true,
@@ -2539,10 +2512,6 @@ function createLeadId() {
       cargo: p.get('cargo') || storedFormData.cargo || '',
       faturamento: p.get('faturamento') || storedFormData.faturamento || '',
       colaboradores: p.get('colaboradores') || storedFormData.colaboradores || '',
-      momento: p.get('momento') || storedFormData.momento || '',
-      momento_label: p.get('momento_label') || storedFormData.momento_label || '',
-      objetivo: p.get('objetivo') || storedFormData.objetivo || '',
-      evento_interesse: p.get('evento_interesse') || storedFormData.evento_interesse || '',
       intencao: p.get('intencao') || storedFormData.intencao || '',
       source: p.get('source') || storedFormData.source || '',
       lgpd: p.get('lgpd') === '1' || Boolean(storedFormData.lgpd),
@@ -2717,11 +2686,6 @@ function getRadioValue(name) {
   return document.querySelector(`input[name="${name}"]:checked`)?.value || '';
 }
 
-function getSelectLabel(id) {
-  const select = document.getElementById(id);
-  return select?.selectedOptions?.[0]?.textContent.trim() || '';
-}
-
 function scrollFormToTop() {
   const screen = document.getElementById('form-screen');
   if (screen) screen.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2795,7 +2759,7 @@ function validateCurrentFormStep() {
     return showFormError('Por favor, selecione a quantidade de colaboradores.', 'input[name="colaboradores"]');
   }
 
-  if (currentFormStep === 5) {
+  if (currentFormStep === 4) {
     if (getFieldValue('f-gotcha')) return false;
     if (!document.getElementById('f-lgpd')?.checked) {
       return showFormError('Para continuar, aceite a Política de Privacidade.', '#f-lgpd');
@@ -2842,10 +2806,6 @@ function buildCandidaturaData(leadId) {
     cargo: getRadioValue('cargo'),
     faturamento: getRadioValue('faturamento'),
     colaboradores: getRadioValue('colaboradores'),
-    momento: getFieldValue('f-momento'),
-    momento_label: getFieldValue('f-momento') ? getSelectLabel('f-momento') : '',
-    objetivo: getFieldValue('f-objetivo'),
-    evento_interesse: getFieldValue('f-evento-interesse'),
     lgpd: Boolean(document.getElementById('f-lgpd')?.checked),
     localizacao: '',
   };

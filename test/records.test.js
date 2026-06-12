@@ -27,10 +27,6 @@ const formData = {
   cargo: 'Sócio ou Fundador',
   faturamento: 'R$1M-R$5M/ano',
   colaboradores: 'De 51 a 100 colaboradores',
-  momento: 'crescimento',
-  momento_label: 'Crescimento acelerado',
-  objetivo: 'Tomar decisões melhores com pares.',
-  evento_interesse: 'Master #102 — Governança',
   lgpd: true,
   localizacao: 'Sao Paulo - SP',
 };
@@ -78,7 +74,6 @@ test('normaliza dados do formulario', () => {
   assert.equal(normalized.empresa, 'Empresa Alpha');
   assert.equal(normalized.cargo, 'Sócio ou Fundador');
   assert.equal(normalized.colaboradores, 'De 51 a 100 colaboradores');
-  assert.equal(normalized.momento_label, 'Crescimento acelerado');
   assert.equal(normalized.lgpd, true);
   assert.equal(normalized.localizacao, 'São Paulo, SP');
 });
@@ -92,7 +87,7 @@ test('preserva campos da candidatura na captura', () => {
   assert.equal(captured.formData.website, 'https://empresa-alpha.com.br');
   assert.equal(captured.formData.cargo, 'Sócio ou Fundador');
   assert.equal(captured.formData.telefone, '+55 (11) 99999-9999');
-  assert.equal(captured.formData.evento_interesse, 'Master #102 — Governança');
+  assert.equal(captured.formData.lgpd, true);
 });
 
 test('gera chave previsivel para Netlify Blobs', () => {

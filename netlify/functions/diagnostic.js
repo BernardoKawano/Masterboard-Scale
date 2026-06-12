@@ -31,8 +31,8 @@ O que a empresa vende e qual o ticket médio por venda?
 Isso é UMA única resposta com apresentação + pergunta 1. Nunca inclua a pergunta 2 aqui.
 
 CONTEXTO PRÉ-PREENCHIDO:
-O formulário já capturou: nome, email, WhatsApp, empresa, site, cargo, faturamento anual, colaboradores, momento da empresa, objetivo principal e evento de interesse.
-Não pergunte novamente nome, email, WhatsApp, empresa, site, cargo, faturamento anual, colaboradores, momento, objetivo ou evento de interesse.
+O formulário já capturou: nome, email, WhatsApp, empresa, site, cargo, faturamento anual e colaboradores.
+Não pergunte novamente nome, email, WhatsApp, empresa, site, cargo, faturamento anual ou colaboradores.
 
 AS 7 PERGUNTAS — UMA POR VEZ, NESSA ORDEM:
 
@@ -118,9 +118,9 @@ PENALIDADES AUTOMÁTICAS DE SCORE:
 - Resposta de 1 palavra para qualquer dimensão → essa dimensão = 0.
 
 INVESTIGAÇÃO SETORIAL (executa internamente antes de gerar o relatório):
-Com base no setor da empresa, porte (faturamento), cargo, colaboradores, momento/objetivo informados e respostas das 7 perguntas, identifique:
+Com base no setor da empresa, porte (faturamento), cargo, colaboradores e respostas das 7 perguntas, identifique:
 1. Os 2 erros mais comuns que empresas desse setor/porte/cargo costumam cometer na operação de receita. Seja específico, direto, e escreva como quem já viu isso dezenas de vezes. Tom: cirúrgico, sem suavizar.
-2. Uma frase vendedora sobre o que o ecossistema Masterboard pode oferecer para essa empresa, considerando setor, porte, cargo, momento e objetivo informados. NÃO cite nomes reais de empresas ou pessoas. Seja específico sobre o tipo de conexão (ex: "clientes corporativos no segmento de saúde", "parceiros de distribuição", "pares de expansão internacional"). Tom: confiante, exclusivo, como quem tem acesso privilegiado.
+2. Uma frase vendedora sobre o que o ecossistema Masterboard pode oferecer para essa empresa, considerando setor, porte, cargo e colaboradores informados. NÃO cite nomes reais de empresas ou pessoas. Seja específico sobre o tipo de conexão (ex: "clientes corporativos no segmento de saúde", "parceiros de distribuição", "pares de expansão internacional"). Tom: confiante, exclusivo, como quem tem acesso privilegiado.
 3. Uma tabela com 3 desafios prováveis, impactos diretos e possíveis conexões estratégicas. A tabela deve parecer uma leitura executiva de board, não uma lista genérica.
 
 CAMPOS NOVOS NO JSON DE RELATÓRIO:
@@ -173,9 +173,6 @@ TOM: Direto, frases curtas, sem elogios. Nunca use as palavras "mentoria" ou "co
       if (formData.cargo) contextParts.push(`Cargo: ${formData.cargo}`);
       if (formData.faturamento) contextParts.push(`Faturamento anual: ${formData.faturamento}`);
       if (formData.colaboradores) contextParts.push(`Colaboradores: ${formData.colaboradores}`);
-      if (formData.momento_label || formData.momento) contextParts.push(`Momento da empresa: ${formData.momento_label || formData.momento}`);
-      if (formData.objetivo) contextParts.push(`Objetivo principal: ${formData.objetivo}`);
-      if (formData.evento_interesse) contextParts.push(`Evento de interesse: ${formData.evento_interesse}`);
       if (formData.localizacao) contextParts.push(`Localização: ${formData.localizacao}`);
 
       if (contextParts.length > 0) {
@@ -316,10 +313,7 @@ async function sendLeadCapture(data) {
       ${data.cargo ? `<strong style="color:#FBBE0A;">Cargo:</strong> ${data.cargo}<br>` : ''}
       ${data.localizacao ? `<strong style="color:#FBBE0A;">Localização:</strong> ${data.localizacao}<br>` : ''}
       <strong style="color:#FBBE0A;">Faturamento:</strong> ${data.faturamento}<br>
-      ${data.colaboradores ? `<strong style="color:#FBBE0A;">Colaboradores:</strong> ${data.colaboradores}<br>` : ''}
-      ${data.momento_label || data.momento ? `<strong style="color:#FBBE0A;">Momento:</strong> ${data.momento_label || data.momento}<br>` : ''}
-      ${data.objetivo ? `<strong style="color:#FBBE0A;">Objetivo:</strong> ${data.objetivo}<br>` : ''}
-      ${data.evento_interesse ? `<strong style="color:#FBBE0A;">Evento de interesse:</strong> ${data.evento_interesse}` : ''}
+      ${data.colaboradores ? `<strong style="color:#FBBE0A;">Colaboradores:</strong> ${data.colaboradores}` : ''}
     </div>
     <div style="margin-top:16px;padding:14px;background:#1a1500;border:1px solid #3a2900;border-radius:8px;font-size:13px;color:#aaa;">
       ⚠ Este lead iniciou o diagnóstico mas ainda não concluiu.
