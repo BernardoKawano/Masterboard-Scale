@@ -13,8 +13,23 @@
   status = 200
 
 [[redirects]]
+  from = "/aceite/"
+  to = "/aceite.html"
+  status = 200
+
+[[redirects]]
+  from = "/aceite"
+  to = "/aceite.html"
+  status = 200
+
+[[redirects]]
   from = "/api/diagnostic"
   to = "/.netlify/functions/diagnostic"
+  status = 200
+
+[[redirects]]
+  from = "/api/deal-acceptance"
+  to = "/.netlify/functions/deal-acceptance"
   status = 200
 
 [[redirects]]

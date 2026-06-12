@@ -2,12 +2,15 @@ const { randomUUID } = require('node:crypto');
 
 const STORE_NAME = 'scale-diagnostics';
 const RECORD_PREFIX = 'leads/';
+const DEAL_ACCEPTANCE_PRODUCTS = ['Scale', 'Masterboard Club'];
+const DEAL_ACCEPTANCE_PAYMENT_OPTIONS = ['Cartão - à vista', 'Cartão - parcelado'];
 
 const STATUS_RANK = {
   captured: 1,
   started: 2,
   error: 2,
   completed: 3,
+  deal_accepted: 4,
 };
 
 function timestamp(now = new Date()) {
@@ -17,6 +20,10 @@ function timestamp(now = new Date()) {
 function cleanString(value) {
   if (value === null || value === undefined) return '';
   return String(value).trim();
+}
+
+function cleanDigits(value) {
+  return cleanString(value).replace(/\D/g, '');
 }
 
 const STATE_ALIASES = {
@@ -166,6 +173,17 @@ function createLeadId() {
   return `lead_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function createDealAcceptanceId() {
+  if (typeof randomUUID === 'function') return `deal_${randomUUID()}`;
+  return `deal_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function normalizeChoice(value, choices = []) {
+  const raw = cleanString(value);
+  const match = choices.find((choice) => normalizeKey(choice) === normalizeKey(raw));
+  return match || raw;
+}
+
 function normalizeFormData(formData = {}) {
   const codigoPais = cleanString(formData.codigo_pais || formData.codigoPais);
   const whatsapp = cleanString(formData.whatsapp);
@@ -191,6 +209,42 @@ function normalizeFormData(formData = {}) {
     evento_interesse: cleanString(formData.evento_interesse || formData.eventoInteresse),
     lgpd: Boolean(formData.lgpd),
     localizacao: normalizeLocation(formData.localizacao),
+  };
+}
+
+function normalizeDealAcceptanceData(formData = {}) {
+  const codigoPais = cleanString(formData.codigo_pais || formData.codigoPais);
+  const whatsapp = cleanString(formData.whatsapp);
+  const telefone = cleanString(formData.telefone) || [codigoPais, whatsapp].filter(Boolean).join(' ');
+  const documento = cleanString(formData.documento || formData.cnpj_cpf || formData.cpf_cnpj);
+  const empresa = cleanString(formData.empresa || formData.razao_social || formData.razaoSocial);
+  const razaoSocial = cleanString(formData.razao_social || formData.razaoSocial || empresa);
+
+  return {
+    leadId: cleanString(formData.leadId || formData.acceptanceId || formData.id),
+    recordType: 'deal_acceptance',
+    source: cleanString(formData.source) || 'aceite-page',
+    nome: cleanString(formData.nome),
+    email: cleanString(formData.email).toLowerCase(),
+    codigo_pais: codigoPais,
+    whatsapp,
+    telefone,
+    documento,
+    documento_numero: cleanDigits(documento),
+    empresa,
+    razao_social: razaoSocial,
+    nome_fantasia: cleanString(formData.nome_fantasia || formData.nomeFantasia),
+    website: cleanString(formData.website),
+    endereco: cleanString(formData.endereco),
+    localizacao: normalizeLocation(formData.localizacao),
+    produto: normalizeChoice(formData.produto, DEAL_ACCEPTANCE_PRODUCTS),
+    forma_pagamento: normalizeChoice(
+      formData.forma_pagamento || formData.formaPagamento,
+      DEAL_ACCEPTANCE_PAYMENT_OPTIONS
+    ),
+    observacoes: cleanString(formData.observacoes),
+    aceite: Boolean(formData.aceite || formData.acceptedTerms),
+    lgpd: Boolean(formData.lgpd),
   };
 }
 
@@ -258,6 +312,28 @@ function createCapturedPatch(formData = {}, now = new Date()) {
     updatedAt: timestamp(now),
     formData: { ...normalized, leadId },
     events: [{ type: 'lead_captured', at: timestamp(now) }],
+  };
+}
+
+function createDealAcceptancePatch(formData = {}, now = new Date()) {
+  const normalized = normalizeDealAcceptanceData(formData);
+  const leadId = normalized.leadId || createDealAcceptanceId();
+  const at = timestamp(now);
+
+  return {
+    leadId,
+    recordType: 'deal_acceptance',
+    status: 'deal_accepted',
+    commercialStatus: 'sold',
+    createdAt: at,
+    updatedAt: at,
+    acceptedAt: at,
+    convertedAt: at,
+    soldAt: at,
+    lostAt: '',
+    formData: { ...normalized, leadId },
+    acceptanceData: { ...normalized, leadId },
+    events: [{ type: 'deal_accepted', at }],
   };
 }
 
@@ -415,10 +491,12 @@ function mergeRecord(existing, patch) {
     createdAt: existing.createdAt || patch.createdAt || patch.updatedAt || timestamp(),
     updatedAt: patch.updatedAt || timestamp(),
     completedAt: patch.completedAt || existing.completedAt,
+    acceptedAt: patch.acceptedAt || existing.acceptedAt,
     convertedAt: nextConvertedAt,
     soldAt: Object.prototype.hasOwnProperty.call(patch, 'soldAt') ? patch.soldAt : existing.soldAt,
     lostAt: Object.prototype.hasOwnProperty.call(patch, 'lostAt') ? patch.lostAt : existing.lostAt,
     formData: mergeFormData(existing.formData, patch.formData),
+    acceptanceData: patch.acceptanceData ? mergeFormData(existing.acceptanceData, patch.acceptanceData) : existing.acceptanceData,
     events: [...(existing.events || []), ...(patch.events || [])],
   };
 }
@@ -429,11 +507,13 @@ function summarizeRecord(record) {
 
   return {
     leadId: record.leadId,
+    recordType: record.recordType || '',
     status: record.status,
     commercialStatus: record.commercialStatus || '',
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
     completedAt: record.completedAt || '',
+    acceptedAt: record.acceptedAt || '',
     convertedAt: record.convertedAt || '',
     soldAt: record.soldAt || '',
     lostAt: record.lostAt || '',
@@ -444,6 +524,8 @@ function summarizeRecord(record) {
     whatsapp: report.whatsapp || form.whatsapp || '',
     faturamento: report.faturamento || form.faturamento || '',
     localizacao: report.localizacao || form.localizacao || '',
+    produto: form.produto || '',
+    forma_pagamento: form.forma_pagamento || '',
     score_geral: Number(report.score_geral || 0),
     nivel: report.nivel || '',
     gargalo_critico: report.gargalo_critico || '',
@@ -459,13 +541,16 @@ module.exports = {
   compactMessages,
   createCapturedPatch,
   createCompletedPatch,
+  createDealAcceptancePatch,
   createAdminPatch,
+  createDealAcceptanceId,
   createErrorPatch,
   createLeadId,
   createStartedPatch,
   ensureLeadId,
   getRecordKey,
   mergeRecord,
+  normalizeDealAcceptanceData,
   normalizeFormData,
   normalizeLocation,
   sanitizeReport,

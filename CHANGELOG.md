@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-06-12
+
+### Added
+- Pagina estatica `aceite.html` para registrar aceite de fechamento em `/aceite`.
+- Endpoint `/api/deal-acceptance` para validar, persistir e notificar a equipe sobre novos aceites.
+- Normalizacao e patch de registros `deal_acceptance` com status `deal_accepted`.
+- Testes automatizados para dados de aceite com CNPJ, produto e forma de pagamento.
+
 ## 2026-06-11
 
 ### Added

@@ -5,9 +5,11 @@ const {
   createAdminPatch,
   createCapturedPatch,
   createCompletedPatch,
+  createDealAcceptancePatch,
   createStartedPatch,
   getRecordKey,
   mergeRecord,
+  normalizeDealAcceptanceData,
   normalizeFormData,
   normalizeLocation,
   summarizeRecord,
@@ -63,6 +65,26 @@ const report = {
   ],
 };
 
+const dealAcceptanceData = {
+  leadId: 'deal_alpha123',
+  source: 'aceite-page',
+  nome: 'Ana Founder',
+  email: ' ANA@EXAMPLE.COM ',
+  codigo_pais: '+55',
+  whatsapp: '(11) 98888-7777',
+  telefone: '+55 (11) 98888-7777',
+  documento: '12.345.678/0001-90',
+  empresa: 'Empresa Alpha',
+  razao_social: 'Empresa Alpha Tecnologia LTDA',
+  website: 'empresa-alpha.com.br',
+  endereco: 'Rua Central, 100 - Sao Paulo/SP',
+  localizacao: 'Sao Paulo - SP',
+  produto: 'scale',
+  forma_pagamento: 'cartao a vista',
+  aceite: true,
+  lgpd: true,
+};
+
 test('normaliza dados do formulario', () => {
   const normalized = normalizeFormData(formData);
 
@@ -88,6 +110,41 @@ test('preserva campos da candidatura na captura', () => {
   assert.equal(captured.formData.cargo, 'Sócio ou Fundador');
   assert.equal(captured.formData.telefone, '+55 (11) 99999-9999');
   assert.equal(captured.formData.lgpd, true);
+});
+
+test('normaliza dados do aceite de fechamento', () => {
+  const normalized = normalizeDealAcceptanceData(dealAcceptanceData);
+
+  assert.equal(normalized.leadId, 'deal_alpha123');
+  assert.equal(normalized.recordType, 'deal_acceptance');
+  assert.equal(normalized.source, 'aceite-page');
+  assert.equal(normalized.email, 'ana@example.com');
+  assert.equal(normalized.documento_numero, '12345678000190');
+  assert.equal(normalized.empresa, 'Empresa Alpha');
+  assert.equal(normalized.razao_social, 'Empresa Alpha Tecnologia LTDA');
+  assert.equal(normalized.localizacao, 'São Paulo, SP');
+  assert.equal(normalized.produto, 'Scale');
+  assert.equal(normalized.forma_pagamento, 'Cartão - à vista');
+  assert.equal(normalized.aceite, true);
+  assert.equal(normalized.lgpd, true);
+});
+
+test('cria patch de aceite como negocio vendido', () => {
+  const accepted = createDealAcceptancePatch(
+    { ...dealAcceptanceData, forma_pagamento: 'Cartão - parcelado' },
+    new Date('2026-06-12T15:00:00.000Z')
+  );
+
+  assert.equal(accepted.leadId, 'deal_alpha123');
+  assert.equal(accepted.recordType, 'deal_acceptance');
+  assert.equal(accepted.status, 'deal_accepted');
+  assert.equal(accepted.commercialStatus, 'sold');
+  assert.equal(accepted.acceptedAt, '2026-06-12T15:00:00.000Z');
+  assert.equal(accepted.convertedAt, '2026-06-12T15:00:00.000Z');
+  assert.equal(accepted.formData.produto, 'Scale');
+  assert.equal(accepted.formData.forma_pagamento, 'Cartão - parcelado');
+  assert.equal(accepted.acceptanceData.documento_numero, '12345678000190');
+  assert.equal(accepted.events.at(-1).type, 'deal_accepted');
 });
 
 test('gera chave previsivel para Netlify Blobs', () => {
@@ -143,11 +200,13 @@ test('resume registro para listagem do dashboard', () => {
 
   assert.deepEqual(summary, {
     leadId: 'lead_abc123',
+    recordType: '',
     status: 'completed',
     commercialStatus: '',
     createdAt: undefined,
     updatedAt: '2026-06-11T12:08:00.000Z',
     completedAt: '2026-06-11T12:08:00.000Z',
+    acceptedAt: '',
     convertedAt: '',
     soldAt: '',
     lostAt: '',
@@ -158,10 +217,31 @@ test('resume registro para listagem do dashboard', () => {
     whatsapp: '(11) 99999-9999',
     faturamento: 'R$1M-R$5M/ano',
     localizacao: 'São Paulo, SP',
+    produto: '',
+    forma_pagamento: '',
     score_geral: 42,
     nivel: 'Em Desenvolvimento',
     gargalo_critico: 'Aquisicao depende de relacionamento direto.',
   });
+});
+
+test('resume aceite para listagem do dashboard', () => {
+  const accepted = createDealAcceptancePatch(
+    { ...dealAcceptanceData, forma_pagamento: 'Cartão - parcelado' },
+    new Date('2026-06-12T15:00:00.000Z')
+  );
+  const summary = summarizeRecord(accepted);
+
+  assert.equal(summary.leadId, 'deal_alpha123');
+  assert.equal(summary.recordType, 'deal_acceptance');
+  assert.equal(summary.status, 'deal_accepted');
+  assert.equal(summary.commercialStatus, 'sold');
+  assert.equal(summary.acceptedAt, '2026-06-12T15:00:00.000Z');
+  assert.equal(summary.nome, 'Ana Founder');
+  assert.equal(summary.empresa, 'Empresa Alpha');
+  assert.equal(summary.email, 'ana@example.com');
+  assert.equal(summary.produto, 'Scale');
+  assert.equal(summary.forma_pagamento, 'Cartão - parcelado');
 });
 
 test('acoes administrativas preservam diagnostico e registram status comercial', () => {
