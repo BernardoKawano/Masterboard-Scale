@@ -14,6 +14,7 @@ const {
   normalizeLocation,
   summarizeRecord,
 } = require('../netlify/functions/_records');
+const { parseRecipientList } = require('../netlify/functions/deal-acceptance');
 
 const formData = {
   leadId: 'lead_abc123',
@@ -217,6 +218,10 @@ test('resume registro para listagem do dashboard', () => {
     whatsapp: '(11) 99999-9999',
     faturamento: 'R$1M-R$5M/ano',
     localizacao: 'São Paulo, SP',
+    documento: '',
+    documento_numero: '',
+    razao_social: '',
+    endereco: '',
     produto: '',
     forma_pagamento: '',
     score_geral: 42,
@@ -240,8 +245,20 @@ test('resume aceite para listagem do dashboard', () => {
   assert.equal(summary.nome, 'Ana Founder');
   assert.equal(summary.empresa, 'Empresa Alpha');
   assert.equal(summary.email, 'ana@example.com');
+  assert.equal(summary.documento, '12.345.678/0001-90');
+  assert.equal(summary.documento_numero, '12345678000190');
+  assert.equal(summary.razao_social, 'Empresa Alpha Tecnologia LTDA');
+  assert.equal(summary.endereco, 'Rua Central, 100 - Sao Paulo/SP');
   assert.equal(summary.produto, 'Scale');
   assert.equal(summary.forma_pagamento, 'Cartão - parcelado');
+});
+
+test('normaliza destinatarios comerciais do aceite por env var', () => {
+  assert.deepEqual(parseRecipientList('fabio@scaleco.ai, comercial@masterboard.com.br; ops@masterboard.com.br'), [
+    'fabio@scaleco.ai',
+    'comercial@masterboard.com.br',
+    'ops@masterboard.com.br',
+  ]);
 });
 
 test('acoes administrativas preservam diagnostico e registram status comercial', () => {

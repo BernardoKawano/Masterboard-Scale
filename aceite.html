@@ -28,11 +28,42 @@
       margin: 0;
       min-height: 100vh;
       background:
-        radial-gradient(circle at top left, rgba(251, 190, 10, 0.12), transparent 34rem),
-        radial-gradient(circle at bottom right, rgba(251, 190, 10, 0.06), transparent 30rem),
+        radial-gradient(circle at 12% 8%, rgba(251, 190, 10, 0.18), transparent 22rem),
+        radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.07), transparent 20rem),
+        radial-gradient(circle at 76% 86%, rgba(251, 190, 10, 0.1), transparent 28rem),
         var(--bg);
       color: var(--text);
       font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    body::before {
+      width: 360px;
+      height: 360px;
+      left: -140px;
+      top: 18vh;
+      background: linear-gradient(135deg, rgba(251, 190, 10, 0.22), rgba(251, 190, 10, 0));
+      filter: blur(10px);
+      animation: floatGlow 12s ease-in-out infinite;
+    }
+
+    body::after {
+      width: 460px;
+      height: 460px;
+      right: -180px;
+      bottom: -160px;
+      background: radial-gradient(circle, rgba(251, 190, 10, 0.16), transparent 68%);
+      animation: floatGlow 16s ease-in-out infinite reverse;
     }
 
     a {
@@ -43,6 +74,7 @@
       width: min(1120px, calc(100% - 32px));
       margin: 0 auto;
       padding: 38px 0 48px;
+      animation: pageIn 700ms ease both;
     }
 
     .brand {
@@ -82,6 +114,7 @@
       border-radius: 24px;
       background: linear-gradient(180deg, rgba(251, 190, 10, 0.1), rgba(17, 17, 17, 0.92));
       overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.26);
     }
 
     .hero::after {
@@ -132,13 +165,53 @@
       color: var(--gold);
     }
 
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .hero-stat {
+      border: 1px solid rgba(251, 190, 10, 0.16);
+      border-radius: 16px;
+      background: rgba(10, 10, 10, 0.44);
+      padding: 13px;
+    }
+
+    .hero-stat strong {
+      display: block;
+      color: var(--gold);
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .hero-stat span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
     .form-card,
     .success-card {
       border: 1px solid var(--border);
       border-radius: 24px;
-      background: rgba(17, 17, 17, 0.94);
+      background: linear-gradient(180deg, rgba(20, 20, 20, 0.97), rgba(12, 12, 12, 0.96));
       box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
       padding: 28px;
+      backdrop-filter: blur(16px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .form-card::before,
+    .success-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(251, 190, 10, 0.1), transparent 36%);
+      pointer-events: none;
     }
 
     .form-title {
@@ -154,9 +227,53 @@
       line-height: 1.65;
     }
 
+    .form-progress {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin: 0 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .form-progress-dot {
+      height: 4px;
+      border-radius: 999px;
+      background: #272727;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .form-progress-dot::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, var(--gold), var(--gold-dark));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 260ms ease;
+    }
+
+    .form-progress-dot.is-active::after,
+    .form-progress-dot.is-done::after {
+      transform: scaleX(1);
+    }
+
     .section {
       padding: 22px 0;
       border-top: 1px solid var(--border);
+    }
+
+    .form-step {
+      display: none;
+      min-height: 470px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .form-step.is-active {
+      animation: slideIn 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      display: block;
     }
 
     .section:first-of-type {
@@ -229,6 +346,25 @@
       gap: 10px;
     }
 
+    .field-hint {
+      color: #707070;
+      font-size: 11px;
+      line-height: 1.45;
+      min-height: 16px;
+    }
+
+    .field-hint.is-loading {
+      color: var(--gold);
+    }
+
+    .field-hint.is-success {
+      color: var(--success);
+    }
+
+    .field-hint.is-warning {
+      color: #F59E0B;
+    }
+
     .option-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -289,8 +425,6 @@
     }
 
     .submit {
-      width: 100%;
-      margin-top: 18px;
       border: 0;
       border-radius: 14px;
       background: linear-gradient(135deg, var(--gold), var(--gold-dark));
@@ -301,11 +435,50 @@
       letter-spacing: 0.12em;
       padding: 17px 20px;
       text-transform: uppercase;
+      transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+    }
+
+    .submit:hover:not(:disabled) {
+      box-shadow: 0 12px 34px rgba(251, 190, 10, 0.2);
+      transform: translateY(-1px);
     }
 
     .submit:disabled {
       cursor: wait;
       opacity: 0.72;
+    }
+
+    .form-actions {
+      display: grid;
+      grid-template-columns: 0.46fr 1fr;
+      gap: 12px;
+      margin-top: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .back {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #0D0D0D;
+      color: var(--muted-strong);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      padding: 17px 18px;
+      text-transform: uppercase;
+      transition: border-color 160ms ease, color 160ms ease, opacity 160ms ease;
+    }
+
+    .back:hover:not(:disabled) {
+      border-color: rgba(251, 190, 10, 0.42);
+      color: var(--text);
+    }
+
+    .back:disabled {
+      cursor: default;
+      opacity: 0.42;
     }
 
     .privacy {
@@ -319,6 +492,7 @@
     .success-card {
       display: none;
       text-align: center;
+      animation: successIn 520ms ease both;
     }
 
     .success-icon {
@@ -352,6 +526,26 @@
       color: var(--gold);
     }
 
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(22px) scale(0.985); }
+      to { opacity: 1; transform: translateX(0) scale(1); }
+    }
+
+    @keyframes successIn {
+      from { opacity: 0; transform: translateY(14px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes floatGlow {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(26px, -20px, 0) scale(1.06); }
+    }
+
     @media (max-width: 900px) {
       .layout {
         grid-template-columns: 1fr;
@@ -361,9 +555,23 @@
         position: relative;
         top: auto;
       }
+
+      .form-step {
+        min-height: auto;
+      }
     }
 
     @media (max-width: 640px) {
+      body::before {
+        width: 240px;
+        height: 240px;
+      }
+
+      body::after {
+        width: 320px;
+        height: 320px;
+      }
+
       .page {
         width: min(100% - 20px, 1120px);
         padding: 20px 0 32px;
@@ -387,10 +595,19 @@
         padding: 22px;
       }
 
+      .hero-stats,
+      .form-actions {
+        grid-template-columns: 1fr;
+      }
+
       .grid,
       .option-grid,
       .phone-row {
         grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: clamp(38px, 15vw, 58px);
       }
     }
   </style>
@@ -414,6 +631,11 @@
           <strong>Vamos.</strong><br>
           Preencha os dados abaixo para formalizar o interesse de fechamento.
         </div>
+        <div class="hero-stats" aria-label="Resumo do fluxo">
+          <div class="hero-stat"><strong>01</strong><span>Dados do responsável</span></div>
+          <div class="hero-stat"><strong>02</strong><span>Empresa e documento</span></div>
+          <div class="hero-stat"><strong>03</strong><span>Produto e pagamento</span></div>
+        </div>
       </section>
 
       <section>
@@ -429,8 +651,9 @@
           <p class="form-sub">
             O envio registra a intenção de fechamento. A cobrança no cartão será combinada pela equipe depois deste aceite.
           </p>
+          <div class="form-progress" id="acceptance-progress" aria-hidden="true"></div>
 
-          <div class="section">
+          <section class="form-step is-active" data-step="0">
             <h3 class="section-title">Responsável</h3>
             <div class="grid">
               <div class="field is-wide">
@@ -440,10 +663,6 @@
               <div class="field">
                 <label for="email">E-mail</label>
                 <input id="email" name="email" type="email" autocomplete="email" placeholder="voce@empresa.com" required>
-              </div>
-              <div class="field">
-                <label for="documento">CNPJ/CPF</label>
-                <input id="documento" name="documento" type="text" inputmode="numeric" autocomplete="off" placeholder="00.000.000/0000-00" oninput="maskDocument(event)" required>
               </div>
               <div class="field is-wide">
                 <label>Telefone / WhatsApp</label>
@@ -461,11 +680,16 @@
                 </div>
               </div>
             </div>
-          </div>
+          </section>
 
-          <div class="section">
+          <section class="form-step" data-step="1">
             <h3 class="section-title">Dados da empresa</h3>
             <div class="grid">
+              <div class="field is-wide">
+                <label for="documento">CNPJ/CPF</label>
+                <input id="documento" name="documento" type="text" inputmode="numeric" autocomplete="off" placeholder="00.000.000/0000-00" oninput="handleDocumentInput(event)" required>
+                <div class="field-hint" id="documento-hint">Ao informar CNPJ, tentamos preencher os dados da empresa automaticamente.</div>
+              </div>
               <div class="field">
                 <label for="empresa">Empresa</label>
                 <input id="empresa" name="empresa" type="text" autocomplete="organization" placeholder="Nome comercial" required>
@@ -487,10 +711,12 @@
                 <input id="endereco" name="endereco" type="text" autocomplete="street-address" placeholder="Rua, número, bairro, cidade/UF">
               </div>
             </div>
-          </div>
+          </section>
 
-          <div class="section">
+          <section class="form-step" data-step="2">
             <h3 class="section-title">Produto</h3>
+            <h2 class="form-title">Qual solução vamos ativar?</h2>
+            <p class="form-sub">Escolha o produto combinado na conversa para o comercial preparar o handoff correto.</p>
             <div class="option-grid">
               <label class="option">
                 <input type="radio" name="produto" value="Scale" required>
@@ -501,10 +727,12 @@
                 <span>Masterboard Club</span>
               </label>
             </div>
-          </div>
+          </section>
 
-          <div class="section">
+          <section class="form-step" data-step="3">
             <h3 class="section-title">Forma de pagamento</h3>
+            <h2 class="form-title">Como combinamos o cartão?</h2>
+            <p class="form-sub">Isso não dispara cobrança automática. Serve para o comercial seguir com a condição correta.</p>
             <div class="option-grid">
               <label class="option">
                 <input type="radio" name="forma_pagamento" value="Cartão - à vista" required>
@@ -515,9 +743,12 @@
                 <span>Cartão - parcelado</span>
               </label>
             </div>
-          </div>
+          </section>
 
-          <div class="section">
+          <section class="form-step" data-step="4">
+            <h3 class="section-title">Confirmação</h3>
+            <h2 class="form-title">Último passo para registrar o aceite.</h2>
+            <p class="form-sub">Ao confirmar, a equipe recebe o registro e o card entra no dashboard comercial como aceite recebido.</p>
             <label class="check">
               <input id="aceite" name="aceite" type="checkbox" required>
               <span>Confirmo o aceite de fechamento comercial e autorizo a equipe Masterboard/ScaleCo a entrar em contato para concluir onboarding e pagamento.</span>
@@ -526,10 +757,13 @@
               <input id="lgpd" name="lgpd" type="checkbox" required>
               <span>Concordo com a <a href="/politica-de-privacidade/" target="_blank" rel="noopener">Política de Privacidade</a> e autorizo o uso dos dados para condução deste fechamento.</span>
             </label>
-          </div>
+          </section>
 
           <div class="error" id="form-error" role="alert" aria-live="polite"></div>
-          <button class="submit" id="submit-btn" type="submit">Registrar aceite</button>
+          <div class="form-actions">
+            <button class="back" id="back-btn" type="button">Voltar</button>
+            <button class="submit" id="submit-btn" type="button">Continuar</button>
+          </div>
           <div class="privacy">Este formulário não executa cobrança automática. Ele registra o aceite e avisa a equipe responsável.</div>
         </form>
 
@@ -552,6 +786,13 @@
     const submitBtn = document.getElementById('submit-btn');
     const successCard = document.getElementById('success-card');
     const successSummary = document.getElementById('success-summary');
+    const documentoHint = document.getElementById('documento-hint');
+    const backBtn = document.getElementById('back-btn');
+    const progress = document.getElementById('acceptance-progress');
+    const ACCEPTANCE_TOTAL_STEPS = 5;
+    let currentAcceptanceStep = 0;
+    let lastCnpjLookup = '';
+    let cnpjLookupAbort = null;
 
     function digitsOnly(value) {
       return String(value || '').replace(/\D/g, '');
@@ -595,6 +836,77 @@
         .replace(/(\d{4})(\d)/, '$1-$2');
     }
 
+    function handleDocumentInput(event) {
+      maskDocument(event);
+      const digits = digitsOnly(event.target.value);
+
+      if (digits.length !== 14) {
+        lastCnpjLookup = '';
+        if (cnpjLookupAbort) cnpjLookupAbort.abort();
+        setDocumentHint('Ao informar CNPJ, tentamos preencher os dados da empresa automaticamente.');
+        return;
+      }
+
+      lookupCnpj(digits);
+    }
+
+    function setDocumentHint(message, tone = '') {
+      documentoHint.textContent = message;
+      documentoHint.className = `field-hint${tone ? ' is-' + tone : ''}`;
+    }
+
+    function fillIfEmpty(id, value) {
+      const field = document.getElementById(id);
+      const cleanValue = String(value || '').trim();
+      if (!field || !cleanValue || field.value.trim()) return;
+      field.value = cleanValue;
+    }
+
+    function titleCase(value) {
+      return String(value || '')
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word) => ['da', 'de', 'di', 'do', 'das', 'dos', 'e'].includes(word) ? word : word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
+
+    function formatAddress(company) {
+      const street = [company.logradouro, company.numero].filter(Boolean).join(', ');
+      const district = company.bairro;
+      const city = [company.municipio, company.uf].filter(Boolean).join('/');
+      const cep = company.cep ? `CEP ${company.cep}` : '';
+      return [street, company.complemento, district, city, cep].filter(Boolean).join(' - ');
+    }
+
+    async function lookupCnpj(cnpj) {
+      if (cnpj === lastCnpjLookup) return;
+      lastCnpjLookup = cnpj;
+
+      if (cnpjLookupAbort) cnpjLookupAbort.abort();
+      cnpjLookupAbort = new AbortController();
+      setDocumentHint('Consultando CNPJ para preencher empresa...', 'loading');
+
+      try {
+        const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`, {
+          signal: cnpjLookupAbort.signal,
+          cache: 'no-store',
+        });
+        if (!response.ok) throw new Error('CNPJ não encontrado.');
+        const company = await response.json();
+
+        fillIfEmpty('empresa', titleCase(company.nome_fantasia || company.razao_social));
+        fillIfEmpty('razao_social', company.razao_social);
+        fillIfEmpty('localizacao', [titleCase(company.municipio), company.uf].filter(Boolean).join(', '));
+        fillIfEmpty('endereco', formatAddress(company));
+
+        setDocumentHint('Dados da empresa encontrados e preenchidos nos campos vazios.', 'success');
+      } catch (error) {
+        if (error.name === 'AbortError') return;
+        setDocumentHint('Não conseguimos consultar esse CNPJ agora. Você pode preencher manualmente.', 'warning');
+      }
+    }
+
     function getValue(name) {
       const field = form.elements[name];
       if (!field) return '';
@@ -604,9 +916,14 @@
       return String(field.value || '').trim();
     }
 
-    function showError(message) {
+    function showError(message, fieldId = '') {
       errorEl.textContent = message;
       errorEl.style.display = 'block';
+      if (fieldId) {
+        const field = document.getElementById(fieldId);
+        if (field && typeof field.focus === 'function') field.focus();
+      }
+      return false;
     }
 
     function clearError() {
@@ -614,43 +931,83 @@
       errorEl.style.display = 'none';
     }
 
-    function validate() {
-      const required = [
-        ['nome', 'Informe o nome completo.'],
-        ['email', 'Informe um e-mail válido.'],
-        ['documento', 'Informe CNPJ ou CPF.'],
-        ['whatsapp', 'Informe telefone/WhatsApp.'],
-        ['empresa', 'Informe o nome da empresa.'],
-        ['produto', 'Selecione o produto.'],
-        ['forma_pagamento', 'Selecione a forma de pagamento.'],
-      ];
+    function initAcceptanceForm() {
+      if (progress && !progress.children.length) {
+        progress.innerHTML = Array.from({ length: ACCEPTANCE_TOTAL_STEPS }, () => '<div class="form-progress-dot"></div>').join('');
+      }
+      renderAcceptanceStep();
+    }
 
-      for (const [name, message] of required) {
-        if (!getValue(name)) {
-          showError(message);
-          return false;
+    function renderAcceptanceStep() {
+      document.querySelectorAll('.form-step').forEach((step, index) => {
+        step.classList.toggle('is-active', index === currentAcceptanceStep);
+      });
+      document.querySelectorAll('.form-progress-dot').forEach((dot, index) => {
+        dot.classList.toggle('is-active', index === currentAcceptanceStep);
+        dot.classList.toggle('is-done', index < currentAcceptanceStep);
+      });
+      backBtn.disabled = currentAcceptanceStep === 0;
+      submitBtn.textContent = currentAcceptanceStep === ACCEPTANCE_TOTAL_STEPS - 1 ? 'Registrar aceite' : 'Continuar';
+      clearError();
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function validateCurrentStep() {
+      const email = getValue('email');
+      const phoneDigits = digitsOnly(getValue('whatsapp'));
+      const documentDigits = digitsOnly(getValue('documento'));
+
+      if (currentAcceptanceStep === 0) {
+        if (!getValue('nome')) return showError('Informe o nome completo.', 'nome');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError('Informe um e-mail válido.', 'email');
+        if (phoneDigits.length < 10) return showError('Informe telefone/WhatsApp válido.', 'whatsapp');
+      }
+
+      if (currentAcceptanceStep === 1) {
+        if (![11, 14].includes(documentDigits.length)) return showError('Informe um CPF com 11 dígitos ou CNPJ com 14 dígitos.', 'documento');
+        if (!getValue('empresa')) return showError('Informe o nome da empresa.', 'empresa');
+        const website = getValue('website');
+        if (website) {
+          try {
+            new URL(/^https?:\/\//i.test(website) ? website : `https://${website}`);
+          } catch (error) {
+            return showError('Informe um site válido. Exemplo: empresa.com.br', 'website');
+          }
         }
       }
 
-      const email = getValue('email');
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showError('Informe um e-mail válido.');
-        return false;
+      if (currentAcceptanceStep === 2 && !getValue('produto')) {
+        return showError('Selecione o produto.');
       }
 
-      const documentDigits = digitsOnly(getValue('documento'));
-      if (![11, 14].includes(documentDigits.length)) {
-        showError('Informe um CPF com 11 dígitos ou CNPJ com 14 dígitos.');
-        return false;
+      if (currentAcceptanceStep === 3 && !getValue('forma_pagamento')) {
+        return showError('Selecione a forma de pagamento.');
       }
 
-      if (!document.getElementById('aceite').checked || !document.getElementById('lgpd').checked) {
-        showError('Confirme o aceite comercial e a autorização de uso dos dados.');
-        return false;
+      if (currentAcceptanceStep === 4) {
+        if (getValue('_gotcha')) return false;
+        if (!document.getElementById('aceite').checked || !document.getElementById('lgpd').checked) {
+          return showError('Confirme o aceite comercial e a autorização de uso dos dados.');
+        }
       }
 
       clearError();
       return true;
+    }
+
+    function nextStep() {
+      if (!validateCurrentStep()) return;
+      if (currentAcceptanceStep >= ACCEPTANCE_TOTAL_STEPS - 1) {
+        submitAcceptance();
+        return;
+      }
+      currentAcceptanceStep += 1;
+      renderAcceptanceStep();
+    }
+
+    function prevStep() {
+      currentAcceptanceStep = Math.max(0, currentAcceptanceStep - 1);
+      renderAcceptanceStep();
     }
 
     function buildPayload() {
@@ -700,12 +1057,11 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      if (!validate()) return;
-
+    async function submitAcceptance() {
+      if (!validateCurrentStep()) return;
       const payload = buildPayload();
       submitBtn.disabled = true;
+      backBtn.disabled = true;
       submitBtn.textContent = 'Registrando...';
 
       try {
@@ -722,9 +1078,18 @@
       } catch (error) {
         showError(error.message || 'Não foi possível registrar o aceite agora.');
         submitBtn.disabled = false;
+        backBtn.disabled = currentAcceptanceStep === 0;
         submitBtn.textContent = 'Registrar aceite';
       }
+    }
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      nextStep();
     });
+    submitBtn.addEventListener('click', nextStep);
+    backBtn.addEventListener('click', prevStep);
+    initAcceptanceForm();
   </script>
 </body>
 </html>

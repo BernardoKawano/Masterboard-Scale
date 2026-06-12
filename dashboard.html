@@ -237,8 +237,8 @@ tr:hover td { background: rgba(251,190,10,0.035); }
 
     <section class="page" id="leadsPage">
       <div class="filters">
-        <input id="searchInput" class="control" type="search" placeholder="Buscar por nome, empresa, email, telefone, cidade, score ou gargalo">
-        <select id="statusFilter" class="control"><option value="all">Todos status</option><option value="completed">Diagnóstico concluído</option><option value="captured">Lead capturado</option><option value="started">Iniciado</option><option value="error">Erro</option></select>
+        <input id="searchInput" class="control" type="search" placeholder="Buscar por nome, empresa, email, telefone, cidade, produto, pagamento ou gargalo">
+        <select id="statusFilter" class="control"><option value="all">Todos status</option><option value="deal_accepted">Aceite recebido</option><option value="completed">Diagnóstico concluído</option><option value="captured">Lead capturado</option><option value="started">Iniciado</option><option value="error">Erro</option></select>
         <select id="scoreFilter" class="control"><option value="all">Todos scores</option><option value="hot">Quente: 60+</option><option value="warm">Morno: 40-59</option><option value="cold">Frio: abaixo de 40</option><option value="none">Sem diagnóstico</option></select>
         <select id="dateFilter" class="control"><option value="all">Todo período</option><option value="today">Hoje</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select>
         <input id="regionFilter" class="control" type="search" placeholder="Região">
@@ -263,6 +263,8 @@ tr:hover td { background: rgba(251,190,10,0.035); }
                 <th data-sort="score">Score</th>
                 <th data-sort="status">Status</th>
                 <th data-sort="commercialStatus">Resultado</th>
+                <th data-sort="produto">Produto</th>
+                <th data-sort="forma_pagamento">Pagamento</th>
                 <th data-sort="faturamento">Faturamento</th>
                 <th data-sort="localizacao">Região</th>
                 <th data-sort="createdAt">Chegada</th>
@@ -367,7 +369,7 @@ async function loadDashboard() {
 
 function showAuth() { $('auth').hidden = false; $('app').hidden = true; }
 function showApp() { $('auth').hidden = true; $('app').hidden = false; $('authError').textContent = ''; }
-function setLoading() { $('metrics').innerHTML = ''; $('tableBody').innerHTML = '<tr><td colspan="11" class="empty">Carregando...</td></tr>'; }
+function setLoading() { $('metrics').innerHTML = ''; $('tableBody').innerHTML = '<tr><td colspan="13" class="empty">Carregando...</td></tr>'; }
 function setView(view, updateUrl = true) {
   state.view = ['home', 'leads', 'kanban', 'pipeline', 'insights'].includes(view) ? view : 'home';
   document.querySelectorAll('.nav-btn').forEach((button) => button.classList.toggle('active', button.dataset.view === state.view));
@@ -387,11 +389,18 @@ function normalizeRecord(record) {
   const rawLocalizacao = report.localizacao || form.localizacao || '';
   return {
     ...record,
+    recordType: record.recordType || form.recordType || '',
     nome: report.nome || form.nome || '',
-    empresa: report.empresa || '',
+    empresa: report.empresa || form.empresa || form.razao_social || '',
     email: report.email || form.email || '',
     whatsapp: report.whatsapp || form.whatsapp || '',
     faturamento: report.faturamento || form.faturamento || '',
+    documento: form.documento || '',
+    documento_numero: form.documento_numero || '',
+    razao_social: form.razao_social || '',
+    endereco: form.endereco || '',
+    produto: form.produto || '',
+    forma_pagamento: form.forma_pagamento || '',
     rawLocalizacao,
     localizacao: normalizeLocation(rawLocalizacao),
     score: Number(report.score_geral || 0),
@@ -403,6 +412,7 @@ function normalizeRecord(record) {
     updatedAt: record.updatedAt || record.createdAt || '',
     createdAt: record.createdAt || '',
     completedAt: record.completedAt || '',
+    acceptedAt: record.acceptedAt || '',
     convertedAt: record.convertedAt || '',
     soldAt: record.soldAt || '',
     lostAt: record.lostAt || '',
@@ -525,7 +535,7 @@ function filteredRecords() {
     if (state.region && !normalizeKey(record.localizacao).includes(normalizeKey(state.region))) return false;
     if (state.revenue !== 'all' && !revenueMatch(record.faturamento, state.revenue)) return false;
     if (!state.query) return true;
-    return [record.leadId, record.nome, record.empresa, record.email, record.whatsapp, record.faturamento, record.localizacao, record.nivel, record.gargalo, labelCommercial(record)]
+    return [record.leadId, record.nome, record.empresa, record.email, record.whatsapp, record.documento, record.razao_social, record.produto, record.forma_pagamento, record.faturamento, record.localizacao, record.nivel, record.gargalo, labelCommercial(record)]
       .some((value) => normalizeKey(value).includes(normalizeKey(state.query)));
   }).sort(sorter);
 }
@@ -569,6 +579,7 @@ function renderMetrics() {
   const qualified = completed.filter((record) => record.score >= 50);
   const average = completed.length ? Math.round(completed.reduce((sum, record) => sum + record.score, 0) / completed.length) : 0;
   const noContact = all.filter((record) => record.status === 'captured').length;
+  const accepted = all.filter(isDealAcceptance).length;
   const won = all.filter(isWon).length;
   const lost = all.filter(isLost).length;
   const closed = won + lost;
@@ -579,6 +590,7 @@ function renderMetrics() {
     ['Último lead', latestArrival ? formatDate(arrivalDate(latestArrival)) : '-', latestArrival ? (latestArrival.empresa || latestArrival.nome || latestArrival.email || 'Lead recebido') : 'Nenhum lead recebido'],
     ['Novos hoje', today, `${week} na semana · ${month} no mês`],
     ['Diagnósticos', completed.length, `${pct(completed.length, all.length)}% do total`],
+    ['Aceites', accepted, `${pct(accepted, all.length)}% da base`],
     ['Qualificados', qualified.length, `${pct(qualified.length, completed.length)}% dos concluídos`],
     ['Deram certo', won, `${pct(won, closed)}% dos encerrados`],
     ['Não deram certo', lost, `${pct(lost, closed)}% dos encerrados`],
@@ -604,11 +616,12 @@ function renderHome() {
   const completed = rows.filter((record) => record.status === 'completed').length;
   const hot = rows.filter((record) => record.score >= 60).length;
   const noContact = rows.filter((record) => record.status === 'captured').length;
+  const accepted = rows.filter(isDealAcceptance).length;
   const cards = [
     ['leads', 'Leads', 'Lista completa com busca, filtros e exportação.', rows.length],
-    ['kanban', 'Kanban', 'Fila por prioridade e diagnóstico.', hot],
+    ['kanban', 'Kanban', 'Fila por prioridade, diagnóstico e aceite.', hot + accepted],
     ['pipeline', 'Funil', 'Conversão do lead ao diagnóstico qualificado.', completed],
-    ['insights', 'Insights', 'Regiões, faturamento e padrões de gargalo.', noContact],
+    ['insights', 'Insights', 'Regiões, produtos, faturamento e padrões.', noContact],
   ];
   $('homeCards').innerHTML = cards.map(([view, title, copy, value]) => `
     <button class="big-card" data-home-view="${view}" type="button">
@@ -639,7 +652,7 @@ function renderHome() {
   bindAdminActions();
 }
 function priorityScore(record) {
-  return (record.status === 'captured' ? 35 : 0) + (record.score || 0) + (revenueMatch(record.faturamento, 'high') ? 25 : 0) + (dateMatch(record.updatedAt, '7') ? 10 : 0);
+  return (isDealAcceptance(record) ? 120 : 0) + (record.status === 'captured' ? 35 : 0) + (record.score || 0) + (revenueMatch(record.faturamento, 'high') ? 25 : 0) + (dateMatch(record.updatedAt, '7') ? 10 : 0);
 }
 function focusCard(record, showArrival = false) {
   return `
@@ -651,8 +664,8 @@ function focusCard(record, showArrival = false) {
         <div style="margin-top:8px"><span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${scorePill(record)} ${commercialPill(record)}</div>
       </div>
       <div style="text-align:right">
-        <strong>${escapeHtml(record.score || '-')}</strong>
-        <div class="muted">${escapeHtml(record.faturamento || '-')}</div>
+        <strong>${escapeHtml(isDealAcceptance(record) ? (record.produto || 'Aceite') : (record.score || '-'))}</strong>
+        <div class="muted">${escapeHtml(record.forma_pagamento || record.faturamento || '-')}</div>
         <button class="icon" data-admin="delete" data-id="${escapeHtml(record.leadId)}" style="margin-top:8px" type="button">Excluir</button>
       </div>
     </div>
@@ -669,6 +682,8 @@ function renderTable() {
       <td><span class="score">${escapeHtml(record.score || '-')}</span> ${scorePill(record)}</td>
       <td><span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span></td>
       <td>${commercialPill(record)}</td>
+      <td>${escapeHtml(record.produto || '-')}</td>
+      <td>${escapeHtml(record.forma_pagamento || '-')}</td>
       <td>${escapeHtml(record.faturamento || '-')}</td>
       <td>${escapeHtml(record.localizacao || '-')}</td>
       <td>${escapeHtml(formatDate(arrivalDate(record)))}</td>
@@ -680,7 +695,7 @@ function renderTable() {
         <button class="icon" data-admin="delete" data-id="${escapeHtml(record.leadId)}">Excluir</button>
       </td>
     </tr>
-  `).join('') : '<tr><td colspan="11" class="empty">Nenhum lead encontrado.</td></tr>';
+  `).join('') : '<tr><td colspan="13" class="empty">Nenhum lead encontrado.</td></tr>';
   document.querySelectorAll('[data-check]').forEach((element) => element.addEventListener('change', () => {
     element.checked ? state.selected.add(element.dataset.check) : state.selected.delete(element.dataset.check);
     renderAll();
@@ -700,6 +715,7 @@ function renderTable() {
 }
 function renderKanban() {
   const stages = [
+    ['accepted', 'Aceites recebidos'],
     ['captured', 'Novo / sem diagnóstico'],
     ['cold', 'Diagnóstico crítico'],
     ['warm', 'Em desenvolvimento'],
@@ -728,6 +744,7 @@ function renderKanban() {
   bindAdminActions();
 }
 function kanbanKey(record) {
+  if (isDealAcceptance(record)) return 'accepted';
   if (record.status !== 'completed') return 'captured';
   if (record.score >= 60) return 'hot';
   if (record.score >= 40) return 'warm';
@@ -736,6 +753,7 @@ function kanbanKey(record) {
 function renderFunnel() {
   const all = filteredRecords();
   const completed = all.filter((record) => record.status === 'completed');
+  const accepted = all.filter(isDealAcceptance);
   const qualified = completed.filter((record) => record.score >= 50);
   const hot = completed.filter((record) => record.score >= 60);
   const won = all.filter(isWon);
@@ -747,6 +765,7 @@ function renderFunnel() {
     ['Diagnósticos concluídos', completed.length],
     ['Qualificados (score 50+)', qualified.length],
     ['Prioridade alta (score 60+)', hot.length],
+    ['Aceites recebidos', accepted.length],
     ['Deram certo', won.length],
     ['Não deram certo', lost.length],
     ['Sem resultado', pendingOutcome.length],
@@ -765,6 +784,8 @@ function renderInsights() {
   const rows = filteredRecords();
   $('insights').innerHTML = [
     insightRank('Regiões com mais leads', rank(rows, (record) => record.localizacao || 'Não informado')),
+    insightRank('Produtos aceitos', rank(rows.filter(isDealAcceptance), (record) => record.produto || 'Não informado')),
+    insightRank('Formas de pagamento', rank(rows.filter(isDealAcceptance), (record) => record.forma_pagamento || 'Não informado')),
     insightRank('Faixas de faturamento', rank(rows, (record) => record.faturamento || 'Não informado')),
     insightRank('Resultado comercial', rank(rows, (record) => labelCommercial(record))),
     insightRank('Níveis SCALE', rank(rows, (record) => record.nivel || 'Sem diagnóstico')),
@@ -802,6 +823,7 @@ function openDrawer(id) {
   if (!record) return;
   state.selectedLeadId = id;
   const report = record.report || {};
+  const isAcceptance = isDealAcceptance(record);
   $('drawer').innerHTML = `
     <div class="drawer-head">
       <div>
@@ -812,9 +834,9 @@ function openDrawer(id) {
       <button class="icon" onclick="closeDrawer()">Fechar</button>
     </div>
     <div class="actions">
-      <button class="btn" onclick="copyLeadPrompt()">Copiar prompt LLM</button>
-      <button class="btn secondary" onclick="downloadLeadPdf()">Abrir PDF</button>
-      <button class="btn secondary" onclick="openQaPopup()">Ver perguntas/respostas</button>
+      ${isAcceptance ? '' : '<button class="btn" onclick="copyLeadPrompt()">Copiar prompt LLM</button>'}
+      ${isAcceptance ? '' : '<button class="btn secondary" onclick="downloadLeadPdf()">Abrir PDF</button>'}
+      ${isAcceptance ? '' : '<button class="btn secondary" onclick="openQaPopup()">Ver perguntas/respostas</button>'}
       <button class="btn secondary" onclick="copyCurrent()">Copiar dados</button>
       <button class="btn secondary" onclick="markCurrentLead('mark_won')">Marcar deu certo</button>
       <button class="btn secondary" onclick="markCurrentLead('mark_lost')">Marcar não deu</button>
@@ -826,29 +848,35 @@ function openDrawer(id) {
     <div class="detail-grid" style="margin-top:18px">
       ${fact('Nome', record.nome)}
       ${fact('Empresa', record.empresa)}
+      ${fact('Razão social', record.razao_social)}
+      ${fact('CNPJ/CPF', record.documento)}
       ${fact('Email', record.email)}
       ${fact('WhatsApp', record.whatsapp)}
+      ${fact('Produto', record.produto)}
+      ${fact('Pagamento', record.forma_pagamento)}
       ${fact('Faturamento', record.faturamento)}
       ${fact('Região', record.localizacao)}
+      ${fact('Endereço', record.endereco)}
       ${fact('Score', record.score || '-')}
       ${fact('Nível', record.nivel || '-')}
       ${fact('Resultado comercial', labelCommercial(record))}
+      ${fact('Aceite em', record.acceptedAt ? formatDate(record.acceptedAt) : '-')}
       ${fact('Resultado em', outcomeDate(record) ? formatDate(outcomeDate(record)) : '-')}
     </div>
-    ${report.tipo ? `
+    ${isAcceptance ? renderAcceptanceDetail(record) : report.tipo ? `
       <div class="section"><h2>Gargalo crítico</h2><div class="copy">${escapeHtml(record.gargalo || 'Não informado')}</div></div>
       <div class="section"><h2>Dimensões SCALE</h2>${Object.entries(report.dimensoes || {}).map(([key, dim]) => dimension(key, dim)).join('')}</div>
       <div class="section"><h2>Prioridades</h2><div class="copy">${escapeHtml(record.prioridades.map((item, index) => `${index + 1}. ${item}`).join('\n') || 'Não informado')}</div></div>
       <div class="section"><h2>Insights Masterboard</h2><div class="copy">${escapeHtml(report.setor_insights || 'Não informado')}</div></div>
     ` : '<div class="section"><div class="empty">Lead capturado, mas diagnóstico ainda não concluído.</div></div>'}
-    <div class="section">
+    ${isAcceptance ? '' : `<div class="section">
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px">
         <h2>Perguntas e respostas</h2>
         <button class="icon" onclick="openQaPopup()" type="button">Abrir completo</button>
       </div>
       ${renderQaCards(record, 6)}
     </div>
-    <div class="section"><h2>Histórico bruto</h2><div class="copy">${escapeHtml(record.conversation || 'Não disponível')}</div></div>
+    <div class="section"><h2>Histórico bruto</h2><div class="copy">${escapeHtml(record.conversation || 'Não disponível')}</div></div>`}
   `;
   $('drawer').classList.add('open');
 }
@@ -1056,6 +1084,28 @@ function labelAdminAction(action) {
   }[action] || 'Lead atualizado';
 }
 function fact(label, value) { return `<div class="fact"><div class="fact-label">${escapeHtml(label)}</div><div class="fact-value">${escapeHtml(value || '-')}</div></div>`; }
+function renderAcceptanceDetail(record) {
+  return `
+    <div class="section">
+      <h2>Aceite de fechamento</h2>
+      <div class="copy">${escapeHtml([
+        `Produto: ${record.produto || '-'}`,
+        `Forma de pagamento: ${record.forma_pagamento || '-'}`,
+        `Aceite registrado em: ${record.acceptedAt ? formatDate(record.acceptedAt) : '-'}`,
+        'Nenhuma cobrança automática foi iniciada por este formulário.',
+      ].join('\n'))}</div>
+    </div>
+    <div class="section">
+      <h2>Dados jurídicos e operacionais</h2>
+      <div class="copy">${escapeHtml([
+        `Razão social: ${record.razao_social || '-'}`,
+        `Documento: ${record.documento || '-'}`,
+        `Endereço: ${record.endereco || '-'}`,
+        `Região: ${record.localizacao || '-'}`,
+      ].join('\n'))}</div>
+    </div>
+  `;
+}
 function dimension(key, dim = {}) {
   const score = Number(dim.score || 0);
   return `
@@ -1070,6 +1120,9 @@ function dimension(key, dim = {}) {
 function isWon(record) {
   return record.commercialStatus === 'converted' || record.commercialStatus === 'sold';
 }
+function isDealAcceptance(record) {
+  return record.status === 'deal_accepted' || record.recordType === 'deal_acceptance';
+}
 function isLost(record) {
   return record.commercialStatus === 'lost';
 }
@@ -1079,13 +1132,15 @@ function outcomeDate(record) {
   return '';
 }
 function labelCommercial(record) {
-  if (isWon(record)) return 'Deu certo';
   if (isLost(record)) return 'Não deu certo';
+  if (isDealAcceptance(record)) return 'Aceite recebido';
+  if (isWon(record)) return 'Deu certo';
   return 'Sem resultado';
 }
 function commercialPill(record) {
-  if (isWon(record)) return '<span class="pill completed">Deu certo</span>';
   if (isLost(record)) return '<span class="pill error">Não deu</span>';
+  if (isDealAcceptance(record)) return '<span class="pill completed">Aceite</span>';
+  if (isWon(record)) return '<span class="pill completed">Deu certo</span>';
   return '<span class="pill">Sem resultado</span>';
 }
 function scorePill(record) {
@@ -1094,7 +1149,7 @@ function scorePill(record) {
   if (record.score >= 40) return '<span class="pill warm">Morno</span>';
   return '<span class="pill cold">Frio</span>';
 }
-function labelStatus(status) { return { captured: 'Capturado', started: 'Iniciado', completed: 'Concluído', error: 'Erro' }[status] || 'Desconhecido'; }
+function labelStatus(status) { return { captured: 'Capturado', started: 'Iniciado', completed: 'Concluído', deal_accepted: 'Aceite recebido', error: 'Erro' }[status] || 'Desconhecido'; }
 function pct(a, b) { return b ? Math.round(a / b * 100) : 0; }
 function arrivalDate(record) {
   return record.createdAt || record.updatedAt || '';
@@ -1117,19 +1172,53 @@ function formatLeadText(record) {
   return [
     `Nome: ${record.nome || '-'}`,
     `Empresa: ${record.empresa || '-'}`,
+    `Razão social: ${record.razao_social || '-'}`,
+    `CNPJ/CPF: ${record.documento || '-'}`,
     `Email: ${record.email || '-'}`,
     `WhatsApp: ${record.whatsapp || '-'}`,
+    `Produto: ${record.produto || '-'}`,
+    `Forma de pagamento: ${record.forma_pagamento || '-'}`,
     `Faturamento: ${record.faturamento || '-'}`,
     `Região: ${record.localizacao || '-'}`,
+    `Endereço: ${record.endereco || '-'}`,
     `Score: ${record.score || '-'}`,
     `Status: ${labelStatus(record.status)}`,
     `Resultado comercial: ${labelCommercial(record)}`,
+    `Aceite em: ${record.acceptedAt ? formatDate(record.acceptedAt) : '-'}`,
     `Resultado em: ${outcomeDate(record) ? formatDate(outcomeDate(record)) : '-'}`,
     `Gargalo: ${record.gargalo || '-'}`,
   ].join('\n');
 }
 function formatLeadPrompt(record) {
   if (!record) return '';
+  if (isDealAcceptance(record)) {
+    return `# Handoff Comercial - Aceite de Fechamento
+
+## Dados do aceite
+| Campo | Valor |
+|---|---|
+| Nome | ${record.nome || '-'} |
+| Empresa | ${record.empresa || '-'} |
+| Razão social | ${record.razao_social || '-'} |
+| CNPJ/CPF | ${record.documento || '-'} |
+| Email | ${record.email || '-'} |
+| WhatsApp | ${record.whatsapp || '-'} |
+| Produto | ${record.produto || '-'} |
+| Forma de pagamento | ${record.forma_pagamento || '-'} |
+| Localização | ${record.localizacao || '-'} |
+| Endereço | ${record.endereco || '-'} |
+| Aceite em | ${record.acceptedAt ? formatDate(record.acceptedAt) : '-'} |
+
+## Tarefa
+Gere um plano de handoff para o comercial/onboarding concluir este fechamento.
+
+Inclua:
+- Próximos passos em até 24h.
+- Mensagem curta de WhatsApp.
+- E-mail de confirmação.
+- Campos que devem ser criados/atualizados no CRM.
+- Pontos de atenção antes de iniciar cobrança manual.`;
+  }
   const report = record.report || {};
   const dimensions = Object.entries(report.dimensoes || {});
   const dimsTable = dimensions.length
@@ -1362,7 +1451,7 @@ async function copyText(text) {
   }
 }
 function downloadCsv(rows, filename) {
-  const cols = ['nome', 'empresa', 'email', 'whatsapp', 'faturamento', 'localizacao', 'score', 'nivel', 'status', 'commercialStatus', 'createdAt', 'convertedAt', 'soldAt', 'lostAt', 'gargalo', 'updatedAt'];
+  const cols = ['nome', 'empresa', 'razao_social', 'documento', 'email', 'whatsapp', 'produto', 'forma_pagamento', 'faturamento', 'localizacao', 'score', 'nivel', 'status', 'commercialStatus', 'acceptedAt', 'createdAt', 'convertedAt', 'soldAt', 'lostAt', 'gargalo', 'updatedAt'];
   const csv = [cols.join(',')]
     .concat(rows.map((record) => cols.map((col) => `"${String(record[col] ?? '').replace(/"/g, '""')}"`).join(',')))
     .join('\n');

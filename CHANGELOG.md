@@ -7,6 +7,10 @@
 - Endpoint `/api/deal-acceptance` para validar, persistir e notificar a equipe sobre novos aceites.
 - Normalizacao e patch de registros `deal_acceptance` com status `deal_accepted`.
 - Testes automatizados para dados de aceite com CNPJ, produto e forma de pagamento.
+- Auto-preenchimento de dados da empresa por CNPJ no formulario `/aceite`.
+- Visualizacao dedicada de aceites no dashboard, com produto, pagamento, documento e dados juridicos.
+- Variavel `DEAL_ACCEPTANCE_RECIPIENTS` para direcionar notificacoes de aceite ao comercial.
+- Fluxo do formulario `/aceite` em slides, com progresso, animacoes e layout responsivo.
 
 ## 2026-06-11
 

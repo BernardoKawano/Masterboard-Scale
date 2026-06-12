@@ -6,6 +6,7 @@ const { connectBlobLambda, saveRecordPatch } = require('./_blobStore');
 
 const VALID_PRODUCTS = new Set(['Scale', 'Masterboard Club']);
 const VALID_PAYMENT_OPTIONS = new Set(['Cartão - à vista', 'Cartão - parcelado']);
+const DEFAULT_RECIPIENTS = ['fabio@scaleco.ai', 'bernardo.kawano@masterboard.com.br'];
 
 function json(statusCode, body) {
   return {
@@ -28,6 +29,19 @@ function normalizeUrl(value) {
   const raw = String(value || '').trim();
   if (!raw) return '';
   return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+}
+
+function parseRecipientList(value) {
+  return String(value || '')
+    .split(/[,\s;]+/)
+    .map((email) => email.trim())
+    .filter(Boolean);
+}
+
+function dealAcceptanceRecipients() {
+  return parseRecipientList(process.env.DEAL_ACCEPTANCE_RECIPIENTS).length
+    ? parseRecipientList(process.env.DEAL_ACCEPTANCE_RECIPIENTS)
+    : DEFAULT_RECIPIENTS;
 }
 
 function validateAcceptance(data) {
@@ -106,7 +120,7 @@ async function sendDealAcceptanceEmail(data) {
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_KEY}` },
     body: JSON.stringify({
       from: 'Archie · ScaleCo <noreply@scaleco.ai>',
-      to: ['fabio@scaleco.ai', 'bernardo.kawano@masterboard.com.br'],
+      to: dealAcceptanceRecipients(),
       subject: `[Aceite] ${data.empresa || data.nome} · ${data.produto} · ${data.forma_pagamento}`,
       html,
     }),
@@ -156,3 +170,6 @@ exports.handler = async function (event) {
     return json(500, { error: 'Erro ao registrar aceite.' });
   }
 };
+
+module.exports.parseRecipientList = parseRecipientList;
+module.exports.dealAcceptanceRecipients = dealAcceptanceRecipients;
