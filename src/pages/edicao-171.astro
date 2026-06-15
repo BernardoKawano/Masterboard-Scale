@@ -1,0 +1,386 @@
+---
+import SectionShell from '../components/landing/SectionShell.astro';
+import ThreadRail from '../components/landing/ThreadRail.astro';
+import {
+  advisoryItems,
+  eventMeta,
+  faqItems,
+  growthItems,
+  methodCards,
+  offer,
+  painCards,
+  scaleItems,
+  schedule,
+  sessions,
+  socialProof,
+  symptomCards,
+  transformationCards,
+} from '../data/edicao171';
+import '../styles/global.css';
+
+const logos = ['HP', 'SAP', 'Microsoft', 'Salesforce'];
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0A0A0A" />
+    <title>Edição 171 · Masterboard powered by ScaleCo</title>
+    <meta
+      name="description"
+      content="Imersão presencial de 2 dias para founders — Curitiba 17-18/07 e Maringá 30-31/07. Transforme esforço heroico em sistema replicável."
+    />
+  </head>
+  <body>
+    <div class="landing-page">
+      <ThreadRail />
+
+      <header class="site-header" data-site-header aria-label="Header fixo">
+        <div class="site-header__inner">
+          <div class="brand-lockup" aria-label="Masterboard powered by ScaleCo">
+            <img class="brand-logo brand-logo--masterboard" src="/assets/masterboard-logo-yellow-transparent.png" alt="Masterboard" />
+            <span class="brand-divider" aria-hidden="true">powered by</span>
+            <img class="brand-logo brand-logo--scaleco" src="/assets/scaleco-logo-transparent.png" alt="ScaleCo" />
+          </div>
+        </div>
+      </header>
+
+      <main class="page-shell">
+
+        <!-- 01 · HERO -->
+        <SectionShell id="hero">
+          <div class="hero-layout">
+            <div>
+              <div class="hero-tags" data-reveal style="--delay:80ms">
+                <span class="tag is-gold">{eventMeta.label}</span>
+                <span class="tag">{eventMeta.subtag}</span>
+              </div>
+
+              <h1 id="hero-title" class="section-title">
+                <span data-reveal style="--delay:120ms">Crescimento vem do <mark>esforço.</mark></span><br />
+                <span data-reveal style="--delay:240ms">Escala vem da <mark>arquitetura.</mark></span>
+              </h1>
+
+              <p class="section-copy" data-reveal style="--delay:500ms">
+                2 dias de imersão presencial para founders que querem transformar <mark>esforço heroico</mark> em <mark>sistema replicável</mark> — com Fábio Couto (Salesforce: US$2M → US$40M em 5 anos).
+              </p>
+
+              <div class="hero-actions" data-reveal="scale" style="--delay:680ms">
+                <a class="cta-button is-filled is-pulsing" href="#offer">{eventMeta.ctaPrimary}</a>
+              </div>
+
+              <div class="hero-sessions" data-reveal style="--delay:800ms" aria-label="Turmas da Edição 171">
+                {sessions.map((s) => (
+                  <a href="#offer" class="hero-session-tag">
+                    <strong>{s.city}</strong>
+                    <span>{s.dates}</span>
+                  </a>
+                ))}
+              </div>
+
+              <div class="hero-proof-stack" data-reveal style="--delay:920ms" aria-label="Provas rápidas da imersão">
+                <span><strong>25 anos</strong> construindo receita</span>
+                <span><strong>HP · SAP · Microsoft · Salesforce</strong></span>
+                <span><strong>US$2M → US$40M</strong> em 5 anos</span>
+              </div>
+            </div>
+
+            <div class="hero-visual" data-hero-visual data-reveal="clip" style="--delay:900ms">
+              <img src="/assets/fabio-couto-2.jpeg" alt="Fábio Couto conduzindo a imersão" />
+              <div class="edition-mark" aria-hidden="true">
+                <strong>171</strong>
+                <span>Edição</span>
+              </div>
+              <div class="hero-visual__caption">
+                Masterboard presencial. Uma sala menor, com líderes construindo a próxima arquitetura da empresa.
+              </div>
+            </div>
+          </div>
+        </SectionShell>
+
+        <!-- 02 · PROBLEM (crescimento vs escala + diagnóstico) -->
+        <SectionShell id="problem">
+          <h2 id="problem-title" class="section-title is-medium" data-reveal>
+            Crescimento é fácil. <mark>Escala é diferente.</mark>
+          </h2>
+          <p class="section-copy" data-reveal style="--delay:120ms">
+            "Crescer é fácil. Qualquer um contrata mais pessoas e fatura mais. Escala é crescer a receita sem aumentar os custos na mesma proporção."
+          </p>
+
+          <div class="compare-table">
+            <article class="paper-card before" data-reveal="left">
+              <h3>Crescimento</h3>
+              <ul>
+                {growthItems.map((item, index) => <li style={`--delay:${index * 60}ms`}>{item}</li>)}
+              </ul>
+            </article>
+
+            <article class="paper-card after" data-reveal="right" style="--delay:300ms">
+              <h3>Escala</h3>
+              <ul class="scale-list">
+                {scaleItems.map((item, index) => <li style={`--delay:${index * 60}ms`}>{item}</li>)}
+              </ul>
+            </article>
+          </div>
+
+          <h2 class="section-title is-medium" style="margin-top:52px" data-reveal>
+            Em todo negócio de R$1M a R$50M, o mesmo padrão se repete.
+          </h2>
+
+          <div class="grid-two" style="margin-top:20px">
+            {painCards.map((pain, index) => (
+              <article class="dark-card" data-reveal="scale" style={`--delay:${index * 80}ms`}>
+                <p>{pain}</p>
+              </article>
+            ))}
+          </div>
+
+          <p class="section-label" style="margin-top:44px">Os 3 sintomas que travam a escala</p>
+          <div class="grid-three">
+            {symptomCards.map((symptom, index) => (
+              <article class="dark-card" data-reveal style={`--delay:${index * 150}ms`}>
+                <span class="symptom-icon" data-motion={symptom.motion} aria-hidden="true">
+                  {symptom.motion === 'rise' && (
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M7 17V7m0 0 3 3M7 7 4 10m13-3v10m0 0 3-3m-3 3-3-3" />
+                    </svg>
+                  )}
+                  {symptom.motion === 'pulse' && (
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 5v9m0 5h.01" />
+                    </svg>
+                  )}
+                  {symptom.motion === 'tilt' && (
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M9.5 9a2.7 2.7 0 1 1 4.5 2c-1.2.8-2 1.5-2 3m0 5h.01" />
+                    </svg>
+                  )}
+                </span>
+                <h3>{symptom.title}</h3>
+                <p>{symptom.body}</p>
+              </article>
+            ))}
+          </div>
+        </SectionShell>
+
+        <!-- 03 · AUTHORITY -->
+        <SectionShell id="authority" class="section-ink section-sticky-media">
+          <div class="quote-panel" data-reveal>
+            <p>
+              "Antes de uma empresa escalar, ela precisa ser arquitetada.<br />
+              Máquinas de receita exigem arquitetura."
+            </p>
+          </div>
+
+          <div class="grid-two">
+            <div class="authority-photo" data-reveal="left">
+              <img src="/assets/fabio-couto-1.jpeg" alt="Fábio Couto, Founder & CEO da ScaleCo" />
+              <span>Retrato editorial de Fábio Couto</span>
+            </div>
+
+            <article class="dark-card" data-reveal="right">
+              <h2 id="authority-title" class="section-title is-medium">Fábio Couto</h2>
+              <p class="section-copy" style="margin-top:12px">
+                Founder & CEO, ScaleCo<br />
+                25 anos construindo motores de receita
+              </p>
+
+              <div class="logo-row" aria-label="Empresas da trajetória de Fábio Couto">
+                {logos.map((logo, index) => (
+                  <span class="logo-chip" data-reveal style={`--delay:${index * 100}ms`}>{logo}</span>
+                ))}
+              </div>
+
+              <div class="stat-badge" data-reveal="scale">
+                <span>US$<span data-countup data-start="2" data-end="2">2</span>M</span>
+                <span class="stat-arrow" aria-hidden="true"></span>
+                <span>US$<span data-countup data-start="2" data-end="40">40</span>M</span>
+              </div>
+
+              <p>Não como observador. Como construtor.</p>
+            </article>
+          </div>
+        </SectionShell>
+
+        <!-- 04 · METHOD + TRANSFORMATION -->
+        <SectionShell id="method">
+          <h2 id="method-title" class="section-title is-medium" data-reveal>
+            O mesmo padrão que faz empresas de <mark>US$1B</mark> funcionar pode fazer a sua empresa de <mark>R$5M</mark> funcionar.
+          </h2>
+          <p class="section-copy" data-reveal style="--delay:180ms">
+            Não é teoria. É o padrão identificado em 25 anos construindo motores de receita — traduzido para o estágio do seu negócio.
+          </p>
+
+          <p class="section-label" style="margin-top:34px">O que existe — e você vai descobrir na Edição 171</p>
+          <div class="grid-three">
+            {methodCards.map((card, index) => (
+              <article class="paper-card veil-card" data-reveal style={`--delay:${index * 80}ms`}>
+                <h3 class="underlined-title">{card.title}</h3>
+                <p>{card.body}</p>
+              </article>
+            ))}
+          </div>
+
+          <div class="quote-panel" style="margin:32px 0 0" data-reveal>
+            <p style="font-size:clamp(20px,2.8vw,34px)">
+              "Você não vai sair com slides. Vai sair com a parte da arquitetura que se aplica diretamente ao seu negócio — construída em 2 dias, com Fábio, ao seu lado."
+            </p>
+          </div>
+
+          <p class="section-label" style="margin-top:44px">O que você sai construindo</p>
+          <div class="grid-two" style="margin-top:16px">
+            {transformationCards.map((card, index) => (
+              <article class="paper-card check-card" data-reveal style={`--delay:${index * 100}ms`}>
+                <h3>{card.title}</h3>
+                <p>{card.body}</p>
+              </article>
+            ))}
+          </div>
+        </SectionShell>
+
+        <!-- 05 · SCHEDULE -->
+        <SectionShell id="schedule">
+          <h2 id="schedule-title" class="section-title is-medium" data-reveal>Da chegada ao encerramento.</h2>
+          <p class="section-copy" data-reveal style="--delay:120ms">
+            Mesmo programa nas duas cidades. Programação detalhada em breve.
+          </p>
+
+          <div class="timeline-grid" style="margin-top:28px">
+            {schedule.days.map((day, index) => (
+              <article class="paper-card timeline-day" data-reveal={index % 2 === 0 ? 'left' : 'right'} style={`--delay:${index * 120}ms`}>
+                <p class="section-label" style="color:#000;margin-bottom:12px">{day.label} · {day.window}</p>
+                <h3>{day.headline}</h3>
+              </article>
+            ))}
+          </div>
+
+          <div class="timeline-divider" data-reveal>
+            Hoje mapeamos a arquitetura estratégica. Amanhã começamos a construir o motor que faz funcionar.
+          </div>
+        </SectionShell>
+
+        <!-- 06 · OFFER (track record + countdown + duas turmas) -->
+        <SectionShell id="offer" class="section-ink" eyebrow="Edição 171 · Escolha sua turma">
+          <h2 id="offer-title" class="section-title is-medium" data-reveal>
+            2 dias. <mark>Presencial.</mark> Curitiba ou Maringá.
+          </h2>
+
+          <div class="track-record" data-reveal style="--delay:100ms">
+            <p class="section-label" style="color:var(--brand-muted)">{socialProof[0].eyebrow}</p>
+            <p style="color:#E8E8E8;font-size:clamp(15px,1.6vw,18px);margin:0;line-height:1.5">
+              <strong style="color:#ffffff">{socialProof[0].title}</strong> · {socialProof[0].body}
+            </p>
+          </div>
+
+          <div class="countdown" data-countdown={eventMeta.targetDate} data-reveal style="--delay:180ms">
+            <div class="countdown-card">
+              <span class="countdown-number" data-countdown-part="days">00</span>
+              <span class="countdown-label">dias</span>
+            </div>
+            <div class="countdown-card">
+              <span class="countdown-number" data-countdown-part="hours">00</span>
+              <span class="countdown-label">horas</span>
+            </div>
+            <div class="countdown-card">
+              <span class="countdown-number" data-countdown-part="minutes">00</span>
+              <span class="countdown-label">min</span>
+            </div>
+          </div>
+          <p class="countdown-context" data-reveal style="--delay:260ms">Próxima turma · Curitiba · 17 e 18 de julho</p>
+
+          <div class="session-cards">
+            {sessions.map((session, i) => (
+              <article class="session-card" data-reveal={i === 0 ? 'left' : 'right'} style={`--delay:${i * 150}ms`}>
+                <p class="session-card__city">{session.city}</p>
+                <p class="session-card__date">{session.dates} · {session.state} · 2026</p>
+                <a class="cta-button is-filled" href="#faq" style="width:100%;justify-content:center;margin-top:auto">
+                  {eventMeta.ctaOffer} · {session.city}
+                </a>
+              </article>
+            ))}
+          </div>
+
+          <div class="grid-two" style="margin-top:20px">
+            <article class="paper-card" data-reveal="left">
+              <h3>O que está incluso</h3>
+              <ul>
+                {offer.included.map((item) => <li>{item}</li>)}
+              </ul>
+            </article>
+            <article class="dark-card" data-reveal="right">
+              <h3>Formato e curadoria</h3>
+              <ul>
+                {offer.format.map((item) => <li>{item}</li>)}
+              </ul>
+            </article>
+          </div>
+        </SectionShell>
+
+        <!-- 07 · ADVISORY -->
+        <SectionShell id="advisory">
+          <article class="advisory-card" data-reveal>
+            <h2 id="advisory-title" class="section-title is-medium">Para quem quer construção acelerada.</h2>
+            <p class="section-copy">
+              Advisory ScaleCo · 6 meses — não é mais imersão, é arquitetura aplicada no seu negócio com acompanhamento direto.
+            </p>
+            <ul style="margin:28px 0 0;padding:0;list-style:none;color:var(--text-muted);line-height:1.8">
+              {advisoryItems.map((item) => <li>— {item}</li>)}
+            </ul>
+            <div class="price-seal" data-reveal="scale">7 vagas · 6 meses · R$150k (R$120k para participantes da Edição 171)</div>
+          </article>
+        </SectionShell>
+
+        <!-- 08 · FAQ + FOOTER -->
+        <SectionShell id="faq">
+          <div class="quote-panel" data-reveal>
+            <p>
+              <span data-reveal>Crescimento vem do esforço.</span><br />
+              <span data-reveal style="--delay:200ms">Escala vem da arquitetura.</span><br />
+              <span data-reveal style="--delay:500ms;color:var(--brand-gold)">A jornada não termina aqui. Começa.</span>
+            </p>
+          </div>
+
+          <p class="section-label" style="margin-top:28px">FAQ</p>
+          <div class="faq-list">
+            {faqItems.map((item, index) => (
+              <article class="faq-item" data-faq-item data-reveal style={`--delay:${index * 80}ms`}>
+                <button class="faq-button" type="button" data-faq-button aria-expanded="false">
+                  <span>{item.question}</span>
+                  <span class="faq-plus" aria-hidden="true">+</span>
+                </button>
+                <div class="faq-answer">
+                  <p>{item.answer}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div class="hero-actions" style="justify-content:center;margin-top:32px" data-reveal="scale">
+            <a class="text-link" href="#offer">Rever detalhes da participação →</a>
+          </div>
+
+          <h2 id="faq-title" class="section-title is-medium" style="margin-top:52px" data-reveal>
+            Fábio Couto · Founder & CEO, ScaleCo
+          </h2>
+          <nav class="footer-links" aria-label="Links institucionais" data-reveal>
+            <a href="#">Termos</a>
+            <a href="#">Privacidade</a>
+            <a href="#">Contato</a>
+            <a href="#">Redes sociais</a>
+          </nav>
+        </SectionShell>
+
+      </main>
+
+      <div class="sticky-cta" data-sticky-cta>
+        <a class="cta-button is-filled" href="#offer">Ver participação</a>
+      </div>
+    </div>
+
+    <script>
+      import '../scripts/landingMotion';
+    </script>
+  </body>
+</html>

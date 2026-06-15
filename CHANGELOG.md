@@ -2,7 +2,17 @@
 
 ## 2026-06-15
 
+### Added
+- Criada a landing Astro/Tailwind da Edição 171 em `/edicao-171`, com seções 00 a 12 seguindo o wireframe e o brandbook Masterboard.
+- Adicionados dados editáveis para cards, FAQ, oferta e cronograma reservado da landing.
+- Implementados helpers testáveis para progresso de scroll, countdown e CTA sticky.
+
 ### Changed
+- Configurado build Astro para publicar `dist` no Netlify, copiando as páginas estáticas legadas para preservar `/`, `/candidatura`, `/aceite` e dashboard.
+- Revisada a landing `/edicao-171` para priorizar a assinatura "Masterboard powered by ScaleCo", incluir logos reais e reduzir a aparência de wireframe com menos molduras e rolagem.
+- Alinhada a landing `/edicao-171` ao design system Masterboard: canvas claro, hero ink, cards com `paper shadow`, cantos angulares e copy sem urgência fabricada.
+- Ajustada a landing `/edicao-171` com Funnel Display local, fotos reais de Fábio Couto, hierarquia de títulos revisada, seções ink alternadas e indicador ativo no scroll.
+- Refinada a landing `/edicao-171` com menos repetição de logos/CTAs, sombras de papel padronizadas e palavras-chave grifadas em amarelo.
 - Ajustado o titulo da pagina `/aceite` para "Vamos fechar?".
 - Incluida a opcao de produto "Combo Club + Scale" no formulario e na validacao server-side.
 - Adicionado accordion de entregaveis da Imersao Scale na etapa de produto.

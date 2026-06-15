@@ -4,6 +4,10 @@
 # Dependencies
 node_modules/
 
+# Build artifacts
+.astro/
+dist/
+
 # Local environment variables
 .env
 .env.*

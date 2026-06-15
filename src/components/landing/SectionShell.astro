@@ -1,0 +1,20 @@
+---
+interface Props {
+  id: string;
+  eyebrow?: string;
+  class?: string;
+}
+
+const { id, eyebrow, class: className = '' } = Astro.props;
+---
+
+<section
+  id={id}
+  class={`landing-section ${className}`}
+  data-section
+  aria-labelledby={`${id}-title`}
+>
+  <span class="thread-node" data-section-node={id} aria-hidden="true"></span>
+  {eyebrow && <p class="section-label">{eyebrow}</p>}
+  <slot />
+</section>

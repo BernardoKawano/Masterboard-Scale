@@ -1,0 +1,19 @@
+---
+import { sectionIds } from '../../data/edicao171';
+---
+
+<div class="mobile-progress" aria-hidden="true">
+  <span></span>
+</div>
+
+<aside class="thread-rail" aria-label="Navegação de seções">
+  <span class="thread-line"></span>
+  <span class="thread-active"></span>
+  <ol>
+    {sectionIds.map((id, index) => (
+      <li style={`--node-index:${index};--node-count:${sectionIds.length};`}>
+        <a href={`#${id}`} aria-label={id} data-thread-target={id}></a>
+      </li>
+    ))}
+  </ol>
+</aside>
