@@ -4,7 +4,7 @@ const {
 } = require('./_records');
 const { connectBlobLambda, saveRecordPatch } = require('./_blobStore');
 
-const VALID_PRODUCTS = new Set(['Scale', 'Masterboard Club']);
+const VALID_PRODUCTS = new Set(['Scale', 'Masterboard Club', 'Combo Club + Scale']);
 const VALID_PAYMENT_OPTIONS = new Set(['Cartão - à vista', 'Cartão - parcelado']);
 const DEFAULT_RECIPIENTS = ['fabio@scaleco.ai', 'bernardo.kawano@masterboard.com.br'];
 
@@ -173,3 +173,4 @@ exports.handler = async function (event) {
 
 module.exports.parseRecipientList = parseRecipientList;
 module.exports.dealAcceptanceRecipients = dealAcceptanceRecipients;
+module.exports.validateAcceptance = validateAcceptance;

@@ -313,6 +313,18 @@
       letter-spacing: 0.04em;
     }
 
+    .required-mark {
+      color: var(--gold);
+      margin-left: 4px;
+    }
+
+    .required-note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+      margin: -14px 0 20px;
+    }
+
     input,
     select,
     textarea {
@@ -371,6 +383,10 @@
       gap: 12px;
     }
 
+    .form-step[data-step="2"] .option-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     .option {
       display: flex;
       gap: 12px;
@@ -387,6 +403,155 @@
     .option input {
       width: auto;
       accent-color: var(--gold);
+    }
+
+    .product-card {
+      margin-top: 18px;
+      border: 1px solid rgba(251, 190, 10, 0.28);
+      border-radius: 18px;
+      background: rgba(251, 190, 10, 0.06);
+      overflow: hidden;
+    }
+
+    .product-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(251, 190, 10, 0.16);
+    }
+
+    .product-name {
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .product-desc {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .product-price {
+      color: var(--gold);
+      flex: 0 0 auto;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+    }
+
+    .deliverables-accordion {
+      background: rgba(10, 10, 10, 0.32);
+    }
+
+    .deliverables-accordion summary {
+      align-items: center;
+      cursor: pointer;
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      list-style: none;
+      padding: 17px 20px;
+      user-select: none;
+    }
+
+    .deliverables-accordion summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .deliverables-title {
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .deliverables-star {
+      color: var(--gold);
+      margin-right: 8px;
+    }
+
+    .deliverables-plus {
+      color: var(--gold);
+      flex: 0 0 auto;
+      font-size: 28px;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .deliverables-accordion[open] .deliverables-plus {
+      transform: rotate(45deg);
+    }
+
+    .deliverables-body {
+      border-top: 1px solid rgba(251, 190, 10, 0.12);
+      color: var(--muted-strong);
+      font-size: 14px;
+      line-height: 1.65;
+      padding: 0 20px 20px;
+    }
+
+    .deliverables-intro {
+      margin: 18px 0;
+    }
+
+    .deliverable-item {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: grid;
+      gap: 4px;
+      padding: 18px 0;
+    }
+
+    .deliverable-item:first-of-type {
+      border-top-color: rgba(251, 190, 10, 0.22);
+    }
+
+    .deliverable-kicker {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .deliverable-heading {
+      align-items: baseline;
+      display: flex;
+      gap: 12px;
+    }
+
+    .deliverable-letter {
+      color: var(--gold);
+      flex: 0 0 auto;
+      font-size: 34px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .deliverable-name {
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .deliverable-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .deliverable-tags span {
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--muted-strong);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 9px;
     }
 
     .check {
@@ -652,7 +817,7 @@
         letter-spacing: -0.065em;
         line-height: 0.9;
         margin: 12px 0 14px;
-        max-width: 9ch;
+        max-width: 11ch;
       }
 
       .hero p {
@@ -710,8 +875,15 @@
 
       .grid,
       .option-grid,
+      .form-step[data-step="2"] .option-grid,
       .phone-row {
         grid-template-columns: 1fr;
+      }
+
+      .product-card-head,
+      .deliverable-heading {
+        align-items: flex-start;
+        flex-direction: column;
       }
 
       h1 {
@@ -739,7 +911,7 @@
     <div class="layout">
       <section class="hero" aria-labelledby="page-title">
         <div class="kicker">Aceite de fechamento</div>
-        <h1 id="page-title">Vamo fechar?</h1>
+        <h1 id="page-title">Vamos fechar?</h1>
         <p>
           Se a call com o Fabio já deixou claro o próximo passo, este formulário registra o aceite comercial
           para a equipe preparar o onboarding e combinar os detalhes finais de pagamento.
@@ -768,21 +940,22 @@
           <p class="form-sub">
             O envio registra a intenção de fechamento. A cobrança no cartão será combinada pela equipe depois deste aceite.
           </p>
+          <p class="required-note"><span class="required-mark">*</span> Campos obrigatórios para registrar o aceite.</p>
           <div class="form-progress" id="acceptance-progress" aria-hidden="true"></div>
 
           <section class="form-step is-active" data-step="0">
             <h3 class="section-title">Responsável</h3>
             <div class="grid">
               <div class="field is-wide">
-                <label for="nome">Nome completo</label>
+                <label for="nome">Nome completo<span class="required-mark">*</span></label>
                 <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Nome de quem está aceitando" required>
               </div>
               <div class="field">
-                <label for="email">E-mail</label>
+                <label for="email">E-mail<span class="required-mark">*</span></label>
                 <input id="email" name="email" type="email" autocomplete="email" placeholder="voce@empresa.com" required>
               </div>
               <div class="field is-wide">
-                <label>Telefone / WhatsApp</label>
+                <label>Telefone / WhatsApp<span class="required-mark">*</span></label>
                 <div class="phone-row">
                   <select id="codigo_pais" name="codigo_pais" aria-label="Código do país">
                     <option value="+55" selected>+55 · Brasil</option>
@@ -803,12 +976,12 @@
             <h3 class="section-title">Dados da empresa</h3>
             <div class="grid">
               <div class="field is-wide">
-                <label for="documento">CNPJ/CPF</label>
+                <label for="documento">CNPJ/CPF<span class="required-mark">*</span></label>
                 <input id="documento" name="documento" type="text" inputmode="numeric" autocomplete="off" placeholder="00.000.000/0000-00" oninput="handleDocumentInput(event)" required>
                 <div class="field-hint" id="documento-hint">Ao informar CNPJ, tentamos preencher os dados da empresa automaticamente.</div>
               </div>
               <div class="field">
-                <label for="empresa">Empresa</label>
+                <label for="empresa">Empresa<span class="required-mark">*</span></label>
                 <input id="empresa" name="empresa" type="text" autocomplete="organization" placeholder="Nome comercial" required>
               </div>
               <div class="field">
@@ -831,7 +1004,7 @@
           </section>
 
           <section class="form-step" data-step="2">
-            <h3 class="section-title">Produto</h3>
+            <h3 class="section-title">Produto<span class="required-mark">*</span></h3>
             <h2 class="form-title">Qual solução vamos ativar?</h2>
             <p class="form-sub">Escolha o produto combinado na conversa para o comercial preparar o handoff correto.</p>
             <div class="option-grid">
@@ -843,11 +1016,89 @@
                 <input type="radio" name="produto" value="Masterboard Club" required>
                 <span>Masterboard Club</span>
               </label>
+              <label class="option">
+                <input type="radio" name="produto" value="Combo Club + Scale" required>
+                <span>Combo Club + Scale</span>
+              </label>
+            </div>
+            <div class="product-card" aria-label="Entregáveis do Scale">
+              <div class="product-card-head">
+                <div>
+                  <div class="product-name">Imersão Scale</div>
+                  <div class="product-desc">4 encontros presenciais de 2 dias</div>
+                </div>
+                <div class="product-price">R$ 60K</div>
+              </div>
+              <details class="deliverables-accordion">
+                <summary>
+                  <span class="deliverables-title"><span class="deliverables-star">✦</span>Ver conteúdo dos encontros</span>
+                  <span class="deliverables-plus" aria-hidden="true">+</span>
+                </summary>
+                <div class="deliverables-body">
+                  <p class="deliverables-intro">4 encontros presenciais de 2 dias. Cada encontro aprofunda uma dimensão do Scale Method™, do diagnóstico à execução institucionalizada.</p>
+
+                  <div class="deliverable-item">
+                    <div class="deliverable-kicker">Ponto de partida</div>
+                    <div class="deliverable-name">Plano de Escala</div>
+                    <p>Antes de qualquer método, você mapeia onde está. O Scale Diagnostic™ revela os gargalos reais da sua operação e transforma o diagnóstico num plano concreto de escala com prioridades, sequência e compromisso.</p>
+                  </div>
+
+                  <div class="deliverable-item">
+                    <div class="deliverable-kicker">Dimensão 1</div>
+                    <div class="deliverable-heading">
+                      <span class="deliverable-letter">S</span>
+                      <span class="deliverable-name">Strategic Architecture</span>
+                    </div>
+                    <p>Você trabalha a visão do negócio, define o cliente ideal com critérios comportamentais reais, constrói a proposta de valor que diferencia e identifica o Growth Motion dominante.</p>
+                    <div class="deliverable-tags"><span>Visão e Scale Plan™</span><span>ICP real</span><span>Proposta de valor</span><span>Growth Motion</span></div>
+                  </div>
+
+                  <div class="deliverable-item">
+                    <div class="deliverable-kicker">Dimensão 2</div>
+                    <div class="deliverable-heading">
+                      <span class="deliverable-letter">C</span>
+                      <span class="deliverable-name">Commercial Engine</span>
+                    </div>
+                    <p>Você constrói o motor: Marketing gera demanda, Vendas converte, CX garante percepção e Produto evolui a partir do CX. O funil passa a operar com processo, cadência e forecast real.</p>
+                    <div class="deliverable-tags"><span>Revenue Engine</span><span>Funil documentado</span><span>Processo de vendas</span><span>Forecast semanal</span></div>
+                  </div>
+
+                  <div class="deliverable-item">
+                    <div class="deliverable-kicker">Dimensão 3</div>
+                    <div class="deliverable-heading">
+                      <span class="deliverable-letter">A</span>
+                      <span class="deliverable-name">Analytics & Governance</span>
+                    </div>
+                    <p>Você constrói a camada de inteligência da operação: KPIs que importam, pipeline com estágios claros, rituais de gestão de receita e forecast confiável.</p>
+                    <div class="deliverable-tags"><span>KPIs de receita</span><span>Pipeline review</span><span>Rituais de gestão</span><span>Forecast confiável</span></div>
+                  </div>
+
+                  <div class="deliverable-item">
+                    <div class="deliverable-kicker">Dimensão 4</div>
+                    <div class="deliverable-heading">
+                      <span class="deliverable-letter">L</span>
+                      <span class="deliverable-name">Leadership Institutionalization</span>
+                    </div>
+                    <p>Você aplica o método CTA: Contratação, Treinamento e Acompanhamento. O resultado é um time que opera com autonomia, sem depender da presença constante do fundador.</p>
+                    <div class="deliverable-tags"><span>Método CTA</span><span>Contratação estratégica</span><span>Autonomia do time</span><span>Cultura de resultado</span></div>
+                  </div>
+
+                  <div class="deliverable-item">
+                    <div class="deliverable-kicker">Dimensão 5</div>
+                    <div class="deliverable-heading">
+                      <span class="deliverable-letter">E</span>
+                      <span class="deliverable-name">Execution Cadence</span>
+                    </div>
+                    <p>Você constrói a cadência de execução que transforma plano em resultado: rituais semanais, OKRs conectados ao Scale Plan™, revisões mensais de performance e um sistema que mantém o time alinhado.</p>
+                    <div class="deliverable-tags"><span>Cadência semanal</span><span>OKRs conectados</span><span>Revisão de performance</span><span>Scale Plan™ vivo</span></div>
+                  </div>
+                </div>
+              </details>
             </div>
           </section>
 
           <section class="form-step" data-step="3">
-            <h3 class="section-title">Forma de pagamento</h3>
+            <h3 class="section-title">Forma de pagamento<span class="required-mark">*</span></h3>
             <h2 class="form-title">Como combinamos o cartão?</h2>
             <p class="form-sub">Isso não dispara cobrança automática. Serve para o comercial seguir com a condição correta.</p>
             <div class="option-grid">
@@ -863,16 +1114,16 @@
           </section>
 
           <section class="form-step" data-step="4">
-            <h3 class="section-title">Confirmação</h3>
+            <h3 class="section-title">Confirmação<span class="required-mark">*</span></h3>
             <h2 class="form-title">Último passo para registrar o aceite.</h2>
             <p class="form-sub">Ao confirmar, a equipe recebe o registro e o card entra no dashboard comercial como aceite recebido.</p>
             <label class="check">
               <input id="aceite" name="aceite" type="checkbox" required>
-              <span>Confirmo o aceite de fechamento comercial e autorizo a equipe Masterboard/ScaleCo a entrar em contato para concluir onboarding e pagamento.</span>
+              <span>Confirmo o aceite de fechamento comercial e autorizo a equipe Masterboard/ScaleCo a entrar em contato para concluir onboarding e pagamento.<span class="required-mark">*</span></span>
             </label>
             <label class="check" style="margin-top:12px;">
               <input id="lgpd" name="lgpd" type="checkbox" required>
-              <span>Concordo com a <a href="/politica-de-privacidade/" target="_blank" rel="noopener">Política de Privacidade</a> e autorizo o uso dos dados para condução deste fechamento.</span>
+              <span>Concordo com a <a href="/politica-de-privacidade/" target="_blank" rel="noopener">Política de Privacidade</a> e autorizo o uso dos dados para condução deste fechamento.<span class="required-mark">*</span></span>
             </label>
           </section>
 
@@ -1052,10 +1303,17 @@
       if (progress && !progress.children.length) {
         progress.innerHTML = Array.from({ length: ACCEPTANCE_TOTAL_STEPS }, () => '<div class="form-progress-dot"></div>').join('');
       }
-      renderAcceptanceStep();
+      renderAcceptanceStep({ shouldScroll: false });
     }
 
-    function renderAcceptanceStep() {
+    function scrollFormIntoViewIfNeeded() {
+      const rect = form.getBoundingClientRect();
+      const isComfortablyVisible = rect.top >= 0 && rect.top <= window.innerHeight * 0.18;
+      if (isComfortablyVisible) return;
+      form.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+
+    function renderAcceptanceStep({ shouldScroll = true } = {}) {
       document.querySelectorAll('.form-step').forEach((step, index) => {
         step.classList.toggle('is-active', index === currentAcceptanceStep);
       });
@@ -1066,7 +1324,7 @@
       backBtn.disabled = currentAcceptanceStep === 0;
       submitBtn.textContent = currentAcceptanceStep === ACCEPTANCE_TOTAL_STEPS - 1 ? 'Registrar aceite' : 'Continuar';
       clearError();
-      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (shouldScroll) requestAnimationFrame(scrollFormIntoViewIfNeeded);
     }
 
     function validateCurrentStep() {

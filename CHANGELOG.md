@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-06-15
+
+### Changed
+- Ajustado o titulo da pagina `/aceite` para "Vamos fechar?".
+- Incluida a opcao de produto "Combo Club + Scale" no formulario e na validacao server-side.
+- Adicionado accordion de entregaveis da Imersao Scale na etapa de produto.
+- Marcados visualmente os campos obrigatorios do formulario de aceite.
+- Reduzido o flick visual removendo o scroll suave automatico a cada renderizacao de etapa.
+
 ## 2026-06-12
 
 ### Added

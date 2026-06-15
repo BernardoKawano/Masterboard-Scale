@@ -2,7 +2,7 @@ const { randomUUID } = require('node:crypto');
 
 const STORE_NAME = 'scale-diagnostics';
 const RECORD_PREFIX = 'leads/';
-const DEAL_ACCEPTANCE_PRODUCTS = ['Scale', 'Masterboard Club'];
+const DEAL_ACCEPTANCE_PRODUCTS = ['Scale', 'Masterboard Club', 'Combo Club + Scale'];
 const DEAL_ACCEPTANCE_PAYMENT_OPTIONS = ['Cartão - à vista', 'Cartão - parcelado'];
 
 const STATUS_RANK = {
