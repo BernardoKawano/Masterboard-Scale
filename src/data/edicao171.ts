@@ -16,10 +16,11 @@ export const sessions = [
 ];
 
 export const eventMeta = {
-  label: 'EDIÇÃO 171 · Masterboard powered by ScaleCo',
+  label: 'Masterboard powered by ScaleCo',
   subtag: 'Imersão presencial · Curitiba 17-18/07 e Maringá 30-31/07',
-  ctaPrimary: 'Solicitar minha participação',
-  ctaOffer: 'Solicitar participação',
+  ctaPrimary: 'Submeter participação',
+  ctaOffer: 'Submeter participação',
+  formUrl: 'https://masterboard.scaleco.ai/candidatura',
   targetDate: '2026-07-17T08:00:00-03:00',
 };
 
@@ -98,20 +99,34 @@ export const transformationCards = [
   },
 ];
 
-export const schedule = {
-  days: [
-    {
-      label: 'Dia 1',
-      window: '8h00–18h00',
-      headline: 'Diagnóstico e direção',
-    },
-    {
-      label: 'Dia 2',
-      window: '8h00–16h30',
-      headline: 'Construindo o motor',
-    },
-  ],
-};
+export const eventModules = [
+  {
+    module: 'Módulo 1',
+    date: '30/07',
+    title: 'Pessoas, processos e resultados.',
+    audience: 'Para sócios e líderes.',
+    bullets: [
+      'Cultura e gestão de alta performance, 4 C’s.',
+      'Recrutando e selecionando melhores vendedores.',
+      'Como utilizar IA para aumentar produtividade, conversão e previsibilidade comercial.',
+    ],
+    caseStudy:
+      'Case Grupo Barigui: +100 concessionárias, 26 marcas e mais de 1 milhão em veículos vendidos.',
+  },
+  {
+    module: 'Módulo 2',
+    date: '31/07',
+    title: 'Da prospecção ao fechamento, novas técnicas.',
+    audience: 'Para sócios, líderes e vendedores.',
+    bullets: [
+      'Prospecção e abordagem por diferentes canais.',
+      'Apresentação e follow-up com método.',
+      'Fechamento e negociação, técnicas para aumentar a percepção de valor e acelerar o processo de venda.',
+    ],
+    caseStudy:
+      'Case Market4u: +2.600 lojas e 2 mi de clientes, presente em mais de 180 cidades e 20 estados.',
+  },
+];
 
 export const socialProof = [
   {
@@ -144,7 +159,7 @@ export const advisoryItems = [
 
 export const faqItems = [
   {
-    question: 'Para quem é a Edição 171?',
+    question: 'Para quem é a imersão?',
     answer:
       'Founders e C-level de empresas com receita entre R$1M e R$50M que querem construir um sistema de escala — não apenas crescer na base do esforço.',
   },
@@ -156,7 +171,7 @@ export const faqItems = [
   {
     question: 'Preciso ter feito as edições anteriores?',
     answer:
-      'Não — a Edição 171 é ponto de entrada e funciona sozinha. Quem participar das próximas edições aprofunda o que começou aqui.',
+      'Não. A imersão funciona como ponto de entrada e aprofunda, em dois módulos, os fundamentos para transformar crescimento em sistema de escala.',
   },
   {
     question: 'O que levo para casa?',
@@ -166,7 +181,7 @@ export const faqItems = [
   {
     question: 'Como funciona a jornada de encontros?',
     answer:
-      'A Edição 171 é a primeira de uma sequência. Cada encontro aprofunda uma camada diferente da arquitetura — participar de um não obriga aos demais.',
+      'Cada encontro aprofunda uma camada diferente da arquitetura de receita. Entrar em um ciclo não obriga a entrada nos demais.',
   },
 ];
 

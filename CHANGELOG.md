@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-06-16
+
+### Changed
+- Neutralizada a copy visível da landing `/edicao-171` para reutilização em múltiplas edições, removendo menções promocionais específicas a "171" e trocando o selo do hero para "2 módulos".
+- CTAs da landing agora usam "Submeter participação" e apontam direto para o formulário de candidatura do diagnóstico em `https://masterboard.scaleco.ai/candidatura`.
+- Rota da landing alterada de `/edicao-171` para `/landing`.
+
+### Added
+- Cards dos módulos 1 e 2 na seção de programação, com público, tópicos e cases Grupo Barigui/Market4u conforme referência visual.
+
 ## 2026-06-15 (noite · refino premium 3)
 
 ### Changed
