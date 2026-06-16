@@ -12,7 +12,9 @@
 - Cards gerais de métricas do dashboard agora aparecem apenas na aba `Principal`.
 - Simplificada a UI do dashboard com navegação compacta, cabeçalho contextual por aba e resumo principal reduzido a KPIs essenciais.
 - Resumo de métricas movido estruturalmente para dentro da aba `Principal`, impedindo exibição nas demais telas.
-- Página `Principal` redesenhada como home de navegação com botões por área e ícones Material Symbols do Google Fonts.
+- Página `Principal` redesenhada como home de navegação sem KPIs duplicados, com botões por área e ícones Material Symbols do Google Fonts.
+- Removida a cidade "Curitiba" dos selos dos cards de Módulo 1 e Módulo 2 na landing.
+- Removida a data da nota do Módulo 2 sobre a próxima edição do Scale.
 
 ### Added
 - Cards dos módulos 1 e 2 na seção de programação, com público, tópicos e cases Grupo Barigui/Market4u conforme referência visual.

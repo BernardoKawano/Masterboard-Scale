@@ -78,6 +78,7 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
 .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
 
 .nav { align-items: center; background: rgba(255,255,255,0.035); border: 1px solid var(--line); border-radius: 18px; display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding: 6px; }
+.nav[hidden] { display: none; }
 .nav-btn { align-items: center; background: transparent; border: 0; border-radius: 999px; cursor: pointer; display: inline-flex; flex: 0 0 auto; gap: 8px; min-height: 38px; padding: 9px 13px; text-align: left; }
 .nav-btn .material-symbols-rounded { color: var(--muted); font-size: 19px; }
 .nav-btn strong { display: block; font-size: 13px; white-space: nowrap; }
@@ -91,6 +92,7 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
 .view-stat { color: var(--muted); font-size: 12px; font-weight: 800; white-space: nowrap; }
 
 .metrics { display: grid; gap: 10px; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 14px; }
+.metrics[hidden] { display: none; }
 .metric { min-height: 84px; padding: 14px; }
 .metric-label { color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; }
 .metric-value { font-size: 30px; font-weight: 900; letter-spacing: -0.05em; margin-top: 6px; }
@@ -103,11 +105,11 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
 .page { display: none; }
 .page.active { display: block; }
 .home-grid { display: grid; gap: 14px; grid-template-columns: 1.1fr 0.9fr; }
-.home-panel { padding: clamp(18px, 2.5vw, 26px); }
-.home-panel-head { align-items: flex-end; display: flex; gap: 16px; justify-content: space-between; margin-bottom: 18px; }
-.home-panel-title { font-size: clamp(24px, 3vw, 34px); font-weight: 900; letter-spacing: -0.04em; margin: 0; }
-.nav-cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-.big-card { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 20px; cursor: pointer; min-height: 170px; padding: 18px; text-align: left; }
+.home-panel { padding: clamp(22px, 4vw, 42px); }
+.home-panel-head { align-items: flex-end; display: flex; gap: 16px; justify-content: space-between; margin-bottom: 22px; }
+.home-panel-title { font-size: clamp(34px, 5vw, 58px); font-weight: 900; letter-spacing: -0.065em; line-height: 0.96; margin: 0; max-width: 780px; }
+.nav-cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.big-card { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 20px; cursor: pointer; min-height: 190px; padding: 20px; text-align: left; }
 .big-card:hover { border-color: rgba(251,190,10,0.38); transform: translateY(-1px); }
 .big-card-top { align-items: center; display: flex; justify-content: space-between; gap: 12px; }
 .big-card-icon { align-items: center; background: rgba(251,190,10,0.12); border: 1px solid rgba(251,190,10,0.24); border-radius: 14px; color: var(--yellow); display: inline-flex; height: 44px; justify-content: center; width: 44px; }
@@ -247,13 +249,11 @@ tr:hover td { background: rgba(251,190,10,0.035); }
     <div class="view-intro" id="viewIntro"></div>
 
     <section class="page active" id="homePage">
-      <div class="metrics" id="metrics"></div>
-
       <div class="home-panel card">
         <div class="home-panel-head">
           <div>
-            <div class="kicker">Escolha uma área</div>
-            <p class="home-panel-title">O que você quer acompanhar agora?</p>
+            <div class="kicker">Cockpit comercial</div>
+            <p class="home-panel-title">Escolha uma área para começar.</p>
           </div>
           <span class="muted">Cada botão abre uma tela específica do cockpit.</span>
         </div>
@@ -418,7 +418,6 @@ async function loadDashboard() {
 function showAuth() { $('auth').hidden = false; $('app').hidden = true; }
 function showApp() { $('auth').hidden = true; $('app').hidden = false; $('authError').textContent = ''; }
 function setLoading() {
-  $('metrics').innerHTML = '';
   $('tableBody').innerHTML = '<tr><td colspan="13" class="empty">Carregando...</td></tr>';
   $('acceptancesBody').innerHTML = '<tr><td colspan="8" class="empty">Carregando...</td></tr>';
 }
@@ -569,8 +568,10 @@ function clearFilters() {
 }
 
 function renderAll() {
-  renderViewIntro();
-  if (state.view === 'home') renderMetrics();
+  const isHome = state.view === 'home';
+  $('nav').hidden = isHome;
+  $('viewIntro').hidden = isHome;
+  if (!isHome) renderViewIntro();
   renderBulkbar();
   if (state.view === 'home') renderHome();
   if (state.view === 'leads') renderTable();
@@ -646,44 +647,18 @@ function revenueMatch(value, kind) {
   return true;
 }
 
-function renderMetrics() {
-  const all = state.records.filter((record) => !record.deletedAt);
-  const visible = filteredRecords();
-  const today = all.filter((record) => dateMatch(record.createdAt || record.updatedAt, 'today')).length;
-  const week = all.filter((record) => dateMatch(record.createdAt || record.updatedAt, '7')).length;
-  const completed = all.filter((record) => record.status === 'completed');
-  const accepted = all.filter(isDealAcceptance).length;
-  const cards = [
-    ['Leads', all.length, `${visible.length} visíveis`],
-    ['Novos hoje', today, `${week} na semana`],
-    ['Diagnósticos', completed.length, `${pct(completed.length, all.length)}% do total`],
-    ['Aceites', accepted, `${pct(accepted, all.length)}% da base`],
-  ];
-  $('metrics').innerHTML = cards.map(([label, value, hint]) => `
-    <div class="metric card">
-      <div class="metric-label">${escapeHtml(label)}</div>
-      <div class="metric-value">${escapeHtml(value)}</div>
-      <div class="metric-hint">${escapeHtml(hint)}</div>
-    </div>
-  `).join('');
-}
 function renderBulkbar() {
   const count = state.selected.size;
   $('bulkbar').classList.toggle('visible', count > 0);
   $('bulkCount').textContent = `${count} selecionado${count === 1 ? '' : 's'}`;
 }
 function renderHome() {
-  const rows = filteredRecords();
-  const completed = rows.filter((record) => record.status === 'completed').length;
-  const hot = rows.filter((record) => record.score >= 60).length;
-  const noContact = rows.filter((record) => record.status === 'captured').length;
-  const accepted = rows.filter(isDealAcceptance).length;
   const cards = [
-    ['leads', 'groups', 'Leads', 'Busca, filtros, seleção e ações comerciais em lote.', `${rows.length} registros`],
-    ['kanban', 'view_kanban', 'Kanban', 'Fila visual por prioridade, diagnóstico e aceite.', `${hot + accepted} em foco`],
-    ['acceptances', 'handshake', 'Aceites', 'Fechamentos recebidos com dados jurídicos e operacionais.', `${accepted} aceites`],
-    ['pipeline', 'monitoring', 'Funil', 'Conversão entre captura, diagnóstico, qualificação e resultado.', `${completed} diagnósticos`],
-    ['insights', 'query_stats', 'Insights', 'Padrões por região, produto, pagamento e gargalo.', `${noContact} sem contato`],
+    ['leads', 'groups', 'Leads', 'Consultar cadastro completo, buscar empresas e executar ações comerciais.', 'Abrir lista'],
+    ['kanban', 'view_kanban', 'Kanban', 'Priorizar a próxima ação por estágio, temperatura e aceite.', 'Abrir fila'],
+    ['acceptances', 'handshake', 'Aceites', 'Ver fechamentos recebidos, dados jurídicos e próximos passos.', 'Ver fechamentos'],
+    ['pipeline', 'monitoring', 'Funil', 'Entender conversão entre captura, diagnóstico, aceite e resultado.', 'Ver conversão'],
+    ['insights', 'query_stats', 'Insights', 'Analisar padrões de região, produto, pagamento e gargalos.', 'Ver análise'],
   ];
   $('homeCards').innerHTML = cards.map(([view, icon, title, copy, value]) => `
     <button class="big-card" data-home-view="${view}" type="button">

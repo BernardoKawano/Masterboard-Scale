@@ -102,7 +102,6 @@ export const transformationCards = [
 export const eventModules = [
   {
     module: 'Módulo 1',
-    location: 'Curitiba',
     title: 'Visão, ICP e processo replicável.',
     audience: 'Para sócios e líderes.',
     bullets: [
@@ -117,7 +116,6 @@ export const eventModules = [
   },
   {
     module: 'Módulo 2',
-    location: 'Curitiba',
     title: 'Motor de receita sem heróis.',
     audience: 'Para sócios e líderes.',
     bullets: [
@@ -126,7 +124,7 @@ export const eventModules = [
       'Cadência e governança de receita: pipeline review, forecast, 1:1, cadência semanal e outras ações.',
     ],
     note:
-      'Na próxima edição do Scale (16 e 17/10), entraremos em Analytics e Governance: KPIs, ritmo e clareza, accountability e dados na tomada de decisão.',
+      'Na próxima edição do Scale, entraremos em Analytics e Governance: KPIs, ritmo e clareza, accountability e dados na tomada de decisão.',
   },
 ];
 
