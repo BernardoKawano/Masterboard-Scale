@@ -200,11 +200,48 @@ function setupFaq() {
   });
 }
 
+function setupTilt() {
+  if (prefersReducedMotion()) return;
+  if (window.matchMedia('(hover: none)').matches) return;
+
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-tilt]'));
+  const MAX_DEG = 7;
+
+  cards.forEach((card) => {
+    let raf = 0;
+
+    function onMove(event: PointerEvent) {
+      const rect = card.getBoundingClientRect();
+      const px = (event.clientX - rect.left) / rect.width;
+      const py = (event.clientY - rect.top) / rect.height;
+      const rotateY = (px - 0.5) * 2 * MAX_DEG;
+      const rotateX = (0.5 - py) * 2 * MAX_DEG;
+
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        card.style.transition = 'transform 90ms linear';
+        card.style.transform = `perspective(900px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-6px)`;
+      });
+    }
+
+    function reset() {
+      if (raf) cancelAnimationFrame(raf);
+      card.style.transition = 'transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1)';
+      card.style.transform = '';
+    }
+
+    card.addEventListener('pointermove', onMove);
+    card.addEventListener('pointerleave', reset);
+    card.addEventListener('pointercancel', reset);
+  });
+}
+
 export function initLandingMotion() {
   setupReveals();
   const getActiveSectionId = setupSections();
   setupScrollState(getActiveSectionId);
   setupFaq();
+  setupTilt();
 
   if (document.querySelector('[data-countdown]')) {
     updateCountdowns();

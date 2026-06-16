@@ -1,5 +1,57 @@
 # Changelog
 
+## 2026-06-15 (noite · refino premium 3)
+
+### Changed
+- Pain cards (01–04): reveal de scroll bem mais pronunciado — entrada com `translateY(52px) + scale(0.94)` e curva suave, stagger de 170ms por card; o número (01–04) "estoura" com leve atraso adicional. Desativado em `prefers-reduced-motion`. Confirmado via Playwright que a cascata é visível (cards ocultos antes de entrar no viewport e revelados em sequência ao rolar).
+- Quote do método: palavras-chave da promessa foram grifadas com `mark` para herdar o amarelo Masterboard (`slides`, `arquitetura`, `negócio`, `2 dias`, `Fábio`).
+
+## 2026-06-15 (noite · refino premium 2)
+
+### Changed
+- Hero-visual: "171/Edição" movido para o canto inferior direito (fora do rosto do Fábio), com a legenda logo abaixo — sem sobreposições.
+- Trust bar do Fábio: além do ícone, agora exibe o nome de cada empresa (HP, SAP, Microsoft, Salesforce).
+- Pain cards (01–04) entram em cascata conforme o scroll (reveal lateral com stagger maior); desativado em mobile/reduced-motion.
+- Aumentadas as fontes da seção "Método" (eyebrow, títulos e textos dos cards "O que existe…").
+
+### Added
+- Profundidade 3D estilo Apple: tilt dos cards do método seguindo o cursor (perspective + rotateX/Y) com camadas em `translateZ` para título/texto. Desativado em toque e com `prefers-reduced-motion`.
+
+## 2026-06-15 (noite · refino premium)
+
+### Changed
+- Reduzida a intensidade dos glows nos cards (sombras, anéis dourados e gradientes radiais mais sutis) para tirar o aspecto "festa".
+- Hero-visual: "171/Edição" reposicionado para o topo e reduzido, eliminando a sobreposição com a legenda inferior.
+- Turmas (Curitiba/Maringá) e provas rápidas do hero ampliadas e com mais destaque (cidade em branco/bold, acento dourado, chips maiores).
+- Cards "Crescimento × Escala": bullets maiores e diferenciados (X neutro para atrito, check dourado para sistema), com hover e entrada escalonada por item.
+- Bloco "Em todo negócio de R$1M a R$50M…" ampliado, com destaque dourado; pain cards maiores, com índice (01–04) e realce na borda.
+- Seção do Fábio mais premium: logos reais (HP, SAP, Microsoft, Salesforce) em SVG monocromático via `mask`, badge `US$2M → US$40M` maior com contagem animada, e a linha "Como construtor." destacada com divisória.
+
+### Added
+- Logos das empresas em `public/assets/logos/` (hp, sap, microsoft, salesforce).
+
+## 2026-06-15 (noite)
+
+### Changed
+- Redesign visual completo da landing `/edicao-171` para a linguagem premium da Scale (substitui a estética "papel" clara):
+  - Fundo preto com `radial-gradient` amarelos e duas "bolas" de glow em blur com respiração (`glowBreath`), como nas outras páginas Scale.
+  - Profundidade 3D: cards em vidro escuro com sombras em camadas, brilho de borda no hover, glows pontuais e elevação; seções alternam entre transparentes e painéis "glass" para criar ritmo.
+  - Hero aberto sobre o canvas escuro, com foto editorial do Fábio em destaque e selo "171".
+  - Header, sticky CTA e thread rail adaptados ao tema escuro (glass + blur).
+
+### Fixed
+- Hero-visual nunca aparecia: `data-reveal="clip"` aplicava `clip-path: inset(100%)` zerando a área visível, fazendo o `IntersectionObserver` nunca marcar o elemento como visível (ficava preso oculto). Trocado para reveal `scale` (opacity+zoom), que não zera a caixa.
+- Palavras-chave douradas do título do hero não eram pintadas: `transform` de reveal em `<span>` inline que quebrava em várias linhas descartava a 2ª linha no Chromium. Spans do título passaram a `display:block`.
+- Corrigido espaçamento dos chips de prova do hero (whitespace colapsado por `inline-flex`).
+
+## 2026-06-15 (tarde)
+
+### Changed
+- Aplicados aprendizados da análise IHC/UX/UI na landing `/edicao-171`, mantendo a estética "papel":
+  - Estados de acessibilidade e feedback de ação: `:focus-visible` em CTAs/links/FAQ/thread rail, `:active` com microfeedback de pressão nos botões e `skip-link` para pular ao conteúdo.
+  - Reforço de CTA inline ao fim das seções `method` e `schedule` (evita o "CTA enterrado" e segue o padrão de CTA repetido por bloco).
+  - Faixa de prova com número na seção `offer` (`proof-strip`) reforçando credibilidade com dados reais já presentes na página.
+
 ## 2026-06-15
 
 ### Added
