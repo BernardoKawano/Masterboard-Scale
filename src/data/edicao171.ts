@@ -102,29 +102,31 @@ export const transformationCards = [
 export const eventModules = [
   {
     module: 'Módulo 1',
-    date: '30/07',
-    title: 'Pessoas, processos e resultados.',
+    location: 'Curitiba',
+    title: 'Visão, ICP e processo replicável.',
     audience: 'Para sócios e líderes.',
     bullets: [
-      'Cultura e gestão de alta performance, 4 C’s.',
-      'Recrutando e selecionando melhores vendedores.',
-      'Como utilizar IA para aumentar produtividade, conversão e previsibilidade comercial.',
-    ],
-    caseStudy:
-      'Case Grupo Barigui: +100 concessionárias, 26 marcas e mais de 1 milhão em veículos vendidos.',
-  },
-  {
-    module: 'Módulo 2',
-    date: '31/07',
-    title: 'Da prospecção ao fechamento, novas técnicas.',
-    audience: 'Para sócios, líderes e vendedores.',
-    bullets: [
-      'Prospecção e abordagem por diferentes canais.',
-      'Apresentação e follow-up com método.',
-      'Fechamento e negociação, técnicas para aumentar a percepção de valor e acelerar o processo de venda.',
+      'Antes de arquitetar a receita, escreva a visão.',
+      'ICP e proposta de valor.',
+      'Growth Motion, 7 formas de crescimento.',
+      'Processo replicável: da estratégia para o sistema.',
+      'Conversão e previsibilidade comercial.',
     ],
     caseStudy:
       'Case Market4u: +2.600 lojas e 2 mi de clientes, presente em mais de 180 cidades e 20 estados.',
+  },
+  {
+    module: 'Módulo 2',
+    location: 'Curitiba',
+    title: 'Motor de receita sem heróis.',
+    audience: 'Para sócios e líderes.',
+    bullets: [
+      'Motor que gera receita sem heróis.',
+      'Gestão de time: contratar, treinar, acompanhar.',
+      'Cadência e governança de receita: pipeline review, forecast, 1:1, cadência semanal e outras ações.',
+    ],
+    note:
+      'Na próxima edição do Scale (16 e 17/10), entraremos em Analytics e Governance: KPIs, ritmo e clareza, accountability e dados na tomada de decisão.',
   },
 ];
 
@@ -149,13 +151,6 @@ export const offer = {
     'Apenas founders e C-level de empresas R$1M–R$50M',
   ],
 };
-
-export const advisoryItems = [
-  'Scale Diagnostic™ individual',
-  'Scale Plan™ do seu negócio',
-  'Sessões semanais com Fábio',
-  'Acesso ao cohort de founders',
-];
 
 export const faqItems = [
   {
@@ -185,4 +180,4 @@ export const faqItems = [
   },
 ];
 
-export const sectionIds = ['hero', 'problem', 'authority', 'method', 'schedule', 'offer', 'advisory', 'faq'];
+export const sectionIds = ['hero', 'problem', 'authority', 'method', 'schedule', 'offer', 'faq'];

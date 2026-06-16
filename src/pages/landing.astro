@@ -2,7 +2,6 @@
 import SectionShell from '../components/landing/SectionShell.astro';
 import ThreadRail from '../components/landing/ThreadRail.astro';
 import {
-  advisoryItems,
   eventMeta,
   eventModules,
   faqItems,
@@ -267,14 +266,15 @@ const ctaTarget = eventMeta.formUrl;
               <article class={`module-card ${index === 0 ? 'is-dark' : 'is-light'}`} data-reveal={index % 2 === 0 ? 'left' : 'right'} style={`--delay:${index * 120}ms`}>
                 <div class="module-card__header">
                   <span>{module.module}</span>
-                  <strong>{module.date}</strong>
+                  <strong>{module.location}</strong>
                 </div>
                 <h3>{module.title}</h3>
                 <p class="module-card__audience">{module.audience}</p>
                 <ul>
                   {module.bullets.map((item) => <li>{item}</li>)}
                 </ul>
-                <p class="module-card__case">{module.caseStudy}</p>
+                {'caseStudy' in module && <p class="module-card__case">{module.caseStudy}</p>}
+                {'note' in module && <p class="module-card__note">{module.note}</p>}
               </article>
             ))}
           </div>
@@ -360,21 +360,7 @@ const ctaTarget = eventMeta.formUrl;
           </div>
         </SectionShell>
 
-        <!-- 07 · ADVISORY -->
-        <SectionShell id="advisory">
-          <article class="advisory-card" data-reveal>
-            <h2 id="advisory-title" class="section-title is-medium">Para quem quer construção acelerada.</h2>
-            <p class="section-copy">
-              Advisory ScaleCo · 6 meses — não é mais imersão, é arquitetura aplicada no seu negócio com acompanhamento direto.
-            </p>
-            <ul style="margin:28px 0 0;padding:0;list-style:none;color:var(--text-muted);line-height:1.8">
-              {advisoryItems.map((item) => <li>— {item}</li>)}
-            </ul>
-            <div class="price-seal" data-reveal="scale">7 vagas · 6 meses · R$150k (R$120k para participantes da imersão)</div>
-          </article>
-        </SectionShell>
-
-        <!-- 08 · FAQ + FOOTER -->
+        <!-- 07 · FAQ + FOOTER -->
         <SectionShell id="faq">
           <div class="quote-panel" data-reveal>
             <p>

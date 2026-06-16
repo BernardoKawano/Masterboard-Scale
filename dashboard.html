@@ -37,11 +37,11 @@ body {
 button, input, select { font: inherit; }
 button { color: inherit; }
 
-.shell { width: min(1440px, calc(100vw - 28px)); margin: 0 auto; padding: 22px 0 44px; }
-.card { background: rgba(17,17,17,0.92); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 24px 80px rgba(0,0,0,0.24); }
+.shell { width: min(1320px, calc(100vw - 32px)); margin: 0 auto; padding: 20px 0 44px; }
+.card { background: rgba(17,17,17,0.86); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 18px 54px rgba(0,0,0,0.20); }
 .kicker { color: var(--yellow); font-size: 10px; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; }
 .muted { color: var(--muted); font-size: 12px; line-height: 1.5; }
-h1 { font-size: clamp(30px, 4vw, 48px); letter-spacing: -0.04em; line-height: 1; margin: 6px 0; }
+h1 { font-size: clamp(28px, 3.4vw, 42px); letter-spacing: -0.04em; line-height: 1; margin: 5px 0; }
 h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; text-transform: uppercase; }
 .label { color: var(--muted); display: block; font-size: 10px; font-weight: 900; letter-spacing: 0.15em; margin: 0 0 7px; text-transform: uppercase; }
 .control { width: 100%; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; color: var(--text); outline: none; padding: 11px 12px; }
@@ -54,19 +54,24 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
 .icon:hover { border-color: rgba(251,190,10,0.45); color: var(--yellow); }
 
 .auth { max-width: 520px; margin: 12vh auto 0; padding: 30px; }
-.topbar { align-items: flex-start; display: flex; gap: 18px; justify-content: space-between; margin-bottom: 16px; }
+.topbar { align-items: center; display: flex; gap: 18px; justify-content: space-between; margin-bottom: 14px; }
 .brand { align-items: center; display: flex; gap: 14px; }
-.brand img { width: 174px; }
+.brand img { width: 142px; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
 
-.nav { display: grid; gap: 10px; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-bottom: 14px; }
-.nav-btn { background: rgba(255,255,255,0.045); border: 1px solid var(--line); border-radius: 15px; cursor: pointer; padding: 14px; text-align: left; }
-.nav-btn strong { display: block; font-size: 14px; margin-bottom: 5px; }
-.nav-btn span { color: var(--muted); font-size: 11px; }
-.nav-btn.active, .nav-btn:hover { background: rgba(251,190,10,0.10); border-color: rgba(251,190,10,0.35); }
+.nav { align-items: center; background: rgba(255,255,255,0.035); border: 1px solid var(--line); border-radius: 18px; display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding: 6px; }
+.nav-btn { align-items: center; background: transparent; border: 0; border-radius: 999px; cursor: pointer; display: inline-flex; flex: 0 0 auto; gap: 8px; min-height: 38px; padding: 9px 13px; text-align: left; }
+.nav-btn strong { display: block; font-size: 13px; white-space: nowrap; }
+.nav-btn span { color: var(--muted); font-size: 10px; white-space: nowrap; }
+.nav-btn.active, .nav-btn:hover { background: rgba(251,190,10,0.14); color: var(--yellow); }
 
-.metrics { display: grid; gap: 10px; grid-template-columns: repeat(6, minmax(0, 1fr)); margin-bottom: 14px; }
-.metric { min-height: 92px; padding: 14px; }
+.view-intro { align-items: flex-end; display: flex; gap: 16px; justify-content: space-between; margin: 8px 0 14px; }
+.view-title { font-size: clamp(24px, 3vw, 36px); font-weight: 900; letter-spacing: -0.04em; line-height: 1; margin: 0; }
+.view-copy { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 7px 0 0; max-width: 680px; }
+.view-stat { color: var(--muted); font-size: 12px; font-weight: 800; white-space: nowrap; }
+
+.metrics { display: grid; gap: 10px; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 14px; }
+.metric { min-height: 84px; padding: 14px; }
 .metric-label { color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; }
 .metric-value { font-size: 30px; font-weight: 900; letter-spacing: -0.05em; margin-top: 6px; }
 .metric-hint { color: var(--muted); font-size: 11px; line-height: 1.4; margin-top: 6px; }
@@ -78,8 +83,8 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
 .page { display: none; }
 .page.active { display: block; }
 .home-grid { display: grid; gap: 14px; grid-template-columns: 1.1fr 0.9fr; }
-.nav-cards { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.big-card { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 18px; cursor: pointer; min-height: 150px; padding: 18px; }
+.nav-cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.big-card { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 18px; cursor: pointer; min-height: 122px; padding: 16px; }
 .big-card:hover { border-color: rgba(251,190,10,0.38); transform: translateY(-1px); }
 .big-card-title { font-size: 22px; font-weight: 900; letter-spacing: -0.02em; margin: 8px 0; }
 .list-stack { display: grid; gap: 8px; max-height: 390px; overflow: auto; padding-right: 4px; }
@@ -87,7 +92,7 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
 .focus-card:hover { border-color: rgba(251,190,10,0.35); }
 
 .table-card { overflow: hidden; }
-.table-scroll { max-height: calc(100vh - 360px); overflow: auto; }
+.table-scroll { max-height: calc(100vh - 285px); overflow: auto; }
 table { border-collapse: separate; border-spacing: 0; min-width: 1100px; width: 100%; }
 th, td { border-bottom: 1px solid var(--line); font-size: 12px; padding: 11px 12px; text-align: left; vertical-align: middle; }
 th { background: rgba(17,17,17,0.98); color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 900; letter-spacing: 0.13em; position: sticky; text-transform: uppercase; top: 0; z-index: 2; }
@@ -117,6 +122,8 @@ tr:hover td { background: rgba(251,190,10,0.035); }
 .funnel-step { align-items: center; display: grid; gap: 12px; grid-template-columns: 210px 1fr 92px; }
 .funnel-bar { background: rgba(255,255,255,0.06); border-radius: 999px; height: 34px; overflow: hidden; }
 .funnel-fill { align-items: center; background: linear-gradient(90deg,var(--yellow),var(--yellow-2)); color: #000; display: flex; font-size: 12px; font-weight: 900; height: 100%; min-width: 34px; padding: 0 12px; }
+.acceptance-summary { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 14px; }
+.acceptance-copy { color: #d8d8d8; font-size: 12px; line-height: 1.5; }
 .insights { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .insight { padding: 16px; }
 .rank { display: grid; gap: 10px; }
@@ -149,9 +156,9 @@ tr:hover td { background: rgba(251,190,10,0.035); }
 .error { color: var(--red); margin-top: 12px; }
 
 @media (max-width: 1180px) {
-  .nav, .metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .home-grid, .insights { grid-template-columns: 1fr; }
+  .home-grid, .insights, .acceptance-summary { grid-template-columns: 1fr; }
   .kanban { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
 }
 @media (max-width: 760px) {
@@ -161,7 +168,9 @@ tr:hover td { background: rgba(251,190,10,0.035); }
   .actions .btn, .actions .btn.secondary { flex: 1; }
   .brand { align-items: flex-start; flex-direction: column; }
   .brand img { width: 150px; }
-  .nav, .metrics, .filters, .nav-cards, .detail-grid { grid-template-columns: 1fr; }
+  .nav-btn span { display: none; }
+  .metrics, .filters, .nav-cards, .detail-grid { grid-template-columns: 1fr; }
+  .view-intro { align-items: flex-start; flex-direction: column; }
   .kanban { grid-template-columns: 1fr; }
   .funnel-step { grid-template-columns: 1fr; }
 }
@@ -202,9 +211,12 @@ tr:hover td { background: rgba(251,190,10,0.035); }
       <button class="nav-btn active" data-view="home" type="button"><strong>Principal</strong><span>Resumo e atalhos</span></button>
       <button class="nav-btn" data-view="leads" type="button"><strong>Leads</strong><span>Lista pesquisável</span></button>
       <button class="nav-btn" data-view="kanban" type="button"><strong>Kanban</strong><span>Por prioridade</span></button>
+      <button class="nav-btn" data-view="acceptances" type="button"><strong>Aceites</strong><span>Fechamentos</span></button>
       <button class="nav-btn" data-view="pipeline" type="button"><strong>Funil</strong><span>Conversão</span></button>
       <button class="nav-btn" data-view="insights" type="button"><strong>Insights</strong><span>Região e padrões</span></button>
     </nav>
+
+    <div class="view-intro" id="viewIntro"></div>
 
     <div class="metrics" id="metrics"></div>
 
@@ -279,6 +291,28 @@ tr:hover td { background: rgba(251,190,10,0.035); }
     </section>
 
     <section class="page" id="kanbanPage"><div class="kanban" id="kanban"></div></section>
+    <section class="page" id="acceptancesPage">
+      <div class="acceptance-summary" id="acceptanceSummary"></div>
+      <div class="table-card card">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th data-acceptance-sort="acceptedAt">Aceite</th>
+                <th data-acceptance-sort="empresa">Empresa</th>
+                <th data-acceptance-sort="nome">Responsável</th>
+                <th data-acceptance-sort="produto">Produto</th>
+                <th data-acceptance-sort="forma_pagamento">Pagamento</th>
+                <th data-acceptance-sort="documento">CNPJ/CPF</th>
+                <th data-acceptance-sort="localizacao">Região</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="acceptancesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
     <section class="page" id="pipelinePage"><div class="card" style="padding:18px"><div class="funnel" id="funnel"></div></div></section>
     <section class="page" id="insightsPage"><div class="insights" id="insights"></div></section>
   </section>
@@ -369,9 +403,13 @@ async function loadDashboard() {
 
 function showAuth() { $('auth').hidden = false; $('app').hidden = true; }
 function showApp() { $('auth').hidden = true; $('app').hidden = false; $('authError').textContent = ''; }
-function setLoading() { $('metrics').innerHTML = ''; $('tableBody').innerHTML = '<tr><td colspan="13" class="empty">Carregando...</td></tr>'; }
+function setLoading() {
+  $('metrics').innerHTML = '';
+  $('tableBody').innerHTML = '<tr><td colspan="13" class="empty">Carregando...</td></tr>';
+  $('acceptancesBody').innerHTML = '<tr><td colspan="8" class="empty">Carregando...</td></tr>';
+}
 function setView(view, updateUrl = true) {
-  state.view = ['home', 'leads', 'kanban', 'pipeline', 'insights'].includes(view) ? view : 'home';
+  state.view = ['home', 'leads', 'kanban', 'acceptances', 'pipeline', 'insights'].includes(view) ? view : 'home';
   document.querySelectorAll('.nav-btn').forEach((button) => button.classList.toggle('active', button.dataset.view === state.view));
   document.querySelectorAll('.page').forEach((page) => page.classList.remove('active'));
   $(`${state.view}Page`).classList.add('active');
@@ -517,13 +555,39 @@ function clearFilters() {
 }
 
 function renderAll() {
-  renderMetrics();
+  renderViewIntro();
+  $('metrics').hidden = state.view !== 'home';
+  if (state.view === 'home') renderMetrics();
   renderBulkbar();
   if (state.view === 'home') renderHome();
   if (state.view === 'leads') renderTable();
   if (state.view === 'kanban') renderKanban();
+  if (state.view === 'acceptances') renderAcceptances();
   if (state.view === 'pipeline') renderFunnel();
   if (state.view === 'insights') renderInsights();
+}
+
+function renderViewIntro() {
+  const all = state.records.filter((record) => !record.deletedAt);
+  const visible = filteredRecords();
+  const accepted = all.filter(isDealAcceptance).length;
+  const copy = {
+    home: ['Cockpit', 'Principal', 'Resumo executivo com números essenciais e atalhos para as áreas operacionais.', `${all.length} registros`],
+    leads: ['Operação', 'Leads', 'Lista completa para busca, filtro, seleção e ações comerciais em lote.', `${visible.length} visíveis`],
+    kanban: ['Prioridade', 'Kanban', 'Fila operacional por prioridade. Use para decidir a próxima ação do time.', `${visible.length} cards`],
+    acceptances: ['Fechamento', 'Aceites', 'Registros recebidos via formulário de aceite, com dados jurídicos e próximos passos.', `${accepted} aceites`],
+    pipeline: ['Conversão', 'Funil', 'Visão entre captura, diagnóstico, qualificação, aceite e resultado comercial.', `${visible.length} registros`],
+    insights: ['Análise', 'Insights', 'Padrões por região, produto, pagamento, resultado e gargalos recorrentes.', `${visible.length} registros`],
+  }[state.view] || ['Dashboard', 'Cockpit', 'Cockpit comercial Masterboard x ScaleCo.', `${visible.length} registros`];
+
+  $('viewIntro').innerHTML = `
+    <div>
+      <div class="kicker">${escapeHtml(copy[0])}</div>
+      <p class="view-title">${escapeHtml(copy[1])}</p>
+      <p class="view-copy">${escapeHtml(copy[2])}</p>
+    </div>
+    <div class="view-stat">${escapeHtml(copy[3])}</div>
+  `;
 }
 
 function filteredRecords() {
@@ -574,29 +638,13 @@ function renderMetrics() {
   const visible = filteredRecords();
   const today = all.filter((record) => dateMatch(record.createdAt || record.updatedAt, 'today')).length;
   const week = all.filter((record) => dateMatch(record.createdAt || record.updatedAt, '7')).length;
-  const month = all.filter((record) => dateMatch(record.createdAt || record.updatedAt, '30')).length;
   const completed = all.filter((record) => record.status === 'completed');
-  const qualified = completed.filter((record) => record.score >= 50);
-  const average = completed.length ? Math.round(completed.reduce((sum, record) => sum + record.score, 0) / completed.length) : 0;
-  const noContact = all.filter((record) => record.status === 'captured').length;
   const accepted = all.filter(isDealAcceptance).length;
-  const won = all.filter(isWon).length;
-  const lost = all.filter(isLost).length;
-  const closed = won + lost;
-  const pendingOutcome = all.length - closed;
-  const latestArrival = sortByArrival(all)[0];
   const cards = [
     ['Leads', all.length, `${visible.length} visíveis`],
-    ['Último lead', latestArrival ? formatDate(arrivalDate(latestArrival)) : '-', latestArrival ? (latestArrival.empresa || latestArrival.nome || latestArrival.email || 'Lead recebido') : 'Nenhum lead recebido'],
-    ['Novos hoje', today, `${week} na semana · ${month} no mês`],
+    ['Novos hoje', today, `${week} na semana`],
     ['Diagnósticos', completed.length, `${pct(completed.length, all.length)}% do total`],
     ['Aceites', accepted, `${pct(accepted, all.length)}% da base`],
-    ['Qualificados', qualified.length, `${pct(qualified.length, completed.length)}% dos concluídos`],
-    ['Deram certo', won, `${pct(won, closed)}% dos encerrados`],
-    ['Não deram certo', lost, `${pct(lost, closed)}% dos encerrados`],
-    ['Sem resultado', pendingOutcome, 'Ainda aberto ou não marcado'],
-    ['Score médio', average, average >= 50 ? 'Base aquecida' : 'Priorizar nutrição'],
-    ['Sem contato', noContact, 'Leads capturados sem diagnóstico'],
   ];
   $('metrics').innerHTML = cards.map(([label, value, hint]) => `
     <div class="metric card">
@@ -620,6 +668,7 @@ function renderHome() {
   const cards = [
     ['leads', 'Leads', 'Lista completa com busca, filtros e exportação.', rows.length],
     ['kanban', 'Kanban', 'Fila por prioridade, diagnóstico e aceite.', hot + accepted],
+    ['acceptances', 'Aceites', 'Fechamentos recebidos e dados jurídicos.', accepted],
     ['pipeline', 'Funil', 'Conversão do lead ao diagnóstico qualificado.', completed],
     ['insights', 'Insights', 'Regiões, produtos, faturamento e padrões.', noContact],
   ];
@@ -749,6 +798,54 @@ function kanbanKey(record) {
   if (record.score >= 60) return 'hot';
   if (record.score >= 40) return 'warm';
   return 'cold';
+}
+function acceptanceDate(record) {
+  return record.acceptedAt || record.soldAt || record.convertedAt || record.updatedAt || record.createdAt || '';
+}
+function acceptanceRows() {
+  return state.records
+    .filter((record) => !record.deletedAt && isDealAcceptance(record))
+    .sort((a, b) => String(acceptanceDate(b)).localeCompare(String(acceptanceDate(a))));
+}
+function renderAcceptances() {
+  const rows = acceptanceRows();
+  const today = rows.filter((record) => dateMatch(acceptanceDate(record), 'today')).length;
+  const month = rows.filter((record) => dateMatch(acceptanceDate(record), '30')).length;
+  const topProduct = rank(rows, (record) => record.produto || 'Não informado')[0];
+  const topPayment = rank(rows, (record) => record.forma_pagamento || 'Não informado')[0];
+
+  $('acceptanceSummary').innerHTML = [
+    ['Aceites recebidos', rows.length, `${today} hoje · ${month} nos últimos 30 dias`],
+    ['Produto mais aceito', topProduct ? topProduct.label : '-', topProduct ? `${topProduct.count} aceite${topProduct.count === 1 ? '' : 's'}` : 'Sem dados'],
+    ['Pagamento mais escolhido', topPayment ? topPayment.label : '-', topPayment ? `${topPayment.count} aceite${topPayment.count === 1 ? '' : 's'}` : 'Sem dados'],
+    ['Ação sugerida', rows.length ? 'Onboarding em 24h' : '-', 'Abrir o card para copiar dados e chamar no WhatsApp'],
+  ].map(([label, value, hint]) => `
+    <div class="metric card">
+      <div class="metric-label">${escapeHtml(label)}</div>
+      <div class="metric-value">${escapeHtml(value)}</div>
+      <div class="metric-hint">${escapeHtml(hint)}</div>
+    </div>
+  `).join('');
+
+  $('acceptancesBody').innerHTML = rows.length ? rows.map((record) => `
+    <tr>
+      <td><div class="lead-name">${escapeHtml(formatDate(acceptanceDate(record)))}</div><div class="lead-sub">${escapeHtml(record.leadId)}</div></td>
+      <td><div class="lead-name">${escapeHtml(record.empresa || '-')}</div><div class="lead-sub">${escapeHtml(record.razao_social || '-')}</div></td>
+      <td><div class="lead-name">${escapeHtml(record.nome || '-')}</div><div class="lead-sub">${escapeHtml(record.email || '-')}</div></td>
+      <td>${escapeHtml(record.produto || '-')}</td>
+      <td>${escapeHtml(record.forma_pagamento || '-')}</td>
+      <td>${escapeHtml(record.documento || record.documento_numero || '-')}</td>
+      <td>${escapeHtml(record.localizacao || '-')}</td>
+      <td>
+        <button class="icon" data-open="${escapeHtml(record.leadId)}">Abrir</button>
+        <button class="icon" data-admin="mark_lost" data-id="${escapeHtml(record.leadId)}">Não deu</button>
+        <button class="icon" data-admin="delete" data-id="${escapeHtml(record.leadId)}">Excluir</button>
+      </td>
+    </tr>
+  `).join('') : '<tr><td colspan="8" class="empty">Nenhum aceite recebido ainda.</td></tr>';
+
+  document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
+  bindAdminActions();
 }
 function renderFunnel() {
   const all = filteredRecords();

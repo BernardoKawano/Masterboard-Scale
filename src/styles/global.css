@@ -1228,7 +1228,8 @@ mark {
   top: 0;
 }
 
-.module-card__case {
+.module-card__case,
+.module-card__note {
   position: relative;
   margin: 26px 0 0;
   padding-left: 22px;
@@ -1244,9 +1245,21 @@ mark {
   color: var(--brand-gold);
 }
 
+.module-card__note::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--brand-gold);
+}
+
 .module-card.is-dark .module-card__audience,
 .module-card.is-dark li,
-.module-card.is-dark .module-card__case {
+.module-card.is-dark .module-card__case,
+.module-card.is-dark .module-card__note {
   color: rgba(255, 255, 255, 0.76);
 }
 
@@ -1257,12 +1270,17 @@ mark {
 
 .module-card.is-light .module-card__audience,
 .module-card.is-light li,
-.module-card.is-light .module-card__case {
+.module-card.is-light .module-card__case,
+.module-card.is-light .module-card__note {
   color: rgba(44, 44, 44, 0.74);
 }
 
 .module-card.is-light .module-card__case::before {
   color: var(--brand-gold-dark);
+}
+
+.module-card.is-light .module-card__note::before {
+  background: var(--brand-gold-dark);
 }
 
 /* ─── Check cards ─── */
@@ -1328,36 +1346,6 @@ mark {
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-}
-
-/* ─── Advisory ─── */
-.advisory-card {
-  position: relative;
-  padding: clamp(28px, 5vw, 56px);
-  border: 1px solid rgba(251, 190, 10, 0.2);
-  border-radius: 22px;
-  background:
-    radial-gradient(120% 120% at 85% -10%, rgba(251, 190, 10, 0.07), transparent 58%),
-    var(--glass-strong);
-  box-shadow: var(--elev);
-  overflow: hidden;
-}
-
-.advisory-card .section-title { color: #FFFFFF; }
-.advisory-card .section-copy { color: var(--text-muted); }
-.advisory-card ul { color: var(--text-muted); }
-
-.price-seal {
-  display: inline-block;
-  margin-top: 18px;
-  padding: 12px 16px;
-  border: 1px solid var(--brand-gold);
-  border-radius: 8px;
-  background: var(--brand-gold);
-  color: #0A0A0A;
-  box-shadow: 0 16px 34px -16px rgba(251, 190, 10, 0.6);
-  font-weight: 800;
-  transform: rotate(-2deg);
 }
 
 /* ─── FAQ ─── */
