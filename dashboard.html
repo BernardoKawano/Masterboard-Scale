@@ -6,6 +6,9 @@
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex,nofollow">
 <title>Dashboard · Scale Diagnostic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0" rel="stylesheet">
 <style>
 :root {
   --bg: #070707;
@@ -36,6 +39,21 @@ body {
 }
 button, input, select { font: inherit; }
 button { color: inherit; }
+.material-symbols-rounded {
+  direction: ltr;
+  display: inline-block;
+  font-family: 'Material Symbols Rounded';
+  font-feature-settings: 'liga';
+  font-size: 20px;
+  font-style: normal;
+  font-weight: normal;
+  letter-spacing: normal;
+  line-height: 1;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  -webkit-font-smoothing: antialiased;
+}
 
 .shell { width: min(1320px, calc(100vw - 32px)); margin: 0 auto; padding: 20px 0 44px; }
 .card { background: rgba(17,17,17,0.86); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 18px 54px rgba(0,0,0,0.20); }
@@ -61,9 +79,11 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
 
 .nav { align-items: center; background: rgba(255,255,255,0.035); border: 1px solid var(--line); border-radius: 18px; display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding: 6px; }
 .nav-btn { align-items: center; background: transparent; border: 0; border-radius: 999px; cursor: pointer; display: inline-flex; flex: 0 0 auto; gap: 8px; min-height: 38px; padding: 9px 13px; text-align: left; }
+.nav-btn .material-symbols-rounded { color: var(--muted); font-size: 19px; }
 .nav-btn strong { display: block; font-size: 13px; white-space: nowrap; }
 .nav-btn span { color: var(--muted); font-size: 10px; white-space: nowrap; }
 .nav-btn.active, .nav-btn:hover { background: rgba(251,190,10,0.14); color: var(--yellow); }
+.nav-btn.active .material-symbols-rounded, .nav-btn:hover .material-symbols-rounded { color: var(--yellow); }
 
 .view-intro { align-items: flex-end; display: flex; gap: 16px; justify-content: space-between; margin: 8px 0 14px; }
 .view-title { font-size: clamp(24px, 3vw, 36px); font-weight: 900; letter-spacing: -0.04em; line-height: 1; margin: 0; }
@@ -83,10 +103,17 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
 .page { display: none; }
 .page.active { display: block; }
 .home-grid { display: grid; gap: 14px; grid-template-columns: 1.1fr 0.9fr; }
-.nav-cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
-.big-card { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 18px; cursor: pointer; min-height: 122px; padding: 16px; }
+.home-panel { padding: clamp(18px, 2.5vw, 26px); }
+.home-panel-head { align-items: flex-end; display: flex; gap: 16px; justify-content: space-between; margin-bottom: 18px; }
+.home-panel-title { font-size: clamp(24px, 3vw, 34px); font-weight: 900; letter-spacing: -0.04em; margin: 0; }
+.nav-cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.big-card { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 20px; cursor: pointer; min-height: 170px; padding: 18px; text-align: left; }
 .big-card:hover { border-color: rgba(251,190,10,0.38); transform: translateY(-1px); }
-.big-card-title { font-size: 22px; font-weight: 900; letter-spacing: -0.02em; margin: 8px 0; }
+.big-card-top { align-items: center; display: flex; justify-content: space-between; gap: 12px; }
+.big-card-icon { align-items: center; background: rgba(251,190,10,0.12); border: 1px solid rgba(251,190,10,0.24); border-radius: 14px; color: var(--yellow); display: inline-flex; height: 44px; justify-content: center; width: 44px; }
+.big-card-icon .material-symbols-rounded { font-size: 25px; }
+.big-card-value { color: var(--muted); font-size: 12px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+.big-card-title { font-size: 22px; font-weight: 900; letter-spacing: -0.02em; margin: 18px 0 8px; }
 .list-stack { display: grid; gap: 8px; max-height: 390px; overflow: auto; padding-right: 4px; }
 .focus-card { align-items: center; background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; display: grid; gap: 10px; grid-template-columns: 1fr auto; padding: 12px; }
 .focus-card:hover { border-color: rgba(251,190,10,0.35); }
@@ -169,6 +196,7 @@ tr:hover td { background: rgba(251,190,10,0.035); }
   .brand { align-items: flex-start; flex-direction: column; }
   .brand img { width: 150px; }
   .nav-btn span { display: none; }
+  .home-panel-head { align-items: flex-start; flex-direction: column; }
   .metrics, .filters, .nav-cards, .detail-grid { grid-template-columns: 1fr; }
   .view-intro { align-items: flex-start; flex-direction: column; }
   .kanban { grid-template-columns: 1fr; }
@@ -208,12 +236,12 @@ tr:hover td { background: rgba(251,190,10,0.035); }
     </div>
 
     <nav class="nav" id="nav">
-      <button class="nav-btn active" data-view="home" type="button"><strong>Principal</strong><span>Resumo e atalhos</span></button>
-      <button class="nav-btn" data-view="leads" type="button"><strong>Leads</strong><span>Lista pesquisável</span></button>
-      <button class="nav-btn" data-view="kanban" type="button"><strong>Kanban</strong><span>Por prioridade</span></button>
-      <button class="nav-btn" data-view="acceptances" type="button"><strong>Aceites</strong><span>Fechamentos</span></button>
-      <button class="nav-btn" data-view="pipeline" type="button"><strong>Funil</strong><span>Conversão</span></button>
-      <button class="nav-btn" data-view="insights" type="button"><strong>Insights</strong><span>Região e padrões</span></button>
+      <button class="nav-btn active" data-view="home" type="button"><span class="material-symbols-rounded" aria-hidden="true">dashboard</span><strong>Principal</strong><span>Resumo e atalhos</span></button>
+      <button class="nav-btn" data-view="leads" type="button"><span class="material-symbols-rounded" aria-hidden="true">groups</span><strong>Leads</strong><span>Lista pesquisável</span></button>
+      <button class="nav-btn" data-view="kanban" type="button"><span class="material-symbols-rounded" aria-hidden="true">view_kanban</span><strong>Kanban</strong><span>Por prioridade</span></button>
+      <button class="nav-btn" data-view="acceptances" type="button"><span class="material-symbols-rounded" aria-hidden="true">handshake</span><strong>Aceites</strong><span>Fechamentos</span></button>
+      <button class="nav-btn" data-view="pipeline" type="button"><span class="material-symbols-rounded" aria-hidden="true">monitoring</span><strong>Funil</strong><span>Conversão</span></button>
+      <button class="nav-btn" data-view="insights" type="button"><span class="material-symbols-rounded" aria-hidden="true">query_stats</span><strong>Insights</strong><span>Região e padrões</span></button>
     </nav>
 
     <div class="view-intro" id="viewIntro"></div>
@@ -221,29 +249,15 @@ tr:hover td { background: rgba(251,190,10,0.035); }
     <section class="page active" id="homePage">
       <div class="metrics" id="metrics"></div>
 
-      <div class="home-grid">
-        <div class="nav-cards" id="homeCards"></div>
-        <div class="card" style="padding:16px">
-          <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px">
-            <h2>Fila de foco</h2>
-            <span class="muted">Quentes, recentes e sem contato</span>
+      <div class="home-panel card">
+        <div class="home-panel-head">
+          <div>
+            <div class="kicker">Escolha uma área</div>
+            <p class="home-panel-title">O que você quer acompanhar agora?</p>
           </div>
-          <div class="list-stack" id="focusList"></div>
+          <span class="muted">Cada botão abre uma tela específica do cockpit.</span>
         </div>
-      </div>
-      <div class="card" style="padding:16px;margin-top:14px">
-        <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px">
-          <h2>Últimos leads que chegaram</h2>
-          <span class="muted">Ordenado por data de chegada, não por atualização</span>
-        </div>
-        <div class="list-stack" id="recentList"></div>
-      </div>
-      <div class="card" style="padding:16px;margin-top:14px">
-        <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px">
-          <h2>Resultado comercial</h2>
-          <span class="muted">Quem deu certo e quem não deu</span>
-        </div>
-        <div class="home-grid" id="outcomeList"></div>
+        <div class="nav-cards" id="homeCards"></div>
       </div>
     </section>
 
@@ -665,39 +679,23 @@ function renderHome() {
   const noContact = rows.filter((record) => record.status === 'captured').length;
   const accepted = rows.filter(isDealAcceptance).length;
   const cards = [
-    ['leads', 'Leads', 'Lista completa com busca, filtros e exportação.', rows.length],
-    ['kanban', 'Kanban', 'Fila por prioridade, diagnóstico e aceite.', hot + accepted],
-    ['acceptances', 'Aceites', 'Fechamentos recebidos e dados jurídicos.', accepted],
-    ['pipeline', 'Funil', 'Conversão do lead ao diagnóstico qualificado.', completed],
-    ['insights', 'Insights', 'Regiões, produtos, faturamento e padrões.', noContact],
+    ['leads', 'groups', 'Leads', 'Busca, filtros, seleção e ações comerciais em lote.', `${rows.length} registros`],
+    ['kanban', 'view_kanban', 'Kanban', 'Fila visual por prioridade, diagnóstico e aceite.', `${hot + accepted} em foco`],
+    ['acceptances', 'handshake', 'Aceites', 'Fechamentos recebidos com dados jurídicos e operacionais.', `${accepted} aceites`],
+    ['pipeline', 'monitoring', 'Funil', 'Conversão entre captura, diagnóstico, qualificação e resultado.', `${completed} diagnósticos`],
+    ['insights', 'query_stats', 'Insights', 'Padrões por região, produto, pagamento e gargalo.', `${noContact} sem contato`],
   ];
-  $('homeCards').innerHTML = cards.map(([view, title, copy, value]) => `
+  $('homeCards').innerHTML = cards.map(([view, icon, title, copy, value]) => `
     <button class="big-card" data-home-view="${view}" type="button">
-      <div class="kicker">${escapeHtml(title)}</div>
-      <div class="big-card-title">${escapeHtml(value)}</div>
+      <div class="big-card-top">
+        <span class="big-card-icon"><span class="material-symbols-rounded" aria-hidden="true">${escapeHtml(icon)}</span></span>
+        <span class="big-card-value">${escapeHtml(value)}</span>
+      </div>
+      <div class="big-card-title">${escapeHtml(title)}</div>
       <div class="muted">${escapeHtml(copy)}</div>
     </button>
   `).join('');
   document.querySelectorAll('[data-home-view]').forEach((button) => button.addEventListener('click', () => setView(button.dataset.homeView)));
-
-  const focus = [...rows].sort((a, b) => priorityScore(b) - priorityScore(a)).slice(0, 12);
-  const recentArrivals = sortByArrival(rows).slice(0, 10);
-  const won = rows.filter(isWon).slice(0, 8);
-  const lost = rows.filter(isLost).slice(0, 8);
-  $('focusList').innerHTML = focus.length ? focus.map(focusCard).join('') : '<div class="empty">Nenhum lead na fila.</div>';
-  $('recentList').innerHTML = recentArrivals.map((record) => focusCard(record, true)).join('') || '<div class="empty">Nenhum lead encontrado.</div>';
-  $('outcomeList').innerHTML = `
-    <div>
-      <div class="metric-label" style="margin-bottom:10px">Deram certo</div>
-      <div class="list-stack">${won.map((record) => focusCard(record, false)).join('') || '<div class="empty">Nenhum ganho marcado.</div>'}</div>
-    </div>
-    <div>
-      <div class="metric-label" style="margin-bottom:10px">Não deram certo</div>
-      <div class="list-stack">${lost.map((record) => focusCard(record, false)).join('') || '<div class="empty">Nenhuma perda marcada.</div>'}</div>
-    </div>
-  `;
-  document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
-  bindAdminActions();
 }
 function priorityScore(record) {
   return (isDealAcceptance(record) ? 120 : 0) + (record.status === 'captured' ? 35 : 0) + (record.score || 0) + (revenueMatch(record.faturamento, 'high') ? 25 : 0) + (dateMatch(record.updatedAt, '7') ? 10 : 0);
