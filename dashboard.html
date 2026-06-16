@@ -218,9 +218,9 @@ tr:hover td { background: rgba(251,190,10,0.035); }
 
     <div class="view-intro" id="viewIntro"></div>
 
-    <div class="metrics" id="metrics"></div>
-
     <section class="page active" id="homePage">
+      <div class="metrics" id="metrics"></div>
+
       <div class="home-grid">
         <div class="nav-cards" id="homeCards"></div>
         <div class="card" style="padding:16px">
@@ -556,7 +556,6 @@ function clearFilters() {
 
 function renderAll() {
   renderViewIntro();
-  $('metrics').hidden = state.view !== 'home';
   if (state.view === 'home') renderMetrics();
   renderBulkbar();
   if (state.view === 'home') renderHome();

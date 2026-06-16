@@ -11,6 +11,7 @@
 - Adicionada aba `Aceites` no dashboard para visualizar fechamentos recebidos, métricas de produto/pagamento e dados jurídicos.
 - Cards gerais de métricas do dashboard agora aparecem apenas na aba `Principal`.
 - Simplificada a UI do dashboard com navegação compacta, cabeçalho contextual por aba e resumo principal reduzido a KPIs essenciais.
+- Resumo de métricas movido estruturalmente para dentro da aba `Principal`, impedindo exibição nas demais telas.
 
 ### Added
 - Cards dos módulos 1 e 2 na seção de programação, com público, tópicos e cases Grupo Barigui/Market4u conforme referência visual.
