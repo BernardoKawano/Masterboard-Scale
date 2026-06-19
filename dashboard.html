@@ -8,16 +8,16 @@
 <title>Dashboard · Scale Diagnostic</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;500;600;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #070707;
+  --bg: #0A0A0A;
   --panel: #111111;
   --panel-2: #181818;
-  --line: rgba(255,255,255,0.09);
-  --text: #ffffff;
-  --muted: #8b8b8b;
-  --muted-2: #cfcfcf;
+  --line: rgba(255,255,255,0.10);
+  --text: #F4F4F4;
+  --muted: #9A9A9A;
+  --muted-2: #D4D4D4;
   --yellow: #FBBE0A;
   --yellow-2: #C99703;
   --green: #22C55E;
@@ -35,10 +35,16 @@ body {
     radial-gradient(circle at 88% 0%, rgba(201,151,3,0.12), transparent 28%),
     var(--bg);
   color: var(--text);
-  font-family: Arial, sans-serif;
+  font-family: 'Funnel Display', Arial, sans-serif;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
 }
 button, input, select { font: inherit; }
 button { color: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible, .nav-btn:focus-visible, .big-card:focus-visible {
+  outline: 2px solid rgba(251,190,10,0.85);
+  outline-offset: 2px;
+}
 .material-symbols-rounded {
   direction: ltr;
   display: inline-block;
@@ -65,16 +71,20 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
 .control { width: 100%; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; color: var(--text); outline: none; padding: 11px 12px; }
 .control:focus { border-color: rgba(251,190,10,0.65); box-shadow: 0 0 0 3px rgba(251,190,10,0.08); }
 .btn { align-items: center; background: var(--yellow); border: 0; border-radius: 12px; color: #000; cursor: pointer; display: inline-flex; font-weight: 900; gap: 8px; justify-content: center; min-height: 40px; padding: 9px 13px; text-decoration: none; }
-.btn:hover { background: var(--yellow-2); }
+.btn:hover:not(:disabled) { background: var(--yellow-2); }
+.btn:disabled { cursor: not-allowed; opacity: 0.42; }
 .btn.secondary { background: rgba(255,255,255,0.045); border: 1px solid var(--line); color: var(--text); }
 .btn.secondary:hover { background: rgba(255,255,255,0.08); }
-.icon { background: rgba(255,255,255,0.045); border: 1px solid var(--line); border-radius: 9px; color: #d8d8d8; cursor: pointer; font-size: 11px; font-weight: 900; min-height: 31px; padding: 6px 9px; }
+.icon { background: rgba(255,255,255,0.045); border: 1px solid var(--line); border-radius: 9px; color: var(--muted-2); cursor: pointer; font-size: 11px; font-weight: 900; min-height: 31px; padding: 6px 9px; }
 .icon:hover { border-color: rgba(251,190,10,0.45); color: var(--yellow); }
 
 .auth { max-width: 520px; margin: 12vh auto 0; padding: 30px; }
 .topbar { align-items: center; display: flex; gap: 18px; justify-content: space-between; margin-bottom: 14px; }
 .brand { align-items: center; display: flex; gap: 14px; }
 .brand img { width: 142px; }
+.topbar-actions-wrap { align-items: flex-start; display: flex; flex-direction: column; gap: 8px; }
+.topbar-compact-toggle { display: none; width: 100%; }
+.topbar-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
 
 .nav { align-items: center; background: rgba(255,255,255,0.035); border: 1px solid var(--line); border-radius: 18px; display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding: 6px; }
@@ -82,7 +92,7 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
 .nav-btn { align-items: center; background: transparent; border: 0; border-radius: 999px; cursor: pointer; display: inline-flex; flex: 0 0 auto; gap: 8px; min-height: 38px; padding: 9px 13px; text-align: left; }
 .nav-btn .material-symbols-rounded { color: var(--muted); font-size: 19px; }
 .nav-btn strong { display: block; font-size: 13px; white-space: nowrap; }
-.nav-btn span { color: var(--muted); font-size: 10px; white-space: nowrap; }
+.nav-btn span { color: rgba(244, 244, 244, 0.58); font-size: 10px; white-space: nowrap; }
 .nav-btn.active, .nav-btn:hover { background: rgba(251,190,10,0.14); color: var(--yellow); }
 .nav-btn.active .material-symbols-rounded, .nav-btn:hover .material-symbols-rounded { color: var(--yellow); }
 
@@ -109,7 +119,7 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
 .home-panel-head { align-items: flex-end; display: flex; gap: 16px; justify-content: space-between; margin-bottom: 22px; }
 .home-panel-title { font-size: clamp(34px, 5vw, 58px); font-weight: 900; letter-spacing: -0.065em; line-height: 0.96; margin: 0; max-width: 780px; }
 .nav-cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-.big-card { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 20px; cursor: pointer; min-height: 190px; padding: 20px; text-align: left; }
+.big-card { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 20px; cursor: pointer; min-height: 190px; padding: 20px; text-align: left; transition: border-color 0.18s ease, transform 0.18s ease; }
 .big-card:hover { border-color: rgba(251,190,10,0.38); transform: translateY(-1px); }
 .big-card-top { align-items: center; display: flex; justify-content: space-between; gap: 12px; }
 .big-card-icon { align-items: center; background: rgba(251,190,10,0.12); border: 1px solid rgba(251,190,10,0.24); border-radius: 14px; color: var(--yellow); display: inline-flex; height: 44px; justify-content: center; width: 44px; }
@@ -121,6 +131,36 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
 .focus-card:hover { border-color: rgba(251,190,10,0.35); }
 
 .table-card { overflow: hidden; }
+.table-scroll-wrap { position: relative; }
+.table-scroll-wrap::after {
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.94));
+  bottom: 0;
+  content: '';
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: opacity 0.2s ease;
+  width: 56px;
+  z-index: 4;
+}
+.table-scroll-wrap.can-scroll::after { opacity: 1; }
+.table-scroll-hint {
+  background: rgba(251, 190, 10, 0.12);
+  border: 1px solid rgba(251, 190, 10, 0.32);
+  border-radius: 999px;
+  color: var(--yellow);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 6px 10px;
+  position: absolute;
+  right: 12px;
+  text-transform: uppercase;
+  top: 10px;
+  z-index: 5;
+}
 .table-scroll { max-height: calc(100vh - 285px); overflow: auto; }
 table { border-collapse: separate; border-spacing: 0; min-width: 1100px; width: 100%; }
 th, td { border-bottom: 1px solid var(--line); font-size: 12px; padding: 11px 12px; text-align: left; vertical-align: middle; }
@@ -131,7 +171,7 @@ tr:hover td { background: rgba(251,190,10,0.035); }
 .lead-name { font-size: 14px; font-weight: 900; }
 .lead-sub { color: var(--muted); font-size: 11px; margin-top: 3px; }
 
-.pill { border: 1px solid var(--line); border-radius: 999px; color: #ccc; display: inline-flex; font-size: 10px; font-weight: 900; letter-spacing: 0.12em; padding: 5px 8px; text-transform: uppercase; white-space: nowrap; }
+.pill { border: 1px solid var(--line); border-radius: 999px; color: var(--muted-2); display: inline-flex; font-size: 10px; font-weight: 900; letter-spacing: 0.12em; padding: 5px 8px; text-transform: uppercase; white-space: nowrap; }
 .pill.completed { border-color: rgba(34,197,94,0.36); color: var(--green); }
 .pill.started { border-color: rgba(245,158,11,0.36); color: var(--orange); }
 .pill.captured { border-color: rgba(251,190,10,0.36); color: var(--yellow); }
@@ -141,39 +181,68 @@ tr:hover td { background: rgba(251,190,10,0.035); }
 .pill.cold { border-color: rgba(96,165,250,0.36); color: var(--blue); }
 .score { font-weight: 900; }
 
-.kanban { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(220px, 1fr)); overflow-x: auto; padding-bottom: 6px; }
+.kanban { display: grid; gap: 12px; grid-template-columns: repeat(5, minmax(200px, 1fr)); overflow-x: auto; padding-bottom: 6px; }
 .kanban-col { min-height: 260px; padding: 12px; }
 .kanban-title { align-items: center; display: flex; font-size: 12px; font-weight: 900; justify-content: space-between; letter-spacing: 0.08em; margin-bottom: 10px; text-transform: uppercase; }
 .mini { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; margin-bottom: 8px; padding: 12px; }
 .mini:hover { border-color: rgba(251,190,10,0.35); }
 
 .funnel { display: grid; gap: 12px; }
-.funnel-step { align-items: center; display: grid; gap: 12px; grid-template-columns: 210px 1fr 92px; }
+.funnel-step { align-items: center; display: grid; gap: 12px; grid-template-columns: 210px 1fr 132px; }
+.funnel-step > .muted { color: var(--muted-2); font-size: 11px; font-weight: 700; text-align: right; }
 .funnel-bar { background: rgba(255,255,255,0.06); border-radius: 999px; height: 34px; overflow: hidden; }
 .funnel-fill { align-items: center; background: linear-gradient(90deg,var(--yellow),var(--yellow-2)); color: #000; display: flex; font-size: 12px; font-weight: 900; height: 100%; min-width: 34px; padding: 0 12px; }
 .acceptance-summary { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 14px; }
-.acceptance-copy { color: #d8d8d8; font-size: 12px; line-height: 1.5; }
+.acceptance-copy { color: var(--muted-2); font-size: 12px; line-height: 1.5; }
 .insights { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .insight { padding: 16px; }
 .rank { display: grid; gap: 10px; }
 .rank-row { display: grid; gap: 8px; grid-template-columns: 1fr auto; }
-.rank-bar { background: rgba(255,255,255,0.06); border-radius: 999px; height: 6px; margin-top: 6px; overflow: hidden; }
+.rank-bar { background: rgba(255,255,255,0.12); border-radius: 999px; height: 8px; margin-top: 6px; overflow: hidden; }
 .rank-bar span { background: var(--yellow); display: block; height: 100%; }
 
-.drawer { background: rgba(10,10,10,0.96); border-left: 1px solid var(--line); bottom: 0; box-shadow: -24px 0 80px rgba(0,0,0,0.38); max-width: 600px; overflow: auto; padding: 22px; position: fixed; right: 0; top: 0; transform: translateX(106%); transition: transform 0.22s ease; width: min(600px, 100vw); z-index: 20; }
+.drawer-backdrop { background: rgba(0,0,0,0.55); inset: 0; opacity: 0; pointer-events: none; position: fixed; transition: opacity 0.22s ease; z-index: 19; }
+.drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+.drawer { background: rgba(10,10,10,0.98); border-left: 1px solid var(--line); bottom: 0; box-shadow: -24px 0 80px rgba(0,0,0,0.38); max-width: 600px; overflow: auto; padding: 22px; position: fixed; right: 0; top: 0; transform: translateX(106%); transition: transform 0.22s ease; width: min(600px, 100vw); z-index: 20; }
 .drawer.open { transform: translateX(0); }
 .drawer-head { align-items: flex-start; display: flex; gap: 14px; justify-content: space-between; margin-bottom: 16px; }
+.drawer-actions { display: grid; gap: 14px; margin-top: 14px; }
+.drawer-actions-block { display: flex; flex-wrap: wrap; gap: 8px; }
+.drawer-actions-label { color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: 0.14em; margin-bottom: 2px; text-transform: uppercase; }
+.drawer-actions-danger .btn.secondary { border-color: rgba(239,68,68,0.38); color: #fca5a5; }
+body.drawer-open { overflow: hidden; }
+.row-actions { display: flex; gap: 6px; white-space: nowrap; }
+.action-menu { position: relative; }
+.action-menu > summary { list-style: none; }
+.action-menu > summary::-webkit-details-marker { display: none; }
+.action-menu-panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+  display: grid;
+  gap: 4px;
+  min-width: 148px;
+  padding: 6px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 5;
+}
+.action-menu-panel .icon { justify-content: flex-start; text-align: left; width: 100%; }
+th.sorted { color: var(--yellow); }
+.home-stat { color: var(--yellow); font-size: 13px; font-weight: 900; letter-spacing: 0.06em; margin-top: 14px; text-transform: uppercase; }
 .detail-grid { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .fact { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 13px; padding: 12px; }
 .fact-label { color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: 0.13em; text-transform: uppercase; }
 .fact-value { font-size: 13px; font-weight: 800; margin-top: 6px; word-break: break-word; }
 .section { border-top: 1px solid var(--line); margin-top: 13px; padding-top: 13px; }
 .section h2 { margin-bottom: 10px; }
-.copy { color: #d8d8d8; font-size: 13px; line-height: 1.65; max-height: 190px; overflow: auto; white-space: pre-wrap; }
+.copy { color: var(--muted-2); font-size: 13px; line-height: 1.65; max-height: 190px; overflow: auto; white-space: pre-wrap; }
 .qa-list { display: grid; gap: 10px; }
 .qa-card { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
 .qa-label { color: var(--yellow); font-size: 10px; font-weight: 900; letter-spacing: 0.13em; text-transform: uppercase; }
-.qa-text { color: #e8e8e8; font-size: 13px; line-height: 1.55; margin-top: 6px; white-space: pre-wrap; }
+.qa-text { color: var(--text); font-size: 13px; line-height: 1.55; margin-top: 6px; white-space: pre-wrap; }
 .qa-answer { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; }
 .dimension { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 13px; margin-bottom: 9px; padding: 12px; }
 .dimension-top { display: flex; justify-content: space-between; }
@@ -182,6 +251,64 @@ tr:hover td { background: rgba(251,190,10,0.035); }
 .toast { background: var(--yellow); border-radius: 12px; bottom: 20px; color: #000; display: none; font-size: 13px; font-weight: 900; left: 50%; padding: 12px 14px; position: fixed; transform: translateX(-50%); z-index: 40; }
 .toast.visible { display: block; }
 .empty { color: var(--muted); padding: 30px; text-align: center; }
+.empty-state { align-items: center; background: rgba(255,255,255,0.03); border: 1px dashed var(--line); border-radius: 14px; display: grid; gap: 10px; justify-items: center; padding: 22px 16px; text-align: center; }
+.empty-state-copy { color: var(--muted-2); font-size: 12px; line-height: 1.5; margin: 0; }
+.preview-backdrop {
+  background: rgba(0, 0, 0, 0.72);
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  transition: opacity 0.22s ease;
+  z-index: 30;
+}
+.preview-backdrop.open { opacity: 1; pointer-events: auto; }
+.preview-panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.55);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: min(92vh, 980px);
+  left: 50%;
+  max-width: 1080px;
+  overflow: hidden;
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -46%) scale(0.98);
+  transition: transform 0.22s ease;
+  width: min(1080px, calc(100vw - 24px));
+  z-index: 31;
+}
+.preview-backdrop.open .preview-panel { transform: translate(-50%, -50%) scale(1); }
+.preview-head {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 14px 16px;
+}
+.preview-head h2 { color: var(--text); font-size: 16px; letter-spacing: -0.02em; margin: 0; text-transform: none; }
+.preview-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.preview-body { min-height: 0; position: relative; }
+.preview-loading {
+  align-items: center;
+  background: rgba(10, 10, 10, 0.55);
+  color: var(--muted-2);
+  display: grid;
+  font-size: 12px;
+  font-weight: 800;
+  inset: 0;
+  letter-spacing: 0.08em;
+  place-items: center;
+  position: absolute;
+  text-transform: uppercase;
+  z-index: 2;
+}
+.preview-loading[hidden] { display: none; }
+.preview-frame { background: #fff; border: 0; display: block; height: 100%; width: 100%; }
 .error { color: var(--red); margin-top: 12px; }
 
 @media (max-width: 1180px) {
@@ -193,6 +320,10 @@ tr:hover td { background: rgba(251,190,10,0.035); }
 @media (max-width: 760px) {
   .shell { width: min(100vw - 18px, 1440px); padding-top: 14px; }
   .topbar { align-items: stretch; flex-direction: column; }
+  .topbar-compact-toggle { display: inline-flex; }
+  .topbar-actions { display: none; justify-content: stretch; width: 100%; }
+  .topbar-actions.open { display: flex; flex-direction: column; }
+  .topbar-actions .btn, .topbar-actions .btn.secondary { width: 100%; }
   .actions { justify-content: stretch; }
   .actions .btn, .actions .btn.secondary { flex: 1; }
   .brand { align-items: flex-start; flex-direction: column; }
@@ -203,6 +334,16 @@ tr:hover td { background: rgba(251,190,10,0.035); }
   .view-intro { align-items: flex-start; flex-direction: column; }
   .kanban { grid-template-columns: 1fr; }
   .funnel-step { grid-template-columns: 1fr; }
+  .preview-panel {
+    border-radius: 0;
+    height: 100vh;
+    max-width: none;
+    top: 0;
+    transform: translate(-50%, 0) scale(1);
+    width: 100vw;
+  }
+  .preview-backdrop.open .preview-panel { transform: translate(-50%, 0) scale(1); }
+  .preview-head { flex-wrap: wrap; }
 }
 </style>
 </head>
@@ -230,10 +371,13 @@ tr:hover td { background: rgba(251,190,10,0.035); }
           <div class="muted" id="generatedAt">Carregando...</div>
         </div>
       </div>
-      <div class="actions">
-        <button class="btn secondary" id="refreshButton" type="button">Atualizar</button>
-        <button class="btn secondary" id="exportFilteredButton" type="button">Exportar filtrados</button>
-        <button class="btn" id="copySelectedButton" type="button">Copiar selecionados</button>
+      <div class="topbar-actions-wrap">
+        <button class="btn secondary topbar-compact-toggle" id="topbarCompactToggle" type="button" aria-expanded="false" aria-controls="topbarActions">Ações do cockpit</button>
+        <div class="actions topbar-actions" id="topbarActions">
+          <button class="btn secondary" id="refreshButton" type="button">Atualizar</button>
+          <button class="btn secondary" id="exportFilteredButton" type="button">Exportar filtrados</button>
+          <button class="btn" id="copySelectedButton" type="button">Copiar selecionados</button>
+        </div>
       </div>
     </div>
 
@@ -279,7 +423,9 @@ tr:hover td { background: rgba(251,190,10,0.035); }
         </div>
       </div>
       <div class="table-card card">
-        <div class="table-scroll">
+        <div class="table-scroll-wrap" data-scroll-hint>
+          <div class="table-scroll-hint" hidden>Role para ver mais colunas →</div>
+          <div class="table-scroll">
           <table>
             <thead>
               <tr>
@@ -300,6 +446,7 @@ tr:hover td { background: rgba(251,190,10,0.035); }
             </thead>
             <tbody id="tableBody"></tbody>
           </table>
+          </div>
         </div>
       </div>
     </section>
@@ -308,7 +455,9 @@ tr:hover td { background: rgba(251,190,10,0.035); }
     <section class="page" id="acceptancesPage">
       <div class="acceptance-summary" id="acceptanceSummary"></div>
       <div class="table-card card">
-        <div class="table-scroll">
+        <div class="table-scroll-wrap" data-scroll-hint>
+          <div class="table-scroll-hint" hidden>Role para ver mais colunas →</div>
+          <div class="table-scroll">
           <table>
             <thead>
               <tr>
@@ -324,6 +473,7 @@ tr:hover td { background: rgba(251,190,10,0.035); }
             </thead>
             <tbody id="acceptancesBody"></tbody>
           </table>
+          </div>
         </div>
       </div>
     </section>
@@ -332,10 +482,32 @@ tr:hover td { background: rgba(251,190,10,0.035); }
   </section>
 </main>
 
-<aside class="drawer" id="drawer"></aside>
+<div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+<aside class="drawer" id="drawer" aria-label="Detalhes do lead"></aside>
+<div class="preview-backdrop" id="previewBackdrop" aria-hidden="true">
+  <section class="preview-panel" role="dialog" aria-labelledby="previewTitle">
+    <div class="preview-head">
+      <h2 id="previewTitle">Prévia do relatório</h2>
+      <div class="preview-actions">
+        <button class="btn" id="previewPrintButton" type="button">Salvar PDF</button>
+        <button class="btn secondary" id="previewTabButton" type="button">Nova aba</button>
+        <button class="btn secondary" id="previewCloseButton" type="button">Fechar</button>
+      </div>
+    </div>
+    <div class="preview-body">
+      <div class="preview-loading" id="previewLoading" hidden>Carregando prévia…</div>
+      <iframe class="preview-frame" id="previewFrame" title="Prévia para impressão"></iframe>
+    </div>
+  </section>
+</div>
 <div class="toast" id="toast">Copiado</div>
 
-<script>
+<script type="module">
+import { getPrintDocumentStyles } from './lib/dashboard-brand.mjs';
+import { getDashboardFixturePayload } from './lib/dashboard-fixture.mjs';
+import { buildEmptyStateHtml, hasActiveDashboardFilters, shouldShowScrollHint } from './lib/dashboard-ui.mjs';
+import { createPreviewBlobUrl, revokePreviewBlobUrl } from './lib/dashboard-preview.mjs';
+
 const state = {
   token: '',
   records: [],
@@ -349,8 +521,11 @@ const state = {
   revenue: 'all',
   sort: { key: 'createdAt', dir: 'desc' },
   view: 'home',
+  previewHtml: '',
+  previewObjectUrl: '',
 };
 const params = new URLSearchParams(window.location.search);
+const useFixture = params.get('fixture') === '1';
 state.token = params.get('token') || '';
 state.view = params.get('view') || 'home';
 const $ = (id) => document.getElementById(id);
@@ -363,6 +538,33 @@ $('tokenButton').addEventListener('click', () => {
   loadDashboard();
 });
 $('refreshButton').addEventListener('click', loadDashboard);
+$('topbarCompactToggle').addEventListener('click', () => {
+  const open = $('topbarActions').classList.toggle('open');
+  $('topbarCompactToggle').setAttribute('aria-expanded', String(open));
+});
+$('previewCloseButton').addEventListener('click', closePreviewModal);
+$('previewBackdrop').addEventListener('click', (event) => {
+  if (event.target === $('previewBackdrop')) closePreviewModal();
+});
+$('previewPrintButton').addEventListener('click', () => {
+  const frame = $('previewFrame');
+  if (frame.contentWindow) frame.contentWindow.focus();
+  if (frame.contentWindow) frame.contentWindow.print();
+});
+$('previewTabButton').addEventListener('click', openPreviewInNewTab);
+document.addEventListener('click', (event) => {
+  const emptyView = event.target.closest('[data-empty-view]');
+  if (emptyView) {
+    event.preventDefault();
+    navigateEmptyState(emptyView.dataset.emptyView);
+    return;
+  }
+  const emptyClear = event.target.closest('[data-empty-action="clear"]');
+  if (emptyClear) {
+    event.preventDefault();
+    clearFilters();
+  }
+});
 $('exportFilteredButton').addEventListener('click', () => downloadCsv(filteredRecords(), 'leads-filtrados.csv'));
 $('copySelectedButton').addEventListener('click', () => copyText(selectedRecords().map(formatLeadText).join('\n\n') || 'Nenhum lead selecionado'));
 $('nav').addEventListener('click', (event) => {
@@ -388,14 +590,21 @@ document.addEventListener('keydown', (event) => {
     setView('leads');
     $('searchInput').focus();
   }
-  if (event.key === 'Escape') closeDrawer();
+  if (event.key === 'Escape') {
+    if ($('previewBackdrop').classList.contains('open')) closePreviewModal();
+    else closeDrawer();
+  }
 });
 
-setView(state.view, false);
-if (state.token) loadDashboard();
-else showAuth();
-
 async function loadDashboard() {
+  if (useFixture) {
+    showApp();
+    const payload = getDashboardFixturePayload();
+    state.records = Array.isArray(payload.records) ? payload.records.map(normalizeRecord) : [];
+    $('generatedAt').textContent = `Modo demonstração · atualizado em ${formatDate(payload.generatedAt)} · ${state.records.length} registros`;
+    renderAll();
+    return;
+  }
   if (!state.token) return showAuth();
   showApp();
   setLoading();
@@ -568,10 +777,8 @@ function clearFilters() {
 }
 
 function renderAll() {
-  const isHome = state.view === 'home';
-  $('nav').hidden = isHome;
-  $('viewIntro').hidden = isHome;
-  if (!isHome) renderViewIntro();
+  $('viewIntro').hidden = state.view === 'home';
+  if (state.view !== 'home') renderViewIntro();
   renderBulkbar();
   if (state.view === 'home') renderHome();
   if (state.view === 'leads') renderTable();
@@ -586,7 +793,7 @@ function renderViewIntro() {
   const visible = filteredRecords();
   const accepted = all.filter(isDealAcceptance).length;
   const copy = {
-    home: ['Cockpit', 'Principal', 'Resumo executivo com números essenciais e atalhos para as áreas operacionais.', `${all.length} registros`],
+    home: ['Cockpit', 'Principal', 'Escolha uma área para operar leads, prioridades, aceites e análises.', `${all.length} registros`],
     leads: ['Operação', 'Leads', 'Lista completa para busca, filtro, seleção e ações comerciais em lote.', `${visible.length} visíveis`],
     kanban: ['Prioridade', 'Kanban', 'Fila operacional por prioridade. Use para decidir a próxima ação do time.', `${visible.length} cards`],
     acceptances: ['Fechamento', 'Aceites', 'Registros recebidos via formulário de aceite, com dados jurídicos e próximos passos.', `${accepted} aceites`],
@@ -651,14 +858,23 @@ function renderBulkbar() {
   const count = state.selected.size;
   $('bulkbar').classList.toggle('visible', count > 0);
   $('bulkCount').textContent = `${count} selecionado${count === 1 ? '' : 's'}`;
+  $('copySelectedButton').disabled = count === 0;
 }
 function renderHome() {
+  const all = state.records.filter((record) => !record.deletedAt);
+  const counts = {
+    leads: all.length,
+    kanban: all.filter((record) => record.status === 'completed' || isDealAcceptance(record)).length,
+    acceptances: all.filter(isDealAcceptance).length,
+    pipeline: all.length,
+    insights: all.filter((record) => record.score > 0).length,
+  };
   const cards = [
-    ['leads', 'groups', 'Leads', 'Consultar cadastro completo, buscar empresas e executar ações comerciais.', 'Abrir lista'],
-    ['kanban', 'view_kanban', 'Kanban', 'Priorizar a próxima ação por estágio, temperatura e aceite.', 'Abrir fila'],
-    ['acceptances', 'handshake', 'Aceites', 'Ver fechamentos recebidos, dados jurídicos e próximos passos.', 'Ver fechamentos'],
-    ['pipeline', 'monitoring', 'Funil', 'Entender conversão entre captura, diagnóstico, aceite e resultado.', 'Ver conversão'],
-    ['insights', 'query_stats', 'Insights', 'Analisar padrões de região, produto, pagamento e gargalos.', 'Ver análise'],
+    ['leads', 'groups', 'Leads', 'Consultar cadastro completo, buscar empresas e executar ações comerciais.', `${counts.leads} registros`],
+    ['kanban', 'view_kanban', 'Kanban', 'Priorizar a próxima ação por estágio, temperatura e aceite.', `${counts.kanban} no funil`],
+    ['acceptances', 'handshake', 'Aceites', 'Ver fechamentos recebidos, dados jurídicos e próximos passos.', `${counts.acceptances} aceites`],
+    ['pipeline', 'monitoring', 'Funil', 'Entender conversão entre captura, diagnóstico, aceite e resultado.', `${counts.pipeline} etapas`],
+    ['insights', 'query_stats', 'Insights', 'Analisar padrões de região, produto, pagamento e gargalos.', `${counts.insights} com score`],
   ];
   $('homeCards').innerHTML = cards.map(([view, icon, title, copy, value]) => `
     <button class="big-card" data-home-view="${view}" type="button">
@@ -668,6 +884,7 @@ function renderHome() {
       </div>
       <div class="big-card-title">${escapeHtml(title)}</div>
       <div class="muted">${escapeHtml(copy)}</div>
+      <div class="home-stat">Abrir área</div>
     </button>
   `).join('');
   document.querySelectorAll('[data-home-view]').forEach((button) => button.addEventListener('click', () => setView(button.dataset.homeView)));
@@ -710,13 +927,20 @@ function renderTable() {
       <td>${escapeHtml(formatDate(arrivalDate(record)))}</td>
       <td>${escapeHtml(formatDate(record.updatedAt))}</td>
       <td>
-        <button class="icon" data-open="${escapeHtml(record.leadId)}">Abrir</button>
-        <button class="icon" data-admin="mark_won" data-id="${escapeHtml(record.leadId)}">Deu certo</button>
-        <button class="icon" data-admin="mark_lost" data-id="${escapeHtml(record.leadId)}">Não deu</button>
-        <button class="icon" data-admin="delete" data-id="${escapeHtml(record.leadId)}">Excluir</button>
+        <div class="row-actions">
+          <button class="icon" data-open="${escapeHtml(record.leadId)}">Abrir</button>
+          <details class="action-menu">
+            <summary class="icon" aria-label="Mais ações para ${escapeHtml(record.nome || 'lead')}">⋯</summary>
+            <div class="action-menu-panel">
+              <button class="icon" data-admin="mark_won" data-id="${escapeHtml(record.leadId)}" type="button">Deu certo</button>
+              <button class="icon" data-admin="mark_lost" data-id="${escapeHtml(record.leadId)}" type="button">Não deu</button>
+              <button class="icon" data-admin="delete" data-id="${escapeHtml(record.leadId)}" type="button">Excluir</button>
+            </div>
+          </details>
+        </div>
       </td>
     </tr>
-  `).join('') : '<tr><td colspan="13" class="empty">Nenhum lead encontrado.</td></tr>';
+  `).join('') : `<tr><td colspan="13">${leadsEmptyState()}</td></tr>`;
   document.querySelectorAll('[data-check]').forEach((element) => element.addEventListener('change', () => {
     element.checked ? state.selected.add(element.dataset.check) : state.selected.delete(element.dataset.check);
     renderAll();
@@ -724,6 +948,8 @@ function renderTable() {
   document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
   document.querySelectorAll('[data-copy]').forEach((element) => element.addEventListener('click', () => copyText(formatLeadText(state.records.find((record) => record.leadId === element.dataset.copy)))));
   bindAdminActions();
+  updateSortHeaders();
+  bindTableScrollHints();
   document.querySelectorAll('th[data-sort]').forEach((th) => {
     th.onclick = () => {
       const key = th.dataset.sort;
@@ -732,6 +958,16 @@ function renderTable() {
       state.sort.key = key;
       renderTable();
     };
+  });
+}
+function updateSortHeaders() {
+  document.querySelectorAll('th[data-sort]').forEach((th) => {
+    const key = th.dataset.sort;
+    if (key === 'select') return;
+    const base = th.dataset.label || th.textContent.replace(/ [↑↓]$/, '').trim();
+    th.dataset.label = base;
+    th.classList.toggle('sorted', state.sort.key === key);
+    th.textContent = `${base}${state.sort.key === key ? (state.sort.dir === 'asc' ? ' ↑' : ' ↓') : ''}`;
   });
 }
 function renderKanban() {
@@ -752,17 +988,120 @@ function renderKanban() {
           <div class="mini" data-open="${escapeHtml(record.leadId)}">
             <div style="display:flex;justify-content:space-between;gap:8px">
               <strong>${escapeHtml(record.nome || 'Lead sem nome')}</strong>
-              <button class="icon" data-admin="delete" data-id="${escapeHtml(record.leadId)}" type="button">Excluir</button>
+              <span class="score">${escapeHtml(isDealAcceptance(record) ? (record.produto || 'Aceite') : (record.score || '-'))}</span>
             </div>
             <div class="muted">${escapeHtml(record.empresa || record.email || '-')}</div>
             <div style="margin-top:8px">${scorePill(record)} <span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${commercialPill(record)}</div>
           </div>
-        `).join('') || '<div class="empty">Vazio</div>'}
+        `).join('') || kanbanEmptyState(key)}
       </div>
     `;
   }).join('');
   document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
   bindAdminActions();
+}
+function leadsEmptyState() {
+  if (hasActiveDashboardFilters(filterSnapshot())) {
+    return buildEmptyStateHtml('Nenhum lead com os filtros atuais.', 'Limpar filtros', 'clear');
+  }
+  return buildEmptyStateHtml('Nenhum lead encontrado neste cockpit.', 'Voltar ao início', 'home');
+}
+function filterSnapshot() {
+  return {
+    query: state.query,
+    status: state.status,
+    score: state.score,
+    date: state.date,
+    region: state.region,
+    revenue: state.revenue,
+  };
+}
+function kanbanEmptyState(key) {
+  if (hasActiveDashboardFilters(filterSnapshot())) {
+    return buildEmptyStateHtml('Nenhum card com os filtros atuais.', 'Limpar filtros', 'clear');
+  }
+  const hints = {
+    accepted: ['Nenhum aceite nesta coluna.', 'Ver aceites', 'acceptances'],
+    captured: ['Nenhum lead aguardando diagnóstico.', 'Ir para Leads', 'leads'],
+    cold: ['Nenhum lead com diagnóstico crítico.', 'Ver leads frios', 'score:cold'],
+    warm: ['Nenhum lead em desenvolvimento (40–59).', 'Ver leads mornos', 'score:warm'],
+    hot: ['Nenhum lead de prioridade alta (60+).', 'Ver leads quentes', 'score:hot'],
+  };
+  const [message, cta, action] = hints[key] || ['Sem cards nesta coluna.', 'Ir para Leads', 'leads'];
+  return buildEmptyStateHtml(message, cta, action);
+}
+function navigateEmptyState(action) {
+  if (['home', 'leads', 'kanban', 'acceptances', 'pipeline', 'insights'].includes(action)) {
+    setView(action);
+    return;
+  }
+  if (action.startsWith('score:')) {
+    setView('leads');
+    state.score = action.slice(6);
+    $('scoreFilter').value = state.score;
+    renderAll();
+  }
+}
+function bindTableScrollHints() {
+  document.querySelectorAll('[data-scroll-hint]').forEach((wrap) => {
+    const scroller = wrap.querySelector('.table-scroll');
+    const hint = wrap.querySelector('.table-scroll-hint');
+    if (!scroller || !hint) return;
+    const update = () => {
+      const show = shouldShowScrollHint(scroller.scrollWidth, scroller.clientWidth, scroller.scrollLeft);
+      wrap.classList.toggle('can-scroll', show);
+      hint.hidden = !show;
+    };
+    update();
+    scroller.onscroll = update;
+    if (!wrap.dataset.bound) {
+      wrap.dataset.bound = '1';
+      window.addEventListener('resize', update);
+    }
+  });
+}
+function openPreviewModal(html, title) {
+  state.previewHtml = html;
+  if (state.previewObjectUrl) revokePreviewBlobUrl(state.previewObjectUrl);
+  $('previewTitle').textContent = title;
+  $('previewLoading').hidden = false;
+  const frame = $('previewFrame');
+  frame.removeAttribute('srcdoc');
+  frame.onload = () => { $('previewLoading').hidden = true; };
+  frame.onerror = () => {
+    $('previewLoading').textContent = 'Não foi possível carregar a prévia';
+  };
+  state.previewObjectUrl = createPreviewBlobUrl(html);
+  frame.src = state.previewObjectUrl;
+  $('previewBackdrop').classList.add('open');
+  $('previewBackdrop').setAttribute('aria-hidden', 'false');
+  document.body.classList.add('drawer-open');
+}
+function closePreviewModal() {
+  $('previewBackdrop').classList.remove('open');
+  $('previewBackdrop').setAttribute('aria-hidden', 'true');
+  const frame = $('previewFrame');
+  frame.onload = null;
+  frame.onerror = null;
+  frame.removeAttribute('src');
+  if (state.previewObjectUrl) {
+    revokePreviewBlobUrl(state.previewObjectUrl);
+    state.previewObjectUrl = '';
+  }
+  $('previewLoading').hidden = true;
+  $('previewLoading').textContent = 'Carregando prévia…';
+  if (!$('drawer').classList.contains('open')) document.body.classList.remove('drawer-open');
+}
+function openPreviewInNewTab() {
+  if (!state.previewHtml) return;
+  const tab = window.open('', '_blank', 'width=980,height=1100');
+  if (!tab) {
+    toast('Pop-up bloqueado. Use Salvar PDF na prévia.');
+    return;
+  }
+  tab.document.write(state.previewHtml);
+  tab.document.close();
+  tab.focus();
 }
 function kanbanKey(record) {
   if (isDealAcceptance(record)) return 'accepted';
@@ -809,15 +1148,23 @@ function renderAcceptances() {
       <td>${escapeHtml(record.documento || record.documento_numero || '-')}</td>
       <td>${escapeHtml(record.localizacao || '-')}</td>
       <td>
-        <button class="icon" data-open="${escapeHtml(record.leadId)}">Abrir</button>
-        <button class="icon" data-admin="mark_lost" data-id="${escapeHtml(record.leadId)}">Não deu</button>
-        <button class="icon" data-admin="delete" data-id="${escapeHtml(record.leadId)}">Excluir</button>
+        <div class="row-actions">
+          <button class="icon" data-open="${escapeHtml(record.leadId)}">Abrir</button>
+          <details class="action-menu">
+            <summary class="icon" aria-label="Mais ações">⋯</summary>
+            <div class="action-menu-panel">
+              <button class="icon" data-admin="mark_lost" data-id="${escapeHtml(record.leadId)}" type="button">Não deu</button>
+              <button class="icon" data-admin="delete" data-id="${escapeHtml(record.leadId)}" type="button">Excluir</button>
+            </div>
+          </details>
+        </div>
       </td>
     </tr>
-  `).join('') : '<tr><td colspan="8" class="empty">Nenhum aceite recebido ainda.</td></tr>';
+  `).join('') : `<tr><td colspan="8">${buildEmptyStateHtml('Nenhum aceite recebido ainda.', 'Ir para Leads', 'leads')}</td></tr>`;
 
   document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
   bindAdminActions();
+  bindTableScrollHints();
 }
 function renderFunnel() {
   const all = filteredRecords();
@@ -845,7 +1192,7 @@ function renderFunnel() {
     <div class="funnel-step">
       <strong>${escapeHtml(label)}</strong>
       <div class="funnel-bar"><div class="funnel-fill" style="width:${Math.max(7, value / max * 100)}%">${value}</div></div>
-      <span class="muted">${index ? pct(value, steps[index - 1][1]) : '100'}%</span>
+      <span class="muted">${index ? `${pct(value, steps[index - 1][1])}% da etapa anterior` : 'Base do funil'}</span>
     </div>
   `).join('') + `<div class="muted" style="margin-top:8px">Relação deu certo/não deu: ${won.length}/${lost.length} · Taxa de acerto: ${pct(won.length, won.length + lost.length)}%</div>`;
 }
@@ -872,7 +1219,7 @@ function insightRank(title, items) {
             <div><strong>${escapeHtml(item.label)}</strong><div class="rank-bar"><span style="width:${item.count / max * 100}%"></span></div></div>
             <span>${item.count}</span>
           </div>
-        `).join('') || '<div class="empty">Sem dados</div>'}
+        `).join('') || buildEmptyStateHtml('Sem dados para este recorte.', 'Ir para Leads', 'leads')}
       </div>
     </div>
   `;
@@ -900,19 +1247,34 @@ function openDrawer(id) {
         <h1 style="font-size:34px">${escapeHtml(record.empresa || record.nome || 'Lead')}</h1>
         <div class="muted">${escapeHtml(formatDate(record.updatedAt))}</div>
       </div>
-      <button class="icon" onclick="closeDrawer()">Fechar</button>
+      <button class="icon" data-drawer-action="close" type="button">Fechar</button>
     </div>
-    <div class="actions">
-      ${isAcceptance ? '' : '<button class="btn" onclick="copyLeadPrompt()">Copiar prompt LLM</button>'}
-      ${isAcceptance ? '' : '<button class="btn secondary" onclick="downloadLeadPdf()">Abrir PDF</button>'}
-      ${isAcceptance ? '' : '<button class="btn secondary" onclick="openQaPopup()">Ver perguntas/respostas</button>'}
-      <button class="btn secondary" onclick="copyCurrent()">Copiar dados</button>
-      <button class="btn secondary" onclick="markCurrentLead('mark_won')">Marcar deu certo</button>
-      <button class="btn secondary" onclick="markCurrentLead('mark_lost')">Marcar não deu</button>
-      <button class="btn secondary" onclick="markCurrentLead('clear_commercial_status')">Limpar resultado</button>
-      <button class="btn secondary" onclick="markCurrentLead('delete')">Excluir card</button>
-      ${record.whatsapp ? `<a class="btn secondary" href="${escapeHtml(whatsappUrl(record.whatsapp))}" target="_blank" rel="noreferrer">WhatsApp</a>` : ''}
-      ${record.email ? `<a class="btn secondary" href="mailto:${escapeHtml(record.email)}">Email</a>` : ''}
+    <div class="drawer-actions">
+      <div>
+        <div class="drawer-actions-label">Ações principais</div>
+        <div class="drawer-actions-block">
+          ${record.whatsapp ? `<a class="btn" href="${escapeHtml(whatsappUrl(record.whatsapp))}" target="_blank" rel="noreferrer">WhatsApp</a>` : ''}
+          ${isAcceptance ? '' : '<button class="btn secondary" data-drawer-action="copy-prompt" type="button">Copiar prompt LLM</button>'}
+          ${isAcceptance ? '' : '<button class="btn secondary" data-drawer-action="pdf" type="button">Prévia PDF</button>'}
+          ${isAcceptance ? '' : '<button class="btn secondary" data-drawer-action="qa" type="button">Perguntas/respostas</button>'}
+          <button class="btn secondary" data-drawer-action="copy" type="button">Copiar dados</button>
+          ${record.email ? `<a class="btn secondary" href="mailto:${escapeHtml(record.email)}">Email</a>` : ''}
+        </div>
+      </div>
+      <div>
+        <div class="drawer-actions-label">Resultado comercial</div>
+        <div class="drawer-actions-block">
+          <button class="btn secondary" data-drawer-action="mark_won" type="button">Marcar deu certo</button>
+          <button class="btn secondary" data-drawer-action="mark_lost" type="button">Marcar não deu</button>
+          <button class="btn secondary" data-drawer-action="clear_commercial_status" type="button">Limpar resultado</button>
+        </div>
+      </div>
+      <div class="drawer-actions-danger">
+        <div class="drawer-actions-label">Zona de risco</div>
+        <div class="drawer-actions-block">
+          <button class="btn secondary" data-drawer-action="delete" type="button">Excluir card</button>
+        </div>
+      </div>
     </div>
     <div class="detail-grid" style="margin-top:18px">
       ${fact('Nome', record.nome)}
@@ -941,41 +1303,51 @@ function openDrawer(id) {
     ${isAcceptance ? '' : `<div class="section">
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px">
         <h2>Perguntas e respostas</h2>
-        <button class="icon" onclick="openQaPopup()" type="button">Abrir completo</button>
+        <button class="icon" data-drawer-action="qa" type="button">Abrir completo</button>
       </div>
       ${renderQaCards(record, 6)}
     </div>
     <div class="section"><h2>Histórico bruto</h2><div class="copy">${escapeHtml(record.conversation || 'Não disponível')}</div></div>`}
   `;
   $('drawer').classList.add('open');
+  $('drawerBackdrop').classList.add('open');
+  document.body.classList.add('drawer-open');
 }
-function closeDrawer() { $('drawer').classList.remove('open'); }
+function closeDrawer() {
+  $('drawer').classList.remove('open');
+  $('drawerBackdrop').classList.remove('open');
+  document.body.classList.remove('drawer-open');
+}
+$('drawerBackdrop').addEventListener('click', closeDrawer);
+$('drawer').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-drawer-action]');
+  if (!button) return;
+  const action = button.dataset.drawerAction;
+  if (action === 'close') closeDrawer();
+  else if (action === 'copy-prompt') copyLeadPrompt();
+  else if (action === 'pdf') downloadLeadPdf();
+  else if (action === 'qa') openQaPopup();
+  else if (action === 'copy') copyCurrent();
+  else if (action) markCurrentLead(action);
+});
 function copyCurrent() { copyText(formatLeadText(state.records.find((record) => record.leadId === state.selectedLeadId))); }
 function copyLeadPrompt() { copyText(formatLeadPrompt(state.records.find((record) => record.leadId === state.selectedLeadId))); }
 function downloadLeadPdf() {
   const record = state.records.find((item) => item.leadId === state.selectedLeadId);
   if (!record) return;
-  const printWindow = window.open('', '_blank', 'width=980,height=1100');
-  if (!printWindow) {
-    toast('Pop-up bloqueado. Permita pop-ups para baixar o PDF.');
-    return;
-  }
-  printWindow.document.write(renderLeadPdfHtml(record));
-  printWindow.document.close();
-  printWindow.focus();
-  toast('Relatório aberto. Use o botão "Salvar PDF" na nova aba.');
+  openPreviewModal(
+    renderLeadPdfHtml(record),
+    `Relatório · ${record.empresa || record.nome || 'Lead'}`,
+  );
+  toast('Prévia aberta. Use Salvar PDF para exportar.');
 }
 function openQaPopup() {
   const record = state.records.find((item) => item.leadId === state.selectedLeadId);
   if (!record) return;
-  const qaWindow = window.open('', '_blank', 'width=980,height=1000');
-  if (!qaWindow) {
-    toast('Pop-up bloqueado. Permita pop-ups para abrir perguntas/respostas.');
-    return;
-  }
-  qaWindow.document.write(renderQaPopupHtml(record));
-  qaWindow.document.close();
-  qaWindow.focus();
+  openPreviewModal(
+    renderQaPopupHtml(record),
+    `Perguntas e respostas · ${record.empresa || record.nome || 'Lead'}`,
+  );
 }
 function buildConversationTurns(record) {
   const text = String(record.conversation || '').trim();
@@ -1037,7 +1409,7 @@ function renderQaCards(record, limit = Infinity) {
           </div>
         </div>
       `).join('')}
-      ${hidden ? `<button class="icon" onclick="openQaPopup()" type="button">Ver mais ${hidden} resposta${hidden === 1 ? '' : 's'}</button>` : ''}
+      ${hidden ? `<button class="icon" data-drawer-action="qa" type="button">Ver mais ${hidden} resposta${hidden === 1 ? '' : 's'}</button>` : ''}
     </div>
   `;
 }
@@ -1060,14 +1432,10 @@ function renderQaPopupHtml(record) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Perguntas e respostas · ${escapeHtml(record.empresa || record.nome || 'Lead')}</title>
+<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-body{background:#f6f4ef;color:#111;font-family:Arial,sans-serif;margin:0;line-height:1.55}
-.wrap{max-width:920px;margin:0 auto;padding:34px 22px 56px}.top{align-items:flex-start;display:flex;gap:18px;justify-content:space-between;margin-bottom:22px}
-.eyebrow{color:#9b7400;font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}h1{font-size:34px;letter-spacing:-.04em;margin:5px 0}h2{font-size:18px;letter-spacing:-.02em;line-height:1.3;margin:8px 0 0}
-.muted{color:#666;font-size:13px}.actions{display:flex;gap:8px;position:sticky;top:12px}.btn{background:#111;border:0;border-radius:10px;color:#fff;cursor:pointer;font-weight:800;padding:10px 13px}
-.btn.secondary{background:#fff;border:1px solid #ddd;color:#111}.qa-list{display:grid;gap:14px}.qa-card{background:#fff;border:1px solid #ddd;border-radius:16px;box-shadow:0 12px 28px rgba(0,0,0,.05);padding:18px}
-.answer{background:#f8f8f8;border-left:4px solid #FBBE0A;border-radius:12px;margin-top:14px;padding:14px}.answer p{margin:6px 0 0;white-space:pre-wrap}
-@media print{.actions{display:none}body{background:#fff}.wrap{padding:18px}.qa-card{break-inside:avoid;box-shadow:none}}
+${getPrintDocumentStyles()}
+.answer p { margin: 6px 0 0; white-space: pre-wrap; }
 </style>
 </head>
 <body>
@@ -1442,19 +1810,9 @@ function renderLeadPdfHtml(record) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Relatório · ${escapeHtml(record.empresa || record.nome || 'Lead')}</title>
+<link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-body{background:#f6f4ef;color:#111;font-family:Arial,sans-serif;margin:0;line-height:1.5}
-.wrap{max-width:1040px;margin:0 auto;padding:32px 22px 56px}.top{align-items:flex-start;display:flex;gap:18px;justify-content:space-between;margin-bottom:20px}
-.actions{display:flex;gap:8px;position:sticky;top:12px;z-index:2}.btn{background:#111;border:0;border-radius:10px;color:#fff;cursor:pointer;font-weight:800;padding:10px 13px}.btn.secondary{background:#fff;border:1px solid #ddd;color:#111}
-.hero{background:#111;border-radius:22px;color:#fff;padding:26px}.eyebrow,.label{color:#9b7400;font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
-h1{font-size:38px;letter-spacing:-.04em;line-height:1;margin:7px 0}h2{border-top:1px solid #ddd;font-size:15px;letter-spacing:.1em;margin:24px 0 12px;padding-top:18px;text-transform:uppercase}
-.hero .muted{color:#bbb}.muted{color:#666;font-size:13px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
-.box{background:#fff;border:1px solid #ddd;border-radius:14px;padding:12px}.value{font-weight:800;margin-top:4px;word-break:break-word}
-.score-row{align-items:center;display:grid;gap:18px;grid-template-columns:140px 1fr}.score{color:#C99703;font-size:54px;font-weight:900;letter-spacing:-.06em}
-table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:8px;text-align:left;vertical-align:top}th{background:#f4f4f4}
-.pre{background:#fff;border:1px solid #ddd;border-radius:14px;padding:14px;white-space:pre-wrap}.qa-list{display:grid;gap:12px}.qa-card{background:#fff;border:1px solid #ddd;border-radius:16px;break-inside:avoid;padding:16px}.question{font-size:16px;font-weight:800;line-height:1.35;margin-top:6px}.answer{background:#f8f8f8;border-left:4px solid #FBBE0A;border-radius:12px;margin-top:12px;padding:12px;white-space:pre-wrap}
-@media print{body{background:#fff}.wrap{max-width:none;padding:18px}.actions{display:none}.hero,.box,.pre,.qa-card{box-shadow:none}h2{break-after:avoid}.qa-card,.box{break-inside:avoid}}
-@media(max-width:760px){.top{display:block}.actions{margin-top:12px}.grid{grid-template-columns:1fr}.score-row{grid-template-columns:1fr}}
+${getPrintDocumentStyles()}
 </style>
 </head>
 <body>
@@ -1548,6 +1906,11 @@ function escapeHtml(value) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+setView(state.view, false);
+if (useFixture) loadDashboard();
+else if (state.token) loadDashboard();
+else showAuth();
 </script>
 </body>
 </html>

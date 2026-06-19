@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-06-19
+
+### Fixed
+- PDF do dashboard (`Abrir PDF`) reescrito em modo papel do brandbook: fundo claro, texto ink (#0A0A0A), labels legíveis e `print-color-adjust: exact` — elimina dourado escuro (#9b7400) sobre hero preto que tornava o texto ilegível na impressão.
+- Popup de perguntas/respostas usa a mesma folha de estilos de impressão compartilhada.
+
+### Changed
+- Dashboard alinhado ao design system Masterboard: Funnel Display, tokens ink/gold/muted do brandbook e contraste reforçado em textos secundários, pills e drawer.
+- Drawer ganhou backdrop escuro com clique fora para fechar e estados `:focus-visible` nos controles interativos.
+- Navegação sempre visível; home exibe contadores reais por área; drawer reorganizado em blocos (principal, comercial, risco).
+- Tabela de leads com menu `⋯` para ações secundárias, indicadores de ordenação e botão "Copiar selecionados" desabilitado sem seleção.
+- Kanban com 5 colunas corretas; exclusão removida dos cards (fica no drawer).
+- Modo `?fixture=1` para auditoria visual local com dados de demonstração.
+- Criado `lib/dashboard-brand.mjs` como fonte única de tokens e estilos de impressão, com testes em `test/dashboard-brand.test.js`.
+
+### Fixed
+- Inicialização do dashboard corrigida: `loadDashboard()` agora roda após helpers de localização, evitando tela vazia.
+- Handlers do drawer corrigidos após migração para `type="module"` (delegação de eventos em vez de `onclick` global).
+
+### Changed (iteração UX)
+- Empty states do kanban e insights com mensagem contextual e CTA (ir para Leads, limpar filtros, etc.).
+- Tabelas com hint “Role para ver mais colunas” e fade lateral quando há scroll horizontal.
+- Prévia PDF/Q&A inline em modal com iframe (sem dependência de pop-up).
+- Topbar mobile colapsável em “Ações do cockpit”.
+- Helpers de UI em `lib/dashboard-ui.mjs` com testes em `test/dashboard-ui.test.js`.
+
+### Changed (prévia e polish)
+- Prévia PDF/Q&A via blob URL com estado de carregamento, botão **Nova aba** e painel fullscreen no mobile.
+- Empty state da tabela de Leads com CTA (limpar filtros ou voltar ao início).
+- Script `npm run audit:dashboard` e screenshots do conteúdo do iframe na auditoria visual.
+
 ## 2026-06-16
 
 ### Changed
