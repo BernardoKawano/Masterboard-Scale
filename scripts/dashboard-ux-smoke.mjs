@@ -69,6 +69,8 @@ async function main() {
   await page.waitForSelector('#kanbanPage.active .kanban-col[data-pipeline-stage]');
   const kanbanCols = await page.locator('.kanban-col[data-pipeline-stage]').count();
   if (kanbanCols !== 6) errors.push(`Kanban deveria ter 6 colunas, tem ${kanbanCols}`);
+  const dragHandles = await page.locator('.kanban-drag-handle').count();
+  if (dragHandles < 1) errors.push('Kanban sem alça de arraste nos cards');
 
   await page.click('[data-view="acceptances"]');
   await page.waitForSelector('#acceptancesPage.active');

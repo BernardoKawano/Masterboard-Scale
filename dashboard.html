@@ -203,9 +203,53 @@ tr:hover td:first-child { background: rgba(20, 18, 12, 0.98); }
 .kanban-col.drop-target { border-color: rgba(251,190,10,0.55); box-shadow: inset 0 0 0 1px rgba(251,190,10,0.35); }
 .kanban-title { align-items: center; display: flex; font-size: 12px; font-weight: 900; justify-content: space-between; letter-spacing: 0.08em; margin-bottom: 10px; text-transform: uppercase; }
 .kanban-stage-dot { border-radius: 999px; flex: 0 0 auto; height: 8px; width: 8px; }
-.kanban-card { cursor: grab; touch-action: none; user-select: none; }
-.kanban-card.dragging { cursor: grabbing; opacity: 0.55; }
-.kanban-card:active { cursor: grabbing; }
+.kanban-card.mini {
+  cursor: default;
+  margin-bottom: 8px;
+  overflow: hidden;
+  padding: 0;
+}
+.kanban-card.dragging { opacity: 0.58; }
+.kanban-drag-handle {
+  align-items: center;
+  background:
+    radial-gradient(circle at 1px 1px, rgba(251, 190, 10, 0.34) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+  background-size: 8px 8px, 100% 100%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: grab;
+  display: flex;
+  justify-content: center;
+  min-height: 30px;
+  padding: 7px 10px;
+  touch-action: none;
+  user-select: none;
+}
+.kanban-drag-handle:hover { background-color: rgba(251, 190, 10, 0.08); }
+.kanban-drag-handle:active,
+.kanban-card.dragging .kanban-drag-handle { cursor: grabbing; }
+.kanban-drag-grip {
+  background-image: radial-gradient(circle, rgba(251, 190, 10, 0.72) 1.5px, transparent 1.6px);
+  background-position: center;
+  background-size: 8px 8px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+  height: 14px;
+  opacity: 0.9;
+  width: 34px;
+}
+.kanban-card-body {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  padding: 10px 12px 12px;
+  text-align: left;
+  width: 100%;
+}
+.kanban-card-body:hover { background: rgba(251, 190, 10, 0.04); }
 .mini { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; margin-bottom: 8px; padding: 12px; }
 .mini:hover { border-color: rgba(251,190,10,0.35); }
 
@@ -1169,13 +1213,18 @@ function renderKanban() {
           <span>${items.length}</span>
         </div>
         ${items.slice(0, 80).map((record) => `
-          <div class="kanban-card mini" draggable="true" data-lead-id="${escapeHtml(record.leadId)}" role="button" tabindex="0" aria-label="Mover ${escapeHtml(record.nome || 'lead')}">
-            <div style="display:flex;justify-content:space-between;gap:8px">
-              <strong>${escapeHtml(record.nome || 'Lead sem nome')}</strong>
-              <span class="score">${escapeHtml(isDealAcceptance(record) ? (record.produto || 'Aceite') : (record.score || '-'))}</span>
+          <div class="kanban-card mini" data-lead-id="${escapeHtml(record.leadId)}">
+            <div class="kanban-drag-handle" draggable="true" title="Arrastar para outro estágio" aria-label="Arrastar ${escapeHtml(record.nome || 'lead')} para outro estágio">
+              <span class="kanban-drag-grip" aria-hidden="true"></span>
             </div>
-            <div class="muted">${escapeHtml(record.empresa || record.email || '-')}</div>
-            <div style="margin-top:8px">${pipelineStagePill(record)} ${scorePill(record)} <span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${commercialPill(record)}</div>
+            <button class="kanban-card-body" type="button">
+              <div style="display:flex;justify-content:space-between;gap:8px">
+                <strong>${escapeHtml(record.nome || 'Lead sem nome')}</strong>
+                <span class="score">${escapeHtml(isDealAcceptance(record) ? (record.produto || 'Aceite') : (record.score || '-'))}</span>
+              </div>
+              <div class="muted">${escapeHtml(record.empresa || record.email || '-')}</div>
+              <div style="margin-top:8px">${pipelineStagePill(record)} ${scorePill(record)} <span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${commercialPill(record)}</div>
+            </button>
           </div>
         `).join('') || kanbanEmptyState(stage.id)}
       </div>
