@@ -2,7 +2,15 @@
 
 ## 2026-06-19
 
-### Fixed
+### Added
+- Aba **Pipeline** no dashboard com funil comercial de 6 estágios (Prospecção → Assinado + Sem fit): barras coloridas, contagem por estágio, lista operacional e métricas de conversão.
+- Campo persistido `pipelineStage` / `pipelineStageAt` no blob, com inferência automática para registros legados e ação `set_pipeline_stage` via PATCH do dashboard.
+- Módulo `lib/dashboard-pipeline.mjs` e testes em `test/dashboard-pipeline.test.js`.
+
+### Changed
+- A aba Funil analítica foi substituída pelo pipeline comercial; estágio ajustável no drawer do lead.
+
+## 2026-06-19 (anterior)
 - PDF do dashboard (`Abrir PDF`) reescrito em modo papel do brandbook: fundo claro, texto ink (#0A0A0A), labels legíveis e `print-color-adjust: exact` — elimina dourado escuro (#9b7400) sobre hero preto que tornava o texto ilegível na impressão.
 - Popup de perguntas/respostas usa a mesma folha de estilos de impressão compartilhada.
 

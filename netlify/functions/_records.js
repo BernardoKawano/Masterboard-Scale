@@ -5,6 +5,15 @@ const RECORD_PREFIX = 'leads/';
 const DEAL_ACCEPTANCE_PRODUCTS = ['Scale', 'Masterboard Club', 'Combo Club + Scale'];
 const DEAL_ACCEPTANCE_PAYMENT_OPTIONS = ['Cartão - à vista', 'Cartão - parcelado'];
 
+const PIPELINE_STAGE_IDS = new Set([
+  'prospeccao',
+  'diagnostico_enviado',
+  'reuniao_diagnostico',
+  'negociacao',
+  'assinado',
+  'sem_fit',
+]);
+
 const STATUS_RANK = {
   captured: 1,
   started: 2,
@@ -392,8 +401,13 @@ function createErrorPatch(formData = {}, error, now = new Date()) {
   };
 }
 
-function createAdminPatch(leadId, action, now = new Date()) {
+function createAdminPatch(leadId, action, options = {}) {
   const normalizedLeadId = cleanString(leadId);
+  const now = options instanceof Date
+    ? options
+    : options.now instanceof Date
+      ? options.now
+      : new Date(options.now || Date.now());
   const at = timestamp(now);
 
   if (!normalizedLeadId) throw new Error('leadId ausente para acao administrativa');
@@ -424,6 +438,8 @@ function createAdminPatch(leadId, action, now = new Date()) {
       convertedAt: at,
       soldAt: at,
       lostAt: '',
+      pipelineStage: 'assinado',
+      pipelineStageAt: at,
       events: [{ type: 'dashboard_marked_won', at }],
     };
   }
@@ -449,6 +465,21 @@ function createAdminPatch(leadId, action, now = new Date()) {
       soldAt: '',
       lostAt: '',
       events: [{ type: 'dashboard_cleared_commercial_status', at }],
+    };
+  }
+
+  if (action === 'set_pipeline_stage') {
+    const stage = cleanString(options.stage);
+    if (!PIPELINE_STAGE_IDS.has(stage)) {
+      throw new Error('Estagio de pipeline invalido');
+    }
+
+    return {
+      leadId: normalizedLeadId,
+      updatedAt: at,
+      pipelineStage: stage,
+      pipelineStageAt: at,
+      events: [{ type: 'dashboard_pipeline_stage_set', at, stage }],
     };
   }
 
@@ -518,6 +549,8 @@ function summarizeRecord(record) {
     soldAt: record.soldAt || '',
     lostAt: record.lostAt || '',
     deletedAt: record.deletedAt || '',
+    pipelineStage: record.pipelineStage || '',
+    pipelineStageAt: record.pipelineStageAt || '',
     nome: report.nome || form.nome || '',
     empresa: report.empresa || form.empresa || '',
     email: report.email || form.email || '',

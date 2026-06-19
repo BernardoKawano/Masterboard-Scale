@@ -187,11 +187,23 @@ tr:hover td { background: rgba(251,190,10,0.035); }
 .mini { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; margin-bottom: 8px; padding: 12px; }
 .mini:hover { border-color: rgba(251,190,10,0.35); }
 
-.funnel { display: grid; gap: 12px; }
-.funnel-step { align-items: center; display: grid; gap: 12px; grid-template-columns: 210px 1fr 132px; }
-.funnel-step > .muted { color: var(--muted-2); font-size: 11px; font-weight: 700; text-align: right; }
-.funnel-bar { background: rgba(255,255,255,0.06); border-radius: 999px; height: 34px; overflow: hidden; }
-.funnel-fill { align-items: center; background: linear-gradient(90deg,var(--yellow),var(--yellow-2)); color: #000; display: flex; font-size: 12px; font-weight: 900; height: 100%; min-width: 34px; padding: 0 12px; }
+.commercial-pipeline { display: grid; gap: 14px; }
+.commercial-pipeline > .metric-label { color: var(--muted-2); font-size: 11px; font-weight: 900; letter-spacing: 0.14em; margin-bottom: 2px; text-transform: uppercase; }
+.commercial-pipeline-row { align-items: center; cursor: pointer; display: grid; gap: 12px; grid-template-columns: minmax(160px, 220px) 1fr 48px; padding: 4px 2px; border-radius: 10px; }
+.commercial-pipeline-row:hover { background: rgba(255,255,255,0.03); }
+.commercial-pipeline-row.active { background: rgba(251,190,10,0.08); outline: 1px solid rgba(251,190,10,0.22); }
+.commercial-pipeline-row.muted-row .commercial-pipeline-label strong { color: var(--muted); }
+.commercial-pipeline-label { align-items: center; display: flex; gap: 10px; min-width: 0; }
+.commercial-pipeline-label strong { font-size: 13px; font-weight: 800; }
+.commercial-pipeline-dot { border-radius: 999px; flex: 0 0 auto; height: 10px; width: 10px; }
+.commercial-pipeline-bar { background: rgba(255,255,255,0.06); border-radius: 999px; height: 12px; overflow: hidden; }
+.commercial-pipeline-fill { border-radius: 999px; height: 100%; min-width: 0; transition: width 0.2s ease; }
+.commercial-pipeline-count { color: var(--text); font-size: 14px; font-weight: 900; text-align: right; }
+.pipeline-footer { color: var(--muted-2); font-size: 11px; font-weight: 700; line-height: 1.5; margin-top: 4px; }
+.pipeline-leads-title { color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: 0.14em; margin-bottom: 12px; text-transform: uppercase; }
+.pipeline-lead { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; margin-bottom: 8px; padding: 12px; }
+.pipeline-lead:hover { border-color: rgba(251,190,10,0.35); }
+.drawer-actions-block .btn.stage-active { border-color: rgba(251,190,10,0.55); color: var(--yellow); }
 .acceptance-summary { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 14px; }
 .acceptance-copy { color: var(--muted-2); font-size: 12px; line-height: 1.5; }
 .insights { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -333,7 +345,7 @@ th.sorted { color: var(--yellow); }
   .metrics, .filters, .nav-cards, .detail-grid { grid-template-columns: 1fr; }
   .view-intro { align-items: flex-start; flex-direction: column; }
   .kanban { grid-template-columns: 1fr; }
-  .funnel-step { grid-template-columns: 1fr; }
+  .commercial-pipeline-row { grid-template-columns: 1fr; }
   .preview-panel {
     border-radius: 0;
     height: 100vh;
@@ -386,7 +398,7 @@ th.sorted { color: var(--yellow); }
       <button class="nav-btn" data-view="leads" type="button"><span class="material-symbols-rounded" aria-hidden="true">groups</span><strong>Leads</strong><span>Lista pesquisável</span></button>
       <button class="nav-btn" data-view="kanban" type="button"><span class="material-symbols-rounded" aria-hidden="true">view_kanban</span><strong>Kanban</strong><span>Por prioridade</span></button>
       <button class="nav-btn" data-view="acceptances" type="button"><span class="material-symbols-rounded" aria-hidden="true">handshake</span><strong>Aceites</strong><span>Fechamentos</span></button>
-      <button class="nav-btn" data-view="pipeline" type="button"><span class="material-symbols-rounded" aria-hidden="true">monitoring</span><strong>Funil</strong><span>Conversão</span></button>
+      <button class="nav-btn" data-view="pipeline" type="button"><span class="material-symbols-rounded" aria-hidden="true">monitoring</span><strong>Pipeline</strong><span>Processo comercial</span></button>
       <button class="nav-btn" data-view="insights" type="button"><span class="material-symbols-rounded" aria-hidden="true">query_stats</span><strong>Insights</strong><span>Região e padrões</span></button>
     </nav>
 
@@ -477,7 +489,10 @@ th.sorted { color: var(--yellow); }
         </div>
       </div>
     </section>
-    <section class="page" id="pipelinePage"><div class="card" style="padding:18px"><div class="funnel" id="funnel"></div></div></section>
+    <section class="page" id="pipelinePage">
+      <div class="card" style="padding:18px"><div class="commercial-pipeline" id="commercialPipeline"></div></div>
+      <div class="card" style="margin-top:12px;padding:18px" id="pipelineLeads"></div>
+    </section>
     <section class="page" id="insightsPage"><div class="insights" id="insights"></div></section>
   </section>
 </main>
@@ -505,6 +520,17 @@ th.sorted { color: var(--yellow); }
 <script type="module">
 import { getPrintDocumentStyles } from './lib/dashboard-brand.mjs';
 import { getDashboardFixturePayload } from './lib/dashboard-fixture.mjs';
+import {
+  PIPELINE_STAGES,
+  barWidth,
+  conversionRate,
+  countActivePipelineLeads,
+  countByStage,
+  countLostCommercial,
+  filterRecordsByStage,
+  getPipelineStageMeta,
+  resolvePipelineStage,
+} from './lib/dashboard-pipeline.mjs';
 import { buildEmptyStateHtml, hasActiveDashboardFilters, shouldShowScrollHint } from './lib/dashboard-ui.mjs';
 import { createPreviewBlobUrl, revokePreviewBlobUrl } from './lib/dashboard-preview.mjs';
 
@@ -521,6 +547,7 @@ const state = {
   revenue: 'all',
   sort: { key: 'createdAt', dir: 'desc' },
   view: 'home',
+  pipelineStageFilter: '',
   previewHtml: '',
   previewObjectUrl: '',
 };
@@ -677,6 +704,8 @@ function normalizeRecord(record) {
     soldAt: record.soldAt || '',
     lostAt: record.lostAt || '',
     deletedAt: record.deletedAt || '',
+    pipelineStage: record.pipelineStage || '',
+    pipelineStageAt: record.pipelineStageAt || '',
   };
 }
 
@@ -784,7 +813,7 @@ function renderAll() {
   if (state.view === 'leads') renderTable();
   if (state.view === 'kanban') renderKanban();
   if (state.view === 'acceptances') renderAcceptances();
-  if (state.view === 'pipeline') renderFunnel();
+  if (state.view === 'pipeline') renderCommercialPipeline();
   if (state.view === 'insights') renderInsights();
 }
 
@@ -797,7 +826,7 @@ function renderViewIntro() {
     leads: ['Operação', 'Leads', 'Lista completa para busca, filtro, seleção e ações comerciais em lote.', `${visible.length} visíveis`],
     kanban: ['Prioridade', 'Kanban', 'Fila operacional por prioridade. Use para decidir a próxima ação do time.', `${visible.length} cards`],
     acceptances: ['Fechamento', 'Aceites', 'Registros recebidos via formulário de aceite, com dados jurídicos e próximos passos.', `${accepted} aceites`],
-    pipeline: ['Conversão', 'Funil', 'Visão entre captura, diagnóstico, qualificação, aceite e resultado comercial.', `${visible.length} registros`],
+    pipeline: ['Comercial', 'Pipeline', 'Estágios do processo comercial — da prospecção ao fechamento ou desqualificação.', `${countActivePipelineLeads(visible)} ativos`],
     insights: ['Análise', 'Insights', 'Padrões por região, produto, pagamento, resultado e gargalos recorrentes.', `${visible.length} registros`],
   }[state.view] || ['Dashboard', 'Cockpit', 'Cockpit comercial Masterboard x ScaleCo.', `${visible.length} registros`];
 
@@ -866,14 +895,14 @@ function renderHome() {
     leads: all.length,
     kanban: all.filter((record) => record.status === 'completed' || isDealAcceptance(record)).length,
     acceptances: all.filter(isDealAcceptance).length,
-    pipeline: all.length,
+    pipeline: countActivePipelineLeads(all),
     insights: all.filter((record) => record.score > 0).length,
   };
   const cards = [
     ['leads', 'groups', 'Leads', 'Consultar cadastro completo, buscar empresas e executar ações comerciais.', `${counts.leads} registros`],
     ['kanban', 'view_kanban', 'Kanban', 'Priorizar a próxima ação por estágio, temperatura e aceite.', `${counts.kanban} no funil`],
     ['acceptances', 'handshake', 'Aceites', 'Ver fechamentos recebidos, dados jurídicos e próximos passos.', `${counts.acceptances} aceites`],
-    ['pipeline', 'monitoring', 'Funil', 'Entender conversão entre captura, diagnóstico, aceite e resultado.', `${counts.pipeline} etapas`],
+    ['pipeline', 'monitoring', 'Pipeline', 'Acompanhar prospecção, diagnóstico, negociação e fechamentos.', `${counts.pipeline} ativos`],
     ['insights', 'query_stats', 'Insights', 'Analisar padrões de região, produto, pagamento e gargalos.', `${counts.insights} com score`],
   ];
   $('homeCards').innerHTML = cards.map(([view, icon, title, copy, value]) => `
@@ -1166,35 +1195,74 @@ function renderAcceptances() {
   bindAdminActions();
   bindTableScrollHints();
 }
-function renderFunnel() {
-  const all = filteredRecords();
-  const completed = all.filter((record) => record.status === 'completed');
-  const accepted = all.filter(isDealAcceptance);
-  const qualified = completed.filter((record) => record.score >= 50);
-  const hot = completed.filter((record) => record.score >= 60);
-  const won = all.filter(isWon);
-  const lost = all.filter(isLost);
-  const pendingOutcome = all.filter((record) => !isWon(record) && !isLost(record));
-  const highRevenue = all.filter((record) => revenueMatch(record.faturamento, 'high'));
-  const steps = [
-    ['Leads capturados', all.length],
-    ['Diagnósticos concluídos', completed.length],
-    ['Qualificados (score 50+)', qualified.length],
-    ['Prioridade alta (score 60+)', hot.length],
-    ['Aceites recebidos', accepted.length],
-    ['Deram certo', won.length],
-    ['Não deram certo', lost.length],
-    ['Sem resultado', pendingOutcome.length],
-    ['Alto faturamento', highRevenue.length],
-  ];
-  const max = Math.max(...steps.map((step) => step[1]), 1);
-  $('funnel').innerHTML = steps.map(([label, value], index) => `
-    <div class="funnel-step">
-      <strong>${escapeHtml(label)}</strong>
-      <div class="funnel-bar"><div class="funnel-fill" style="width:${Math.max(7, value / max * 100)}%">${value}</div></div>
-      <span class="muted">${index ? `${pct(value, steps[index - 1][1])}% da etapa anterior` : 'Base do funil'}</span>
-    </div>
-  `).join('') + `<div class="muted" style="margin-top:8px">Relação deu certo/não deu: ${won.length}/${lost.length} · Taxa de acerto: ${pct(won.length, won.length + lost.length)}%</div>`;
+function renderCommercialPipeline() {
+  const rows = filteredRecords();
+  const counts = countByStage(rows);
+  const max = Math.max(...PIPELINE_STAGES.map((stage) => counts[stage.id]), 1);
+  const filter = state.pipelineStageFilter;
+
+  $('commercialPipeline').innerHTML = `
+    <div class="metric-label">Funil de conversão</div>
+    ${PIPELINE_STAGES.map((stage) => `
+      <div class="commercial-pipeline-row ${filter === stage.id ? 'active' : ''} ${stage.muted ? 'muted-row' : ''}" data-pipeline-stage="${escapeHtml(stage.id)}" role="button" tabindex="0" aria-pressed="${filter === stage.id}">
+        <div class="commercial-pipeline-label">
+          <span class="commercial-pipeline-dot" style="background:${stage.color}"></span>
+          <strong>${escapeHtml(stage.label)}</strong>
+        </div>
+        <div class="commercial-pipeline-bar"><div class="commercial-pipeline-fill" style="width:${barWidth(counts[stage.id], max)}%;background:${stage.color}"></div></div>
+        <div class="commercial-pipeline-count">${counts[stage.id]}</div>
+      </div>
+    `).join('')}
+    <div class="pipeline-footer">Conversão ativa: ${conversionRate(rows)}% · Sem fit: ${counts.sem_fit} · Não deu certo: ${countLostCommercial(rows)}</div>
+  `;
+
+  document.querySelectorAll('[data-pipeline-stage]').forEach((element) => {
+    const selectStage = () => {
+      const stageId = element.dataset.pipelineStage;
+      state.pipelineStageFilter = state.pipelineStageFilter === stageId ? '' : stageId;
+      renderCommercialPipeline();
+    };
+    element.addEventListener('click', selectStage);
+    element.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        selectStage();
+      }
+    });
+  });
+
+  renderPipelineLeadsList(rows);
+}
+function renderPipelineLeadsList(rows) {
+  const container = $('pipelineLeads');
+  const stageId = state.pipelineStageFilter;
+  if (!stageId) {
+    container.innerHTML = buildEmptyStateHtml('Clique em um estágio acima para ver os leads correspondentes.', 'Ir para Leads', 'leads');
+    container.querySelectorAll('[data-empty-action]').forEach((element) => {
+      element.addEventListener('click', () => navigateEmptyState(element.dataset.emptyAction));
+    });
+    return;
+  }
+
+  const meta = getPipelineStageMeta(stageId);
+  const items = filterRecordsByStage(rows, stageId);
+  container.innerHTML = `
+    <div class="pipeline-leads-title">${escapeHtml(meta?.label || stageId)} · ${items.length}</div>
+    ${items.length ? items.slice(0, 80).map((record) => `
+      <div class="pipeline-lead" data-open="${escapeHtml(record.leadId)}">
+        <div style="display:flex;justify-content:space-between;gap:8px">
+          <strong>${escapeHtml(record.nome || 'Lead sem nome')}</strong>
+          <span class="score">${escapeHtml(isDealAcceptance(record) ? (record.produto || 'Aceite') : (record.score || '-'))}</span>
+        </div>
+        <div class="muted">${escapeHtml(record.empresa || record.email || '-')}</div>
+        <div style="margin-top:8px">${scorePill(record)} <span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${commercialPill(record)}</div>
+      </div>
+    `).join('') : buildEmptyStateHtml('Nenhum lead neste estágio com os filtros atuais.', 'Limpar filtros', 'clear')}
+  `;
+  document.querySelectorAll('#pipelineLeads [data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
+  container.querySelectorAll('[data-empty-action]').forEach((element) => {
+    element.addEventListener('click', () => navigateEmptyState(element.dataset.emptyAction));
+  });
 }
 function renderInsights() {
   const rows = filteredRecords();
@@ -1240,6 +1308,7 @@ function openDrawer(id) {
   state.selectedLeadId = id;
   const report = record.report || {};
   const isAcceptance = isDealAcceptance(record);
+  const currentPipelineStage = resolvePipelineStage(record);
   $('drawer').innerHTML = `
     <div class="drawer-head">
       <div>
@@ -1259,6 +1328,14 @@ function openDrawer(id) {
           ${isAcceptance ? '' : '<button class="btn secondary" data-drawer-action="qa" type="button">Perguntas/respostas</button>'}
           <button class="btn secondary" data-drawer-action="copy" type="button">Copiar dados</button>
           ${record.email ? `<a class="btn secondary" href="mailto:${escapeHtml(record.email)}">Email</a>` : ''}
+        </div>
+      </div>
+      <div>
+        <div class="drawer-actions-label">Estágio comercial</div>
+        <div class="drawer-actions-block">
+          ${PIPELINE_STAGES.map((stage) => `
+            <button class="btn secondary ${currentPipelineStage === stage.id ? 'stage-active' : ''}" data-drawer-action="set_pipeline_stage" data-stage="${escapeHtml(stage.id)}" type="button">${escapeHtml(stage.label)}</button>
+          `).join('')}
         </div>
       </div>
       <div>
@@ -1290,6 +1367,7 @@ function openDrawer(id) {
       ${fact('Endereço', record.endereco)}
       ${fact('Score', record.score || '-')}
       ${fact('Nível', record.nivel || '-')}
+      ${fact('Estágio comercial', getPipelineStageMeta(currentPipelineStage)?.label || currentPipelineStage)}
       ${fact('Resultado comercial', labelCommercial(record))}
       ${fact('Aceite em', record.acceptedAt ? formatDate(record.acceptedAt) : '-')}
       ${fact('Resultado em', outcomeDate(record) ? formatDate(outcomeDate(record)) : '-')}
@@ -1328,6 +1406,10 @@ $('drawer').addEventListener('click', (event) => {
   else if (action === 'pdf') downloadLeadPdf();
   else if (action === 'qa') openQaPopup();
   else if (action === 'copy') copyCurrent();
+  else if (action === 'set_pipeline_stage') {
+    const stage = button.dataset.stage;
+    if (stage) patchDashboardRecord(state.selectedLeadId, action, { stage });
+  }
   else if (action) markCurrentLead(action);
 });
 function copyCurrent() { copyText(formatLeadText(state.records.find((record) => record.leadId === state.selectedLeadId))); }
@@ -1468,7 +1550,7 @@ function bindAdminActions() {
     patchDashboardRecord(element.dataset.id, element.dataset.admin);
   }));
 }
-async function patchDashboardRecord(leadId, action) {
+async function patchDashboardRecord(leadId, action, extra = {}) {
   const messages = {
     delete: 'Excluir este card do dashboard? O registro ficará preservado no histórico para restauração técnica.',
     mark_converted: 'Marcar este lead como deu certo?',
@@ -1486,7 +1568,7 @@ async function patchDashboardRecord(leadId, action) {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
-      body: JSON.stringify({ leadId, action }),
+      body: JSON.stringify({ leadId, action, stage: extra.stage }),
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(payload.error || 'Não foi possível atualizar o lead.');
@@ -1499,7 +1581,7 @@ async function patchDashboardRecord(leadId, action) {
       openDrawer(leadId);
     }
     renderAll();
-    toast(labelAdminAction(action));
+    toast(extra.stage ? labelPipelineStageAction(extra.stage) : labelAdminAction(action));
   } catch (error) {
     toast(error.message);
   }
@@ -1518,7 +1600,12 @@ function labelAdminAction(action) {
     mark_won: 'Lead marcado como deu certo',
     mark_lost: 'Lead marcado como não deu certo',
     clear_commercial_status: 'Resultado comercial limpo',
+    set_pipeline_stage: 'Estágio comercial atualizado',
   }[action] || 'Lead atualizado';
+}
+function labelPipelineStageAction(stageId) {
+  const meta = getPipelineStageMeta(stageId);
+  return meta ? `Estágio: ${meta.label}` : 'Estágio comercial atualizado';
 }
 function fact(label, value) { return `<div class="fact"><div class="fact-label">${escapeHtml(label)}</div><div class="fact-value">${escapeHtml(value || '-')}</div></div>`; }
 function renderAcceptanceDetail(record) {

@@ -8,6 +8,8 @@ test('fixture cobre estados principais do dashboard', () => {
   assert.ok(statuses.has('completed'));
   assert.ok(statuses.has('captured'));
   assert.ok(statuses.has('deal_accepted'));
+  assert.ok(records.some((record) => record.pipelineStage === 'reuniao_diagnostico'));
+  assert.ok(records.some((record) => record.pipelineStage === 'sem_fit'));
 });
 
 test('payload de fixture inclui metadados de listagem', () => {
