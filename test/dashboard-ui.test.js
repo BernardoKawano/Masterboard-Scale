@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   buildEmptyStateHtml,
+  buildFilterBannerHtml,
   hasActiveDashboardFilters,
   shouldShowScrollHint,
 } from '../lib/dashboard-ui.mjs';
@@ -18,6 +19,12 @@ test('empty state inclui CTA quando informado', () => {
   assert.match(html, /Sem dados/);
   assert.match(html, /data-empty-view="leads"/);
   assert.match(html, /Ir para Leads/);
+});
+
+test('banner de filtros ativos inclui limpar', () => {
+  const html = buildFilterBannerHtml();
+  assert.match(html, /Filtros da aba Leads/);
+  assert.match(html, /data-empty-action="clear"/);
 });
 
 test('detecta filtros ativos no dashboard', () => {

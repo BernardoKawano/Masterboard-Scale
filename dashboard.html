@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex,nofollow">
 <title>Dashboard · Scale Diagnostic</title>
@@ -62,6 +62,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, .nav-btn:focus-
 }
 
 .shell { width: min(1320px, calc(100vw - 32px)); margin: 0 auto; padding: 20px 0 44px; }
+.desktop-only { display: block; }
+.mobile-only { display: none; }
+.mobile-list { display: grid; gap: 10px; }
 .card { background: rgba(17,17,17,0.86); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 18px 54px rgba(0,0,0,0.20); }
 .kicker { color: var(--yellow); font-size: 10px; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; }
 .muted { color: var(--muted); font-size: 12px; line-height: 1.5; }
@@ -155,21 +158,48 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
   font-weight: 900;
   letter-spacing: 0.08em;
   padding: 6px 10px;
+  pointer-events: none;
   position: absolute;
   right: 12px;
   text-transform: uppercase;
   top: 10px;
   z-index: 5;
 }
-.table-scroll { max-height: calc(100vh - 285px); overflow: auto; }
-table { border-collapse: separate; border-spacing: 0; min-width: 1100px; width: 100%; }
-th, td { border-bottom: 1px solid var(--line); font-size: 12px; padding: 11px 12px; text-align: left; vertical-align: middle; }
+.table-scroll {
+  max-height: calc(100vh - 285px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-color: rgba(251, 190, 10, 0.55) rgba(255, 255, 255, 0.08);
+  scrollbar-width: thin;
+  touch-action: pan-x pan-y;
+}
+.table-scroll.can-scroll-x,
+.table-scroll-wrap.can-scroll-x .table-scroll { cursor: grab; }
+.table-scroll.is-dragging { cursor: grabbing; user-select: none; }
+.table-scroll.is-dragging * { cursor: grabbing; }
+.table-scroll::-webkit-scrollbar { height: 12px; width: 12px; }
+.table-scroll::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.06); border-radius: 999px; }
+.table-scroll::-webkit-scrollbar-thumb {
+  background: rgba(251, 190, 10, 0.5);
+  border: 2px solid rgba(17, 17, 17, 0.9);
+  border-radius: 999px;
+}
+.table-scroll::-webkit-scrollbar-thumb:hover { background: rgba(251, 190, 10, 0.72); }
+table { border-collapse: separate; border-spacing: 0; min-width: 1320px; width: 100%; }
+th, td { border-bottom: 1px solid var(--line); font-size: 12px; padding: 11px 12px; text-align: left; vertical-align: middle; white-space: nowrap; }
 th { background: rgba(17,17,17,0.98); color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 900; letter-spacing: 0.13em; position: sticky; text-transform: uppercase; top: 0; z-index: 2; }
 th:first-child, td:first-child { left: 0; position: sticky; z-index: 3; }
+th:first-child { z-index: 5; }
 td:first-child { background: rgba(17,17,17,0.98); }
+.table-scroll[data-scroll-x]:not([data-scroll-x="0"]) td:first-child,
+.table-scroll[data-scroll-x]:not([data-scroll-x="0"]) th:first-child {
+  box-shadow: 10px 0 18px rgba(0, 0, 0, 0.38);
+}
 tr:hover td { background: rgba(251,190,10,0.035); }
-.lead-name { font-size: 14px; font-weight: 900; }
-.lead-sub { color: var(--muted); font-size: 11px; margin-top: 3px; }
+tr:hover td:first-child { background: rgba(20, 18, 12, 0.98); }
+.lead-name { font-size: 14px; font-weight: 900; white-space: normal; min-width: 160px; }
+.lead-sub { color: var(--muted); font-size: 11px; margin-top: 3px; white-space: normal; }
 
 .pill { border: 1px solid var(--line); border-radius: 999px; color: var(--muted-2); display: inline-flex; font-size: 10px; font-weight: 900; letter-spacing: 0.12em; padding: 5px 8px; text-transform: uppercase; white-space: nowrap; }
 .pill.completed { border-color: rgba(34,197,94,0.36); color: var(--green); }
@@ -179,6 +209,7 @@ tr:hover td { background: rgba(251,190,10,0.035); }
 .pill.hot { border-color: rgba(239,68,68,0.36); color: var(--red); }
 .pill.warm { border-color: rgba(245,158,11,0.36); color: var(--orange); }
 .pill.cold { border-color: rgba(96,165,250,0.36); color: var(--blue); }
+.pill.muted { border-color: rgba(154,154,154,0.4); color: var(--muted); }
 .score { font-weight: 900; }
 
 .kanban { display: grid; gap: 12px; grid-template-columns: repeat(5, minmax(200px, 1fr)); overflow-x: auto; padding-bottom: 6px; }
@@ -200,6 +231,8 @@ tr:hover td { background: rgba(251,190,10,0.035); }
 .commercial-pipeline-fill { border-radius: 999px; height: 100%; min-width: 0; transition: width 0.2s ease; }
 .commercial-pipeline-count { color: var(--text); font-size: 14px; font-weight: 900; text-align: right; }
 .pipeline-footer { color: var(--muted-2); font-size: 11px; font-weight: 700; line-height: 1.5; margin-top: 4px; }
+.pipeline-hint { color: var(--muted-2); font-size: 12px; line-height: 1.5; margin-bottom: 2px; }
+.filter-banner { align-items: center; background: rgba(251,190,10,0.08); border: 1px solid rgba(251,190,10,0.22); border-radius: 12px; color: var(--muted-2); display: flex; flex-wrap: wrap; font-size: 12px; gap: 10px; justify-content: space-between; line-height: 1.45; margin-bottom: 12px; padding: 10px 12px; }
 .pipeline-leads-title { color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: 0.14em; margin-bottom: 12px; text-transform: uppercase; }
 .pipeline-lead { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; margin-bottom: 8px; padding: 12px; }
 .pipeline-lead:hover { border-color: rgba(251,190,10,0.35); }
@@ -217,6 +250,7 @@ tr:hover td { background: rgba(251,190,10,0.035); }
 .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
 .drawer { background: rgba(10,10,10,0.98); border-left: 1px solid var(--line); bottom: 0; box-shadow: -24px 0 80px rgba(0,0,0,0.38); max-width: 600px; overflow: auto; padding: 22px; position: fixed; right: 0; top: 0; transform: translateX(106%); transition: transform 0.22s ease; width: min(600px, 100vw); z-index: 20; }
 .drawer.open { transform: translateX(0); }
+.drawer-title { font-size: clamp(24px, 6vw, 34px); letter-spacing: -0.04em; line-height: 1.05; margin: 5px 0; }
 .drawer-head { align-items: flex-start; display: flex; gap: 14px; justify-content: space-between; margin-bottom: 16px; }
 .drawer-actions { display: grid; gap: 14px; margin-top: 14px; }
 .drawer-actions-block { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -323,6 +357,52 @@ th.sorted { color: var(--yellow); }
 .preview-frame { background: #fff; border: 0; display: block; height: 100%; width: 100%; }
 .error { color: var(--red); margin-top: 12px; }
 
+.lead-mobile-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto 1fr;
+  padding: 12px;
+}
+.lead-mobile-check { align-self: start; display: grid; padding-top: 4px; }
+.lead-mobile-check input { height: 18px; width: 18px; }
+.lead-mobile-body {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+.lead-mobile-head { align-items: flex-start; display: flex; gap: 10px; justify-content: space-between; }
+.lead-mobile-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.lead-mobile-facts {
+  display: grid;
+  gap: 8px 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 10px 0 0;
+}
+.lead-mobile-facts div { min-width: 0; }
+.lead-mobile-facts dt {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  margin-bottom: 3px;
+  text-transform: uppercase;
+}
+.lead-mobile-facts dd { font-size: 12px; font-weight: 700; margin: 0; word-break: break-word; }
+.lead-mobile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  grid-column: 1 / -1;
+}
+.acceptance-mobile-card { grid-template-columns: 1fr; }
+
 @media (max-width: 1180px) {
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -330,8 +410,11 @@ th.sorted { color: var(--yellow); }
   .kanban { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
 }
 @media (max-width: 760px) {
-  .shell { width: min(100vw - 18px, 1440px); padding-top: 14px; }
+  .shell { padding: 14px 0 calc(88px + env(safe-area-inset-bottom, 0px)); width: min(100vw - 18px, 1440px); }
+  .desktop-only { display: none !important; }
+  .mobile-only { display: block; }
   .topbar { align-items: stretch; flex-direction: column; }
+  .topbar h1 { font-size: clamp(22px, 7vw, 30px); }
   .topbar-compact-toggle { display: inline-flex; }
   .topbar-actions { display: none; justify-content: stretch; width: 100%; }
   .topbar-actions.open { display: flex; flex-direction: column; }
@@ -339,13 +422,70 @@ th.sorted { color: var(--yellow); }
   .actions { justify-content: stretch; }
   .actions .btn, .actions .btn.secondary { flex: 1; }
   .brand { align-items: flex-start; flex-direction: column; }
-  .brand img { width: 150px; }
+  .brand img { width: 132px; }
+  .nav {
+    background: rgba(10, 10, 10, 0.96);
+    border-radius: 18px 18px 0 0;
+    bottom: 0;
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.42);
+    left: 9px;
+    margin-bottom: 0;
+    padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px));
+    position: fixed;
+    right: 9px;
+    width: auto;
+    z-index: 15;
+  }
+  .nav-btn { flex: 1 1 auto; justify-content: center; min-height: 44px; padding: 8px 10px; }
+  .nav-btn strong { font-size: 11px; }
   .nav-btn span { display: none; }
   .home-panel-head { align-items: flex-start; flex-direction: column; }
   .metrics, .filters, .nav-cards, .detail-grid { grid-template-columns: 1fr; }
   .view-intro { align-items: flex-start; flex-direction: column; }
+  .view-stat { white-space: normal; }
   .kanban { grid-template-columns: 1fr; }
-  .commercial-pipeline-row { grid-template-columns: 1fr; }
+  .commercial-pipeline-row {
+    gap: 8px;
+    grid-template-areas:
+      'label count'
+      'bar bar';
+    grid-template-columns: 1fr auto;
+  }
+  .commercial-pipeline-label { grid-area: label; }
+  .commercial-pipeline-bar { grid-area: bar; }
+  .commercial-pipeline-count { grid-area: count; }
+  .bulkbar { align-items: stretch; flex-direction: column; }
+  .bulkbar .actions { justify-content: stretch; width: 100%; }
+  .bulkbar .actions .icon { flex: 1; }
+  .table-scroll { max-height: calc(100dvh - 320px); }
+  .table-scroll-wrap.can-scroll-x .table-scroll,
+  .table-scroll.can-scroll-x { cursor: auto; }
+  .table-scroll-hint {
+    font-size: 9px;
+    left: 12px;
+    max-width: calc(100% - 24px);
+    right: auto;
+    text-align: center;
+    white-space: normal;
+  }
+  .drawer {
+    border-left: 0;
+    border-radius: 18px 18px 0 0;
+    border-top: 1px solid var(--line);
+    bottom: 0;
+    left: 0;
+    max-height: min(92dvh, calc(100dvh - env(safe-area-inset-top, 0px) - 12px));
+    max-width: none;
+    padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+    right: 0;
+    top: auto;
+    transform: translateY(106%);
+    width: 100%;
+  }
+  .drawer.open { transform: translateY(0); }
+  .drawer-actions-block .btn,
+  .drawer-actions-block .btn.secondary { flex: 1 1 calc(50% - 4px); min-width: 0; }
+  .toast { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); max-width: calc(100vw - 24px); text-align: center; }
   .preview-panel {
     border-radius: 0;
     height: 100vh;
@@ -434,9 +574,9 @@ th.sorted { color: var(--yellow); }
           <button class="icon" id="clearSelectionButton" type="button">Limpar seleção</button>
         </div>
       </div>
-      <div class="table-card card">
+      <div class="table-card card desktop-only">
         <div class="table-scroll-wrap" data-scroll-hint>
-          <div class="table-scroll-hint" hidden>Role para ver mais colunas →</div>
+          <div class="table-scroll-hint" hidden>Role horizontalmente · Shift + roda · ou arraste</div>
           <div class="table-scroll">
           <table>
             <thead>
@@ -447,6 +587,7 @@ th.sorted { color: var(--yellow); }
                 <th data-sort="score">Score</th>
                 <th data-sort="status">Status</th>
                 <th data-sort="commercialStatus">Resultado</th>
+                <th>Estágio</th>
                 <th data-sort="produto">Produto</th>
                 <th data-sort="forma_pagamento">Pagamento</th>
                 <th data-sort="faturamento">Faturamento</th>
@@ -461,14 +602,15 @@ th.sorted { color: var(--yellow); }
           </div>
         </div>
       </div>
+      <div class="mobile-only mobile-list" id="leadsMobileList"></div>
     </section>
 
     <section class="page" id="kanbanPage"><div class="kanban" id="kanban"></div></section>
     <section class="page" id="acceptancesPage">
       <div class="acceptance-summary" id="acceptanceSummary"></div>
-      <div class="table-card card">
+      <div class="table-card card desktop-only">
         <div class="table-scroll-wrap" data-scroll-hint>
-          <div class="table-scroll-hint" hidden>Role para ver mais colunas →</div>
+          <div class="table-scroll-hint" hidden>Role horizontalmente · Shift + roda · ou arraste</div>
           <div class="table-scroll">
           <table>
             <thead>
@@ -488,6 +630,7 @@ th.sorted { color: var(--yellow); }
           </div>
         </div>
       </div>
+      <div class="mobile-only mobile-list" id="acceptancesMobileList"></div>
     </section>
     <section class="page" id="pipelinePage">
       <div class="card" style="padding:18px"><div class="commercial-pipeline" id="commercialPipeline"></div></div>
@@ -531,7 +674,9 @@ import {
   getPipelineStageMeta,
   resolvePipelineStage,
 } from './lib/dashboard-pipeline.mjs';
-import { buildEmptyStateHtml, hasActiveDashboardFilters, shouldShowScrollHint } from './lib/dashboard-ui.mjs';
+import { bindAllTableScrollers } from './lib/dashboard-table-scroll.mjs';
+import { buildAcceptanceMobileCardHtml, buildLeadMobileCardHtml } from './lib/dashboard-mobile.mjs';
+import { buildEmptyStateHtml, buildFilterBannerHtml, hasActiveDashboardFilters } from './lib/dashboard-ui.mjs';
 import { createPreviewBlobUrl, revokePreviewBlobUrl } from './lib/dashboard-preview.mjs';
 
 const state = {
@@ -550,6 +695,7 @@ const state = {
   pipelineStageFilter: '',
   previewHtml: '',
   previewObjectUrl: '',
+  patchInFlight: false,
 };
 const params = new URLSearchParams(window.location.search);
 const useFixture = params.get('fixture') === '1';
@@ -654,7 +800,7 @@ async function loadDashboard() {
 function showAuth() { $('auth').hidden = false; $('app').hidden = true; }
 function showApp() { $('auth').hidden = true; $('app').hidden = false; $('authError').textContent = ''; }
 function setLoading() {
-  $('tableBody').innerHTML = '<tr><td colspan="13" class="empty">Carregando...</td></tr>';
+  $('tableBody').innerHTML = '<tr><td colspan="14" class="empty">Carregando...</td></tr>';
   $('acceptancesBody').innerHTML = '<tr><td colspan="8" class="empty">Carregando...</td></tr>';
 }
 function setView(view, updateUrl = true) {
@@ -949,6 +1095,7 @@ function renderTable() {
       <td><span class="score">${escapeHtml(record.score || '-')}</span> ${scorePill(record)}</td>
       <td><span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span></td>
       <td>${commercialPill(record)}</td>
+      <td>${pipelineStagePill(record)}</td>
       <td>${escapeHtml(record.produto || '-')}</td>
       <td>${escapeHtml(record.forma_pagamento || '-')}</td>
       <td>${escapeHtml(record.faturamento || '-')}</td>
@@ -969,7 +1116,18 @@ function renderTable() {
         </div>
       </td>
     </tr>
-  `).join('') : `<tr><td colspan="13">${leadsEmptyState()}</td></tr>`;
+  `).join('') : `<tr><td colspan="14">${leadsEmptyState()}</td></tr>`;
+  $('leadsMobileList').innerHTML = rows.length ? rows.map((record) => buildLeadMobileCardHtml(record, {
+    name: escapeHtml(record.nome || 'Lead sem nome'),
+    subtitle: escapeHtml(record.empresa || record.email || record.leadId),
+    score: escapeHtml(record.score || '-'),
+    pills: `<span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${scorePill(record)} ${commercialPill(record)} ${pipelineStagePill(record)}`,
+    produto: escapeHtml(record.produto || '-'),
+    pagamento: escapeHtml(record.forma_pagamento || '-'),
+    regiao: escapeHtml(record.localizacao || '-'),
+    chegada: escapeHtml(formatDate(arrivalDate(record))),
+    selected: state.selected.has(record.leadId),
+  })).join('') : `<div class="card" style="padding:16px">${leadsEmptyState()}</div>`;
   document.querySelectorAll('[data-check]').forEach((element) => element.addEventListener('change', () => {
     element.checked ? state.selected.add(element.dataset.check) : state.selected.delete(element.dataset.check);
     renderAll();
@@ -978,7 +1136,7 @@ function renderTable() {
   document.querySelectorAll('[data-copy]').forEach((element) => element.addEventListener('click', () => copyText(formatLeadText(state.records.find((record) => record.leadId === element.dataset.copy)))));
   bindAdminActions();
   updateSortHeaders();
-  bindTableScrollHints();
+  bindAllTableScrollers();
   document.querySelectorAll('th[data-sort]').forEach((th) => {
     th.onclick = () => {
       const key = th.dataset.sort;
@@ -1070,24 +1228,6 @@ function navigateEmptyState(action) {
     $('scoreFilter').value = state.score;
     renderAll();
   }
-}
-function bindTableScrollHints() {
-  document.querySelectorAll('[data-scroll-hint]').forEach((wrap) => {
-    const scroller = wrap.querySelector('.table-scroll');
-    const hint = wrap.querySelector('.table-scroll-hint');
-    if (!scroller || !hint) return;
-    const update = () => {
-      const show = shouldShowScrollHint(scroller.scrollWidth, scroller.clientWidth, scroller.scrollLeft);
-      wrap.classList.toggle('can-scroll', show);
-      hint.hidden = !show;
-    };
-    update();
-    scroller.onscroll = update;
-    if (!wrap.dataset.bound) {
-      wrap.dataset.bound = '1';
-      window.addEventListener('resize', update);
-    }
-  });
 }
 function openPreviewModal(html, title) {
   state.previewHtml = html;
@@ -1191,18 +1331,31 @@ function renderAcceptances() {
     </tr>
   `).join('') : `<tr><td colspan="8">${buildEmptyStateHtml('Nenhum aceite recebido ainda.', 'Ir para Leads', 'leads')}</td></tr>`;
 
+  $('acceptancesMobileList').innerHTML = rows.length ? rows.map((record) => buildAcceptanceMobileCardHtml(record, {
+    empresa: escapeHtml(record.empresa || '-'),
+    responsavel: escapeHtml(record.nome || record.email || '-'),
+    date: escapeHtml(formatDate(acceptanceDate(record))),
+    produto: escapeHtml(record.produto || '-'),
+    pagamento: escapeHtml(record.forma_pagamento || '-'),
+    regiao: escapeHtml(record.localizacao || '-'),
+  })).join('') : `<div class="card" style="padding:16px">${buildEmptyStateHtml('Nenhum aceite recebido ainda.', 'Ir para Leads', 'leads')}</div>`;
+
   document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
   bindAdminActions();
-  bindTableScrollHints();
+  bindAllTableScrollers();
 }
 function renderCommercialPipeline() {
   const rows = filteredRecords();
   const counts = countByStage(rows);
   const max = Math.max(...PIPELINE_STAGES.map((stage) => counts[stage.id]), 1);
   const filter = state.pipelineStageFilter;
+  const filtersActive = hasActiveDashboardFilters(filterSnapshot());
+  const totalActive = countActivePipelineLeads(state.records.filter((record) => !record.deletedAt));
 
   $('commercialPipeline').innerHTML = `
+    ${filtersActive ? buildFilterBannerHtml(`Filtros ativos: o funil mostra ${countActivePipelineLeads(rows)} de ${totalActive} leads ativos.`) : ''}
     <div class="metric-label">Funil de conversão</div>
+    <p class="pipeline-hint">Clique em um estágio para listar leads. Abra o card para mover o estágio comercial no drawer.</p>
     ${PIPELINE_STAGES.map((stage) => `
       <div class="commercial-pipeline-row ${filter === stage.id ? 'active' : ''} ${stage.muted ? 'muted-row' : ''}" data-pipeline-stage="${escapeHtml(stage.id)}" role="button" tabindex="0" aria-pressed="${filter === stage.id}">
         <div class="commercial-pipeline-label">
@@ -1238,9 +1391,6 @@ function renderPipelineLeadsList(rows) {
   const stageId = state.pipelineStageFilter;
   if (!stageId) {
     container.innerHTML = buildEmptyStateHtml('Clique em um estágio acima para ver os leads correspondentes.', 'Ir para Leads', 'leads');
-    container.querySelectorAll('[data-empty-action]').forEach((element) => {
-      element.addEventListener('click', () => navigateEmptyState(element.dataset.emptyAction));
-    });
     return;
   }
 
@@ -1255,14 +1405,11 @@ function renderPipelineLeadsList(rows) {
           <span class="score">${escapeHtml(isDealAcceptance(record) ? (record.produto || 'Aceite') : (record.score || '-'))}</span>
         </div>
         <div class="muted">${escapeHtml(record.empresa || record.email || '-')}</div>
-        <div style="margin-top:8px">${scorePill(record)} <span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${commercialPill(record)}</div>
+        <div style="margin-top:8px">${pipelineStagePill(record)} ${scorePill(record)} <span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${commercialPill(record)}</div>
       </div>
     `).join('') : buildEmptyStateHtml('Nenhum lead neste estágio com os filtros atuais.', 'Limpar filtros', 'clear')}
   `;
   document.querySelectorAll('#pipelineLeads [data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
-  container.querySelectorAll('[data-empty-action]').forEach((element) => {
-    element.addEventListener('click', () => navigateEmptyState(element.dataset.emptyAction));
-  });
 }
 function renderInsights() {
   const rows = filteredRecords();
@@ -1313,7 +1460,7 @@ function openDrawer(id) {
     <div class="drawer-head">
       <div>
         <div class="kicker">${escapeHtml(labelStatus(record.status))}</div>
-        <h1 style="font-size:34px">${escapeHtml(record.empresa || record.nome || 'Lead')}</h1>
+        <h1 class="drawer-title">${escapeHtml(record.empresa || record.nome || 'Lead')}</h1>
         <div class="muted">${escapeHtml(formatDate(record.updatedAt))}</div>
       </div>
       <button class="icon" data-drawer-action="close" type="button">Fechar</button>
@@ -1551,6 +1698,7 @@ function bindAdminActions() {
   }));
 }
 async function patchDashboardRecord(leadId, action, extra = {}) {
+  if (state.patchInFlight) return;
   const messages = {
     delete: 'Excluir este card do dashboard? O registro ficará preservado no histórico para restauração técnica.',
     mark_converted: 'Marcar este lead como deu certo?',
@@ -1561,6 +1709,12 @@ async function patchDashboardRecord(leadId, action, extra = {}) {
   };
   if (messages[action] && !window.confirm(messages[action])) return;
 
+  if (useFixture) {
+    applyFixturePatch(leadId, action, extra);
+    return;
+  }
+
+  state.patchInFlight = true;
   try {
     const response = await fetch(`/api/dashboard?token=${encodeURIComponent(state.token)}`, {
       method: 'PATCH',
@@ -1584,7 +1738,47 @@ async function patchDashboardRecord(leadId, action, extra = {}) {
     toast(extra.stage ? labelPipelineStageAction(extra.stage) : labelAdminAction(action));
   } catch (error) {
     toast(error.message);
+  } finally {
+    state.patchInFlight = false;
   }
+}
+function applyFixturePatch(leadId, action, extra = {}) {
+  const index = state.records.findIndex((item) => item.leadId === leadId);
+  if (index < 0) return;
+  const now = new Date().toISOString();
+  const record = { ...state.records[index] };
+
+  if (action === 'set_pipeline_stage' && extra.stage) {
+    record.pipelineStage = extra.stage;
+    record.pipelineStageAt = now;
+    record.updatedAt = now;
+  } else if (action === 'delete') {
+    record.deletedAt = now;
+    record.updatedAt = now;
+  } else if (['mark_won', 'mark_sold', 'mark_converted'].includes(action)) {
+    record.commercialStatus = 'sold';
+    record.pipelineStage = 'assinado';
+    record.pipelineStageAt = now;
+    record.soldAt = now;
+    record.updatedAt = now;
+  } else if (action === 'mark_lost') {
+    record.commercialStatus = 'lost';
+    record.lostAt = now;
+    record.updatedAt = now;
+  } else if (action === 'clear_commercial_status') {
+    record.commercialStatus = '';
+    record.updatedAt = now;
+  }
+
+  state.records[index] = normalizeRecord(record);
+  if (action === 'delete') {
+    state.selected.delete(leadId);
+    if (state.selectedLeadId === leadId) closeDrawer();
+  } else if (state.selectedLeadId === leadId) {
+    openDrawer(leadId);
+  }
+  renderAll();
+  toast(extra.stage ? labelPipelineStageAction(extra.stage) : labelAdminAction(action));
 }
 function upsertRecord(record) {
   const normalized = normalizeRecord(record);
@@ -1666,6 +1860,12 @@ function commercialPill(record) {
   if (isDealAcceptance(record)) return '<span class="pill completed">Aceite</span>';
   if (isWon(record)) return '<span class="pill completed">Deu certo</span>';
   return '<span class="pill">Sem resultado</span>';
+}
+function pipelineStagePill(record) {
+  const stage = resolvePipelineStage(record);
+  const meta = getPipelineStageMeta(stage);
+  const muted = stage === 'sem_fit' ? ' muted' : '';
+  return `<span class="pill${muted}">${escapeHtml(meta?.label || stage)}</span>`;
 }
 function scorePill(record) {
   if (!record.score) return '<span class="pill">Sem score</span>';

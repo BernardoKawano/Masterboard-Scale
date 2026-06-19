@@ -6,7 +6,8 @@
     "build": "astro build && node scripts/copy-static-assets.mjs",
     "preview": "astro preview",
     "test": "node --test",
-    "audit:dashboard": "node scripts/dashboard-visual-audit.mjs"
+    "audit:dashboard": "node scripts/dashboard-visual-audit.mjs",
+    "audit:ux": "node scripts/dashboard-ux-smoke.mjs"
   },
   "dependencies": {
     "@astrojs/tailwind": "^6.0.2",
