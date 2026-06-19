@@ -134,8 +134,12 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
 .focus-card:hover { border-color: rgba(251,190,10,0.35); }
 
 .table-card { overflow: hidden; }
-.table-scroll-wrap { position: relative; }
-.table-scroll-wrap::after {
+.table-scroll-wrap {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.table-scroll::after {
   background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.94));
   bottom: 0;
   content: '';
@@ -148,27 +152,28 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
   width: 56px;
   z-index: 4;
 }
-.table-scroll-wrap.can-scroll::after { opacity: 1; }
+.table-scroll-wrap.can-scroll .table-scroll::after { opacity: 1; }
 .table-scroll-hint {
   background: rgba(251, 190, 10, 0.12);
   border: 1px solid rgba(251, 190, 10, 0.32);
-  border-radius: 999px;
+  border-radius: 12px;
   color: var(--yellow);
+  flex: 0 0 auto;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;
-  padding: 6px 10px;
+  line-height: 1.4;
+  margin: 12px 12px 0;
+  padding: 8px 12px;
   pointer-events: none;
-  position: absolute;
-  right: 12px;
+  text-align: center;
   text-transform: uppercase;
-  top: 10px;
-  z-index: 5;
 }
 .table-scroll {
   max-height: calc(100vh - 285px);
   overflow: auto;
   overscroll-behavior: contain;
+  position: relative;
   -webkit-overflow-scrolling: touch;
   scrollbar-color: rgba(251, 190, 10, 0.55) rgba(255, 255, 255, 0.08);
   scrollbar-width: thin;
@@ -462,10 +467,7 @@ th.sorted { color: var(--yellow); }
   .table-scroll.can-scroll-x { cursor: auto; }
   .table-scroll-hint {
     font-size: 9px;
-    left: 12px;
-    max-width: calc(100% - 24px);
-    right: auto;
-    text-align: center;
+    margin: 10px 10px 0;
     white-space: normal;
   }
   .drawer {
