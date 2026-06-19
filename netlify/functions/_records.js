@@ -334,6 +334,8 @@ function createDealAcceptancePatch(formData = {}, now = new Date()) {
     recordType: 'deal_acceptance',
     status: 'deal_accepted',
     commercialStatus: 'sold',
+    pipelineStage: 'assinado',
+    pipelineStageAt: at,
     createdAt: at,
     updatedAt: at,
     acceptedAt: at,
@@ -452,6 +454,8 @@ function createAdminPatch(leadId, action, options = {}) {
       convertedAt: '',
       soldAt: '',
       lostAt: at,
+      pipelineStage: 'sem_fit',
+      pipelineStageAt: at,
       events: [{ type: 'dashboard_marked_lost', at }],
     };
   }

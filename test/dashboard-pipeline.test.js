@@ -6,11 +6,14 @@ import {
   conversionRate,
   countActivePipelineLeads,
   countByStage,
+  countClosedDeals,
   countLostCommercial,
+  filterClosedDeals,
   inferPipelineStage,
   isValidPipelineStage,
   resolvePipelineStage,
 } from '../lib/dashboard-pipeline.mjs';
+import { getDashboardFixtureRecords } from '../lib/dashboard-fixture.mjs';
 
 test('lista de estágios inclui sem fit como sexto estágio', () => {
   assert.equal(PIPELINE_STAGE_IDS.length, 6);
@@ -62,6 +65,27 @@ test('contagens por estágio ignoram registros excluídos', () => {
   assert.equal(counts.negociacao, 0);
 });
 
+test('aceite formal e fechado manual compartilham estágio assinado', () => {
+  assert.equal(resolvePipelineStage({
+    status: 'deal_accepted',
+    recordType: 'deal_acceptance',
+    pipelineStage: 'negociacao',
+  }), 'assinado');
+  assert.equal(resolvePipelineStage({
+    status: 'completed',
+    commercialStatus: 'sold',
+    pipelineStage: 'reuniao_diagnostico',
+  }), 'assinado');
+});
+
+test('contagem de fechados coincide com estágio assinado', () => {
+  const records = getDashboardFixtureRecords();
+  const counts = countByStage(records);
+  assert.equal(countClosedDeals(records), counts.assinado);
+  assert.equal(filterClosedDeals(records).length, counts.assinado);
+  assert.equal(counts.assinado, 2);
+});
+
 test('métricas de conversão excluem sem fit', () => {
   const records = [
     { status: 'captured' },
@@ -71,9 +95,9 @@ test('métricas de conversão excluem sem fit', () => {
     { status: 'completed', commercialStatus: 'lost' },
   ];
 
-  assert.equal(countActivePipelineLeads(records), 4);
+  assert.equal(countActivePipelineLeads(records), 3);
   assert.equal(countLostCommercial(records), 1);
-  assert.equal(conversionRate(records), 25);
+  assert.equal(conversionRate(records), 33);
   assert.equal(barWidth(1, 3), 33.33333333333333);
   assert.equal(barWidth(0, 3), 0);
 });

@@ -217,9 +217,14 @@ tr:hover td:first-child { background: rgba(20, 18, 12, 0.98); }
 .pill.muted { border-color: rgba(154,154,154,0.4); color: var(--muted); }
 .score { font-weight: 900; }
 
-.kanban { display: grid; gap: 12px; grid-template-columns: repeat(5, minmax(200px, 1fr)); overflow-x: auto; padding-bottom: 6px; }
-.kanban-col { min-height: 260px; padding: 12px; }
+.kanban { display: grid; gap: 12px; grid-template-columns: repeat(6, minmax(200px, 1fr)); overflow-x: auto; padding-bottom: 6px; }
+.kanban-col { min-height: 260px; padding: 12px; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.kanban-col.drop-target { border-color: rgba(251,190,10,0.55); box-shadow: inset 0 0 0 1px rgba(251,190,10,0.35); }
 .kanban-title { align-items: center; display: flex; font-size: 12px; font-weight: 900; justify-content: space-between; letter-spacing: 0.08em; margin-bottom: 10px; text-transform: uppercase; }
+.kanban-stage-dot { border-radius: 999px; flex: 0 0 auto; height: 8px; width: 8px; }
+.kanban-card { cursor: grab; touch-action: none; user-select: none; }
+.kanban-card.dragging { cursor: grabbing; opacity: 0.55; }
+.kanban-card:active { cursor: grabbing; }
 .mini { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; margin-bottom: 8px; padding: 12px; }
 .mini:hover { border-color: rgba(251,190,10,0.35); }
 
@@ -538,7 +543,7 @@ th.sorted { color: var(--yellow); }
     <nav class="nav" id="nav">
       <button class="nav-btn active" data-view="home" type="button"><span class="material-symbols-rounded" aria-hidden="true">dashboard</span><strong>Principal</strong><span>Resumo e atalhos</span></button>
       <button class="nav-btn" data-view="leads" type="button"><span class="material-symbols-rounded" aria-hidden="true">groups</span><strong>Leads</strong><span>Lista pesquisável</span></button>
-      <button class="nav-btn" data-view="kanban" type="button"><span class="material-symbols-rounded" aria-hidden="true">view_kanban</span><strong>Kanban</strong><span>Por prioridade</span></button>
+      <button class="nav-btn" data-view="kanban" type="button"><span class="material-symbols-rounded" aria-hidden="true">view_kanban</span><strong>Kanban</strong><span>Estágios comerciais</span></button>
       <button class="nav-btn" data-view="acceptances" type="button"><span class="material-symbols-rounded" aria-hidden="true">handshake</span><strong>Aceites</strong><span>Fechamentos</span></button>
       <button class="nav-btn" data-view="pipeline" type="button"><span class="material-symbols-rounded" aria-hidden="true">monitoring</span><strong>Pipeline</strong><span>Processo comercial</span></button>
       <button class="nav-btn" data-view="insights" type="button"><span class="material-symbols-rounded" aria-hidden="true">query_stats</span><strong>Insights</strong><span>Região e padrões</span></button>
@@ -671,11 +676,14 @@ import {
   conversionRate,
   countActivePipelineLeads,
   countByStage,
+  countClosedDeals,
   countLostCommercial,
+  filterClosedDeals,
   filterRecordsByStage,
   getPipelineStageMeta,
   resolvePipelineStage,
 } from './lib/dashboard-pipeline.mjs';
+import { bindKanbanBoard, resetKanbanBoard } from './lib/dashboard-kanban.mjs';
 import { bindAllTableScrollers } from './lib/dashboard-table-scroll.mjs';
 import { buildAcceptanceMobileCardHtml, buildLeadMobileCardHtml } from './lib/dashboard-mobile.mjs';
 import { buildEmptyStateHtml, buildFilterBannerHtml, hasActiveDashboardFilters } from './lib/dashboard-ui.mjs';
@@ -968,12 +976,12 @@ function renderAll() {
 function renderViewIntro() {
   const all = state.records.filter((record) => !record.deletedAt);
   const visible = filteredRecords();
-  const accepted = all.filter(isDealAcceptance).length;
+  const closed = countClosedDeals(visible);
   const copy = {
     home: ['Cockpit', 'Principal', 'Escolha uma área para operar leads, prioridades, aceites e análises.', `${all.length} registros`],
     leads: ['Operação', 'Leads', 'Lista completa para busca, filtro, seleção e ações comerciais em lote.', `${visible.length} visíveis`],
-    kanban: ['Prioridade', 'Kanban', 'Fila operacional por prioridade. Use para decidir a próxima ação do time.', `${visible.length} cards`],
-    acceptances: ['Fechamento', 'Aceites', 'Registros recebidos via formulário de aceite, com dados jurídicos e próximos passos.', `${accepted} aceites`],
+    kanban: ['Comercial', 'Kanban', 'Arraste cards entre estágios — as mudanças refletem no pipeline e na lista de leads.', `${visible.length} cards`],
+    acceptances: ['Fechamento', 'Aceites', 'Todos os negócios assinados ou fechados (formulário de aceite ou marcação manual).', `${closed} fechados`],
     pipeline: ['Comercial', 'Pipeline', 'Estágios do processo comercial — da prospecção ao fechamento ou desqualificação.', `${countActivePipelineLeads(visible)} ativos`],
     insights: ['Análise', 'Insights', 'Padrões por região, produto, pagamento, resultado e gargalos recorrentes.', `${visible.length} registros`],
   }[state.view] || ['Dashboard', 'Cockpit', 'Cockpit comercial Masterboard x ScaleCo.', `${visible.length} registros`];
@@ -1039,17 +1047,18 @@ function renderBulkbar() {
 }
 function renderHome() {
   const all = state.records.filter((record) => !record.deletedAt);
+  const stageCounts = countByStage(all);
   const counts = {
     leads: all.length,
-    kanban: all.filter((record) => record.status === 'completed' || isDealAcceptance(record)).length,
-    acceptances: all.filter(isDealAcceptance).length,
+    kanban: countActivePipelineLeads(all),
+    acceptances: stageCounts.assinado,
     pipeline: countActivePipelineLeads(all),
     insights: all.filter((record) => record.score > 0).length,
   };
   const cards = [
     ['leads', 'groups', 'Leads', 'Consultar cadastro completo, buscar empresas e executar ações comerciais.', `${counts.leads} registros`],
-    ['kanban', 'view_kanban', 'Kanban', 'Priorizar a próxima ação por estágio, temperatura e aceite.', `${counts.kanban} no funil`],
-    ['acceptances', 'handshake', 'Aceites', 'Ver fechamentos recebidos, dados jurídicos e próximos passos.', `${counts.acceptances} aceites`],
+    ['kanban', 'view_kanban', 'Kanban', 'Arrastar cards entre estágios comerciais (sincroniza com o pipeline).', `${counts.kanban} ativos`],
+    ['acceptances', 'handshake', 'Aceites', 'Negócios assinados ou fechados — alinhado ao estágio Assinado/fechado.', `${counts.acceptances} fechados`],
     ['pipeline', 'monitoring', 'Pipeline', 'Acompanhar prospecção, diagnóstico, negociação e fechamentos.', `${counts.pipeline} ativos`],
     ['insights', 'query_stats', 'Insights', 'Analisar padrões de região, produto, pagamento e gargalos.', `${counts.insights} com score`],
   ];
@@ -1160,33 +1169,41 @@ function updateSortHeaders() {
   });
 }
 function renderKanban() {
-  const stages = [
-    ['accepted', 'Aceites recebidos'],
-    ['captured', 'Novo / sem diagnóstico'],
-    ['cold', 'Diagnóstico crítico'],
-    ['warm', 'Em desenvolvimento'],
-    ['hot', 'Prioridade alta'],
-  ];
   const rows = filteredRecords();
-  $('kanban').innerHTML = stages.map(([key, title]) => {
-    const items = rows.filter((record) => kanbanKey(record) === key);
+  const kanban = $('kanban');
+  resetKanbanBoard(kanban);
+  kanban.innerHTML = PIPELINE_STAGES.map((stage) => {
+    const items = filterRecordsByStage(rows, stage.id);
     return `
-      <div class="kanban-col card">
-        <div class="kanban-title"><span>${escapeHtml(title)}</span><span>${items.length}</span></div>
-        ${items.slice(0, 60).map((record) => `
-          <div class="mini" data-open="${escapeHtml(record.leadId)}">
+      <div class="kanban-col card" data-pipeline-stage="${escapeHtml(stage.id)}">
+        <div class="kanban-title">
+          <span style="display:flex;align-items:center;gap:8px;min-width:0">
+            <span class="kanban-stage-dot" style="background:${stage.color}"></span>
+            <span>${escapeHtml(stage.label)}</span>
+          </span>
+          <span>${items.length}</span>
+        </div>
+        ${items.slice(0, 80).map((record) => `
+          <div class="kanban-card mini" draggable="true" data-lead-id="${escapeHtml(record.leadId)}" role="button" tabindex="0" aria-label="Mover ${escapeHtml(record.nome || 'lead')}">
             <div style="display:flex;justify-content:space-between;gap:8px">
               <strong>${escapeHtml(record.nome || 'Lead sem nome')}</strong>
               <span class="score">${escapeHtml(isDealAcceptance(record) ? (record.produto || 'Aceite') : (record.score || '-'))}</span>
             </div>
             <div class="muted">${escapeHtml(record.empresa || record.email || '-')}</div>
-            <div style="margin-top:8px">${scorePill(record)} <span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${commercialPill(record)}</div>
+            <div style="margin-top:8px">${pipelineStagePill(record)} ${scorePill(record)} <span class="pill ${escapeHtml(record.status)}">${labelStatus(record.status)}</span> ${commercialPill(record)}</div>
           </div>
-        `).join('') || kanbanEmptyState(key)}
+        `).join('') || kanbanEmptyState(stage.id)}
       </div>
     `;
   }).join('');
-  document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
+
+  bindKanbanBoard(kanban, {
+    onMove: (leadId, stage) => {
+      if (stage === resolvePipelineStage(state.records.find((record) => record.leadId === leadId) || {})) return;
+      patchDashboardRecord(leadId, 'set_pipeline_stage', { stage });
+    },
+    onOpen: (leadId) => openDrawer(leadId),
+  });
   bindAdminActions();
 }
 function leadsEmptyState() {
@@ -1205,18 +1222,20 @@ function filterSnapshot() {
     revenue: state.revenue,
   };
 }
-function kanbanEmptyState(key) {
+function kanbanEmptyState(stageId) {
   if (hasActiveDashboardFilters(filterSnapshot())) {
     return buildEmptyStateHtml('Nenhum card com os filtros atuais.', 'Limpar filtros', 'clear');
   }
+  const meta = getPipelineStageMeta(stageId);
   const hints = {
-    accepted: ['Nenhum aceite nesta coluna.', 'Ver aceites', 'acceptances'],
-    captured: ['Nenhum lead aguardando diagnóstico.', 'Ir para Leads', 'leads'],
-    cold: ['Nenhum lead com diagnóstico crítico.', 'Ver leads frios', 'score:cold'],
-    warm: ['Nenhum lead em desenvolvimento (40–59).', 'Ver leads mornos', 'score:warm'],
-    hot: ['Nenhum lead de prioridade alta (60+).', 'Ver leads quentes', 'score:hot'],
+    prospeccao: ['Nenhum lead em prospecção.', 'Ver leads', 'leads'],
+    diagnostico_enviado: ['Nenhum lead com diagnóstico enviado.', 'Ver pipeline', 'pipeline'],
+    reuniao_diagnostico: ['Nenhum lead em reunião de diagnóstico.', 'Ver pipeline', 'pipeline'],
+    negociacao: ['Nenhum lead em negociação.', 'Ver pipeline', 'pipeline'],
+    assinado: ['Nenhum negócio fechado neste recorte.', 'Ver aceites', 'acceptances'],
+    sem_fit: ['Nenhum lead marcado como sem fit.', 'Ver pipeline', 'pipeline'],
   };
-  const [message, cta, action] = hints[key] || ['Sem cards nesta coluna.', 'Ir para Leads', 'leads'];
+  const [message, cta, action] = hints[stageId] || [`Sem cards em ${meta?.label || stageId}.`, 'Ir para Leads', 'leads'];
   return buildEmptyStateHtml(message, cta, action);
 }
 function navigateEmptyState(action) {
@@ -1274,32 +1293,27 @@ function openPreviewInNewTab() {
   tab.document.close();
   tab.focus();
 }
-function kanbanKey(record) {
-  if (isDealAcceptance(record)) return 'accepted';
-  if (record.status !== 'completed') return 'captured';
-  if (record.score >= 60) return 'hot';
-  if (record.score >= 40) return 'warm';
-  return 'cold';
-}
 function acceptanceDate(record) {
   return record.acceptedAt || record.soldAt || record.convertedAt || record.updatedAt || record.createdAt || '';
 }
-function acceptanceRows() {
-  return state.records
-    .filter((record) => !record.deletedAt && isDealAcceptance(record))
+function closedDealRows() {
+  return filterClosedDeals(state.records)
     .sort((a, b) => String(acceptanceDate(b)).localeCompare(String(acceptanceDate(a))));
 }
+function closedDealKind(record) {
+  return isDealAcceptance(record) ? 'Aceite formal' : 'Fechado no cockpit';
+}
 function renderAcceptances() {
-  const rows = acceptanceRows();
+  const rows = closedDealRows();
   const today = rows.filter((record) => dateMatch(acceptanceDate(record), 'today')).length;
   const month = rows.filter((record) => dateMatch(acceptanceDate(record), '30')).length;
   const topProduct = rank(rows, (record) => record.produto || 'Não informado')[0];
   const topPayment = rank(rows, (record) => record.forma_pagamento || 'Não informado')[0];
 
   $('acceptanceSummary').innerHTML = [
-    ['Aceites recebidos', rows.length, `${today} hoje · ${month} nos últimos 30 dias`],
-    ['Produto mais aceito', topProduct ? topProduct.label : '-', topProduct ? `${topProduct.count} aceite${topProduct.count === 1 ? '' : 's'}` : 'Sem dados'],
-    ['Pagamento mais escolhido', topPayment ? topPayment.label : '-', topPayment ? `${topPayment.count} aceite${topPayment.count === 1 ? '' : 's'}` : 'Sem dados'],
+    ['Negócios fechados', rows.length, `Alinhado ao Assinado/fechado · ${today} hoje · ${month} nos últimos 30 dias`],
+    ['Produto mais fechado', topProduct ? topProduct.label : '-', topProduct ? `${topProduct.count} negócio${topProduct.count === 1 ? '' : 's'}` : 'Sem dados'],
+    ['Pagamento mais usado', topPayment ? topPayment.label : '-', topPayment ? `${topPayment.count} negócio${topPayment.count === 1 ? '' : 's'}` : 'Sem dados'],
     ['Ação sugerida', rows.length ? 'Onboarding em 24h' : '-', 'Abrir o card para copiar dados e chamar no WhatsApp'],
   ].map(([label, value, hint]) => `
     <div class="metric card">
@@ -1311,7 +1325,7 @@ function renderAcceptances() {
 
   $('acceptancesBody').innerHTML = rows.length ? rows.map((record) => `
     <tr>
-      <td><div class="lead-name">${escapeHtml(formatDate(acceptanceDate(record)))}</div><div class="lead-sub">${escapeHtml(record.leadId)}</div></td>
+      <td><div class="lead-name">${escapeHtml(formatDate(acceptanceDate(record)))}</div><div class="lead-sub">${escapeHtml(closedDealKind(record))} · ${escapeHtml(record.leadId)}</div></td>
       <td><div class="lead-name">${escapeHtml(record.empresa || '-')}</div><div class="lead-sub">${escapeHtml(record.razao_social || '-')}</div></td>
       <td><div class="lead-name">${escapeHtml(record.nome || '-')}</div><div class="lead-sub">${escapeHtml(record.email || '-')}</div></td>
       <td>${escapeHtml(record.produto || '-')}</td>
@@ -1331,16 +1345,16 @@ function renderAcceptances() {
         </div>
       </td>
     </tr>
-  `).join('') : `<tr><td colspan="8">${buildEmptyStateHtml('Nenhum aceite recebido ainda.', 'Ir para Leads', 'leads')}</td></tr>`;
+  `).join('') : `<tr><td colspan="8">${buildEmptyStateHtml('Nenhum negócio fechado ainda.', 'Ir para Pipeline', 'pipeline')}</td></tr>`;
 
   $('acceptancesMobileList').innerHTML = rows.length ? rows.map((record) => buildAcceptanceMobileCardHtml(record, {
     empresa: escapeHtml(record.empresa || '-'),
-    responsavel: escapeHtml(record.nome || record.email || '-'),
+    responsavel: escapeHtml(`${record.nome || '-'} · ${closedDealKind(record)}`),
     date: escapeHtml(formatDate(acceptanceDate(record))),
     produto: escapeHtml(record.produto || '-'),
     pagamento: escapeHtml(record.forma_pagamento || '-'),
     regiao: escapeHtml(record.localizacao || '-'),
-  })).join('') : `<div class="card" style="padding:16px">${buildEmptyStateHtml('Nenhum aceite recebido ainda.', 'Ir para Leads', 'leads')}</div>`;
+  })).join('') : `<div class="card" style="padding:16px">${buildEmptyStateHtml('Nenhum negócio fechado ainda.', 'Ir para Pipeline', 'pipeline')}</div>`;
 
   document.querySelectorAll('[data-open]').forEach((element) => element.addEventListener('click', () => openDrawer(element.dataset.open)));
   bindAdminActions();
@@ -1368,7 +1382,7 @@ function renderCommercialPipeline() {
         <div class="commercial-pipeline-count">${counts[stage.id]}</div>
       </div>
     `).join('')}
-    <div class="pipeline-footer">Conversão ativa: ${conversionRate(rows)}% · Sem fit: ${counts.sem_fit} · Não deu certo: ${countLostCommercial(rows)}</div>
+    <div class="pipeline-footer">Conversão ativa: ${conversionRate(rows)}% · Assinado/fechado: ${counts.assinado} · Sem fit: ${counts.sem_fit} · Não deu certo: ${countLostCommercial(rows)}</div>
   `;
 
   document.querySelectorAll('[data-pipeline-stage]').forEach((element) => {
@@ -1766,6 +1780,8 @@ function applyFixturePatch(leadId, action, extra = {}) {
   } else if (action === 'mark_lost') {
     record.commercialStatus = 'lost';
     record.lostAt = now;
+    record.pipelineStage = 'sem_fit';
+    record.pipelineStageAt = now;
     record.updatedAt = now;
   } else if (action === 'clear_commercial_status') {
     record.commercialStatus = '';

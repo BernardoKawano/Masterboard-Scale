@@ -140,6 +140,8 @@ test('cria patch de aceite como negocio vendido', () => {
   assert.equal(accepted.recordType, 'deal_acceptance');
   assert.equal(accepted.status, 'deal_accepted');
   assert.equal(accepted.commercialStatus, 'sold');
+  assert.equal(accepted.pipelineStage, 'assinado');
+  assert.equal(accepted.pipelineStageAt, '2026-06-12T15:00:00.000Z');
   assert.equal(accepted.acceptedAt, '2026-06-12T15:00:00.000Z');
   assert.equal(accepted.convertedAt, '2026-06-12T15:00:00.000Z');
   assert.equal(accepted.formData.produto, 'Scale');
@@ -281,6 +283,8 @@ test('acoes administrativas preservam diagnostico e registram status comercial',
   assert.equal(wonRecord.convertedAt, '2026-06-11T12:10:00.000Z');
   assert.equal(wonRecord.soldAt, '2026-06-11T12:10:00.000Z');
   assert.equal(deletedRecord.commercialStatus, 'lost');
+  assert.equal(lostRecord.pipelineStage, 'sem_fit');
+  assert.equal(lostRecord.pipelineStageAt, '2026-06-11T12:12:00.000Z');
   assert.equal(deletedRecord.convertedAt, '');
   assert.equal(deletedRecord.soldAt, '');
   assert.equal(deletedRecord.lostAt, '2026-06-11T12:12:00.000Z');

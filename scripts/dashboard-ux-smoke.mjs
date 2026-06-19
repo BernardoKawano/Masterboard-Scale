@@ -45,6 +45,8 @@ async function main() {
   const rows = await page.locator('.commercial-pipeline-row').count();
   if (rows !== 6) errors.push(`Esperava 6 estágios, encontrou ${rows}`);
 
+  const pipelineAssinado = await page.locator('#commercialPipeline [data-pipeline-stage="assinado"] .commercial-pipeline-count').innerText();
+
   await page.click('[data-pipeline-stage="prospeccao"]');
   await page.waitForSelector('.pipeline-lead');
   const leads = await page.locator('.pipeline-lead').count();
@@ -63,6 +65,18 @@ async function main() {
   await page.waitForSelector('.drawer:not(.open)');
 
   await page.setViewportSize({ width: 960, height: 900 });
+  await page.click('[data-view="kanban"]');
+  await page.waitForSelector('#kanbanPage.active .kanban-col[data-pipeline-stage]');
+  const kanbanCols = await page.locator('.kanban-col[data-pipeline-stage]').count();
+  if (kanbanCols !== 6) errors.push(`Kanban deveria ter 6 colunas, tem ${kanbanCols}`);
+
+  await page.click('[data-view="acceptances"]');
+  await page.waitForSelector('#acceptancesPage.active');
+  const acceptanceRows = await page.locator('#acceptancesBody tr').count();
+  if (Number(pipelineAssinado) !== acceptanceRows) {
+    errors.push(`Fechamentos (${acceptanceRows}) diverge de Assinado/fechado (${pipelineAssinado})`);
+  }
+
   await page.click('[data-view="leads"]');
   await page.waitForSelector('#leadsPage.active .table-scroll-wrap.can-scroll-x');
   const before = await page.locator('.table-scroll').first().evaluate((el) => el.scrollLeft);
