@@ -415,7 +415,10 @@ th.sorted { color: var(--yellow); }
   .brand { align-items: flex-start; flex-direction: column; }
   .brand img { width: 132px; }
   .nav {
-    background: rgba(10, 10, 10, 0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid var(--line);
     border-radius: 18px 18px 0 0;
     bottom: 0;
     box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.42);
@@ -427,7 +430,8 @@ th.sorted { color: var(--yellow); }
     width: auto;
     z-index: 15;
   }
-  .nav-btn { flex: 1 1 auto; justify-content: center; min-height: 44px; padding: 8px 10px; }
+  .nav-btn { background: transparent; flex: 1 1 auto; justify-content: center; min-height: 44px; padding: 8px 10px; }
+  .nav-btn.active, .nav-btn:hover { background: rgba(251,190,10,0.14); }
   .nav-btn strong { font-size: 11px; }
   .nav-btn span { display: none; }
   .home-panel-head { align-items: flex-start; flex-direction: column; }
