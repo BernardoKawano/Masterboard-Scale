@@ -139,20 +139,6 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
   flex-direction: column;
   position: relative;
 }
-.table-scroll::after {
-  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.94));
-  bottom: 0;
-  content: '';
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-  right: 0;
-  top: 0;
-  transition: opacity 0.2s ease;
-  width: 56px;
-  z-index: 4;
-}
-.table-scroll-wrap.can-scroll .table-scroll::after { opacity: 1; }
 .table-scroll-hint {
   background: rgba(251, 190, 10, 0.12);
   border: 1px solid rgba(251, 190, 10, 0.32);
@@ -173,7 +159,6 @@ h2 { color: var(--muted); font-size: 12px; letter-spacing: 0.16em; margin: 0; te
   max-height: calc(100vh - 285px);
   overflow: auto;
   overscroll-behavior: contain;
-  position: relative;
   -webkit-overflow-scrolling: touch;
   scrollbar-color: rgba(251, 190, 10, 0.55) rgba(255, 255, 255, 0.08);
   scrollbar-width: thin;
@@ -197,10 +182,6 @@ th { background: rgba(17,17,17,0.98); color: var(--muted); cursor: pointer; font
 th:first-child, td:first-child { left: 0; position: sticky; z-index: 3; }
 th:first-child { z-index: 5; }
 td:first-child { background: rgba(17,17,17,0.98); }
-.table-scroll[data-scroll-x]:not([data-scroll-x="0"]) td:first-child,
-.table-scroll[data-scroll-x]:not([data-scroll-x="0"]) th:first-child {
-  box-shadow: 10px 0 18px rgba(0, 0, 0, 0.38);
-}
 tr:hover td { background: rgba(251,190,10,0.035); }
 tr:hover td:first-child { background: rgba(20, 18, 12, 0.98); }
 .lead-name { font-size: 14px; font-weight: 900; white-space: normal; min-width: 160px; }
