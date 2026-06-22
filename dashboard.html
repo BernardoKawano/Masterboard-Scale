@@ -237,7 +237,16 @@ tr:hover td:first-child { background: rgba(20, 18, 12, 0.98); }
 .pill.muted { border-color: rgba(154,154,154,0.4); color: var(--muted); }
 .score { font-weight: 900; }
 
-.kanban { display: grid; gap: 12px; grid-template-columns: repeat(7, minmax(200px, 1fr)); overflow-x: auto; padding-bottom: 6px; }
+.kanban-scroll-wrap .table-scroll.kanban {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(7, minmax(220px, 240px));
+  width: max-content;
+  min-width: 100%;
+  max-height: calc(100vh - 220px);
+  overflow: auto;
+  padding: 6px 4px 8px;
+}
 .kanban-col { min-height: 260px; padding: 12px; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
 .kanban-col.drop-target { border-color: rgba(251,190,10,0.55); box-shadow: inset 0 0 0 1px rgba(251,190,10,0.35); }
 .kanban-title { align-items: center; display: flex; font-size: 12px; font-weight: 900; justify-content: space-between; letter-spacing: 0.08em; margin-bottom: 10px; text-transform: uppercase; }
@@ -481,7 +490,6 @@ th.sorted { color: var(--yellow); }
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home-grid, .insights, .acceptance-summary { grid-template-columns: 1fr; }
-  .kanban { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
 }
 @media (max-width: 760px) {
   .shell { padding: 14px 0 calc(88px + env(safe-area-inset-bottom, 0px)); width: min(100vw - 18px, 1440px); }
@@ -521,7 +529,7 @@ th.sorted { color: var(--yellow); }
   .metrics, .filters, .nav-cards, .detail-grid { grid-template-columns: 1fr; }
   .view-intro { align-items: flex-start; flex-direction: column; }
   .view-stat { white-space: normal; }
-  .kanban { grid-template-columns: 1fr; }
+  .kanban-scroll-wrap .table-scroll.kanban { grid-template-columns: 1fr; width: 100%; }
   .commercial-pipeline-row {
     gap: 8px;
     grid-template-areas:
@@ -680,7 +688,14 @@ th.sorted { color: var(--yellow); }
       <div class="mobile-only mobile-list" id="leadsMobileList"></div>
     </section>
 
-    <section class="page" id="kanbanPage"><div class="kanban" id="kanban"></div></section>
+    <section class="page" id="kanbanPage">
+      <div class="table-card card" style="padding:12px">
+        <div class="table-scroll-wrap kanban-scroll-wrap" data-scroll-hint data-scroll-mode="kanban">
+          <div class="table-scroll-hint" hidden>Role horizontalmente · Shift + roda · ou arraste</div>
+          <div class="table-scroll kanban" id="kanban"></div>
+        </div>
+      </div>
+    </section>
     <section class="page" id="acceptancesPage">
       <div class="acceptance-summary" id="acceptanceSummary"></div>
       <div class="table-card card desktop-only">
@@ -1277,6 +1292,7 @@ function renderKanban() {
     },
     onOpen: (leadId) => openDrawer(leadId),
   });
+  bindAllTableScrollers($('kanbanPage'));
   bindAdminActions();
 }
 function leadsEmptyState() {

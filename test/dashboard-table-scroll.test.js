@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { canScrollHorizontally, updateTableScrollState } from '../lib/dashboard-table-scroll.mjs';
+import {
+  canScrollHorizontally,
+  getHorizontalPanIgnoreSelector,
+  shouldIgnoreHorizontalPan,
+  updateTableScrollState,
+} from '../lib/dashboard-table-scroll.mjs';
 
 test('detecta overflow horizontal da tabela', () => {
   assert.equal(canScrollHorizontally({ scrollWidth: 1200, clientWidth: 800 }), true);
@@ -33,4 +38,21 @@ test('atualiza classes e hint do wrapper de scroll', () => {
   assert.equal(wrap.classList.values.has('can-scroll-x'), true);
   assert.equal(hint.hidden, false);
   assert.equal(scroller.dataset.scrollX, '0');
+});
+
+test('ignora arraste horizontal na alça do kanban', () => {
+  const handle = {
+    closest(selector) {
+      if (selector.includes('kanban-drag-handle')) return handle;
+      return null;
+    },
+  };
+  const column = {
+    closest() {
+      return null;
+    },
+  };
+
+  assert.equal(shouldIgnoreHorizontalPan(handle, getHorizontalPanIgnoreSelector({ dataset: { scrollMode: 'kanban' } })), true);
+  assert.equal(shouldIgnoreHorizontalPan(column, getHorizontalPanIgnoreSelector({ dataset: { scrollMode: 'kanban' } })), false);
 });
