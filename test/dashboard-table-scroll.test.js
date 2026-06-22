@@ -52,7 +52,9 @@ test('ignora arraste horizontal na alça do kanban', () => {
       return null;
     },
   };
+  const ignore = getHorizontalPanIgnoreSelector({ dataset: { scrollMode: 'kanban' } });
 
-  assert.equal(shouldIgnoreHorizontalPan(handle, getHorizontalPanIgnoreSelector({ dataset: { scrollMode: 'kanban' } })), true);
-  assert.equal(shouldIgnoreHorizontalPan(column, getHorizontalPanIgnoreSelector({ dataset: { scrollMode: 'kanban' } })), false);
+  assert.equal(shouldIgnoreHorizontalPan(handle, ignore), true);
+  assert.equal(shouldIgnoreHorizontalPan(column, ignore), false);
+  assert.equal(ignore, '.kanban-drag-handle');
 });

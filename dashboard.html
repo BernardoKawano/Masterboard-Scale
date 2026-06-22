@@ -237,17 +237,22 @@ tr:hover td:first-child { background: rgba(20, 18, 12, 0.98); }
 .pill.muted { border-color: rgba(154,154,154,0.4); color: var(--muted); }
 .score { font-weight: 900; }
 
-.kanban-scroll-wrap .table-scroll.kanban {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(7, minmax(220px, 240px));
-  width: max-content;
-  min-width: 100%;
+.kanban-scroll-wrap .kanban-scroll {
   max-height: calc(100vh - 220px);
   overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+}
+.kanban-scroll-wrap .kanban {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(7, 220px);
+  width: max-content;
+  min-width: 100%;
   padding: 6px 4px 8px;
 }
-.kanban-col { min-height: 260px; padding: 12px; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.kanban-col { min-height: 260px; min-width: 0; padding: 12px; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
 .kanban-col.drop-target { border-color: rgba(251,190,10,0.55); box-shadow: inset 0 0 0 1px rgba(251,190,10,0.35); }
 .kanban-title { align-items: center; display: flex; font-size: 12px; font-weight: 900; justify-content: space-between; letter-spacing: 0.08em; margin-bottom: 10px; text-transform: uppercase; }
 .kanban-stage-dot { border-radius: 999px; flex: 0 0 auto; height: 8px; width: 8px; }
@@ -529,7 +534,7 @@ th.sorted { color: var(--yellow); }
   .metrics, .filters, .nav-cards, .detail-grid { grid-template-columns: 1fr; }
   .view-intro { align-items: flex-start; flex-direction: column; }
   .view-stat { white-space: normal; }
-  .kanban-scroll-wrap .table-scroll.kanban { grid-template-columns: 1fr; width: 100%; }
+  .kanban-scroll-wrap .kanban { grid-template-columns: 1fr; width: 100%; }
   .commercial-pipeline-row {
     gap: 8px;
     grid-template-areas:
@@ -692,7 +697,9 @@ th.sorted { color: var(--yellow); }
       <div class="table-card card" style="padding:12px">
         <div class="table-scroll-wrap kanban-scroll-wrap" data-scroll-hint data-scroll-mode="kanban">
           <div class="table-scroll-hint" hidden>Role horizontalmente · Shift + roda · ou arraste</div>
-          <div class="table-scroll kanban" id="kanban"></div>
+          <div class="table-scroll kanban-scroll">
+            <div class="kanban" id="kanban"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -767,7 +774,7 @@ import {
   resolvePipelineStage,
 } from './lib/dashboard-pipeline.mjs';
 import { bindKanbanBoard, resetKanbanBoard } from './lib/dashboard-kanban.mjs';
-import { bindAllTableScrollers } from './lib/dashboard-table-scroll.mjs';
+import { bindAllTableScrollers, refreshHorizontalScroller } from './lib/dashboard-table-scroll.mjs';
 import { buildAcceptanceMobileCardHtml, buildLeadMobileCardHtml } from './lib/dashboard-mobile.mjs';
 import { buildEmptyStateHtml, buildFilterBannerHtml, hasActiveDashboardFilters } from './lib/dashboard-ui.mjs';
 import { createPreviewBlobUrl, revokePreviewBlobUrl } from './lib/dashboard-preview.mjs';
@@ -1293,6 +1300,7 @@ function renderKanban() {
     onOpen: (leadId) => openDrawer(leadId),
   });
   bindAllTableScrollers($('kanbanPage'));
+  refreshHorizontalScroller($('kanbanPage')?.querySelector('[data-scroll-hint]'));
   bindAdminActions();
 }
 function leadsEmptyState() {
