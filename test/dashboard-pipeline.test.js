@@ -15,9 +15,11 @@ import {
 } from '../lib/dashboard-pipeline.mjs';
 import { getDashboardFixtureRecords } from '../lib/dashboard-fixture.mjs';
 
-test('lista de estágios inclui sem fit como sexto estágio', () => {
-  assert.equal(PIPELINE_STAGE_IDS.length, 6);
+test('lista de estágios inclui sem fit como último estágio', () => {
+  assert.equal(PIPELINE_STAGE_IDS.length, 7);
+  assert.equal(PIPELINE_STAGE_IDS.at(-2), 'assinado');
   assert.equal(PIPELINE_STAGE_IDS.at(-1), 'sem_fit');
+  assert.equal(isValidPipelineStage('convidado_evento'), true);
   assert.equal(isValidPipelineStage('sem_fit'), true);
   assert.equal(isValidPipelineStage('invalid'), false);
 });

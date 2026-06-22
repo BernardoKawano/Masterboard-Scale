@@ -43,7 +43,7 @@ async function main() {
   await page.waitForSelector('#commercialPipeline .commercial-pipeline-row');
 
   const rows = await page.locator('.commercial-pipeline-row').count();
-  if (rows !== 6) errors.push(`Esperava 6 estágios, encontrou ${rows}`);
+  if (rows !== 7) errors.push(`Esperava 7 estágios, encontrou ${rows}`);
 
   const pipelineAssinado = await page.locator('#commercialPipeline [data-pipeline-stage="assinado"] .commercial-pipeline-count').innerText();
 
@@ -76,7 +76,7 @@ async function main() {
   await page.waitForSelector('#acceptancesPage.active');
   const acceptanceRows = await page.locator('#acceptancesBody tr').count();
   if (Number(pipelineAssinado) !== acceptanceRows) {
-    errors.push(`Fechamentos (${acceptanceRows}) diverge de Assinado/fechado (${pipelineAssinado})`);
+    errors.push(`Fechamentos (${acceptanceRows}) diverge de Assinado/pago (${pipelineAssinado})`);
   }
 
   await page.click('[data-view="leads"]');

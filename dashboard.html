@@ -24,21 +24,62 @@
   --orange: #F59E0B;
   --red: #EF4444;
   --blue: #60A5FA;
+  --site-canvas:
+    radial-gradient(circle at 16% 10%, rgba(251, 190, 10, 0.16), transparent 30%),
+    radial-gradient(circle at 88% 16%, rgba(201, 151, 3, 0.12), transparent 28%),
+    radial-gradient(circle at 50% 96%, rgba(251, 190, 10, 0.08), transparent 36%),
+    var(--bg);
 }
 
 * { box-sizing: border-box; }
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 12% 8%, rgba(251,190,10,0.15), transparent 30%),
-    radial-gradient(circle at 88% 0%, rgba(201,151,3,0.12), transparent 28%),
-    var(--bg);
+  background: var(--site-canvas);
+  background-repeat: no-repeat;
+  background-size: 100vw 100vh, 100vw 100vh, 100vw 100vh, auto;
+  background-attachment: fixed, fixed, fixed, scroll;
   color: var(--text);
   font-family: 'Funnel Display', Arial, sans-serif;
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
 }
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 999px;
+  filter: blur(60px);
+  opacity: 0.28;
+  animation: glowBreath 9s ease-in-out infinite;
+}
+
+body::before {
+  width: 320px;
+  height: 320px;
+  left: -120px;
+  top: 14vh;
+  background: rgba(251, 190, 10, 0.30);
+}
+
+body::after {
+  width: 380px;
+  height: 380px;
+  right: -150px;
+  bottom: 6vh;
+  background: rgba(201, 151, 3, 0.22);
+  animation-delay: -3.5s;
+}
+
+@keyframes glowBreath {
+  0%, 100% { opacity: 0.22; transform: translate3d(0, 0, 0) scale(0.9); }
+  50% { opacity: 0.5; transform: translate3d(20px, -14px, 0) scale(1.14); }
+}
+
+.shell { position: relative; z-index: 1; width: min(1320px, calc(100vw - 32px)); margin: 0 auto; padding: 20px 0 44px; }
 button, input, select { font: inherit; }
 button { color: inherit; }
 button:focus-visible, input:focus-visible, select:focus-visible, .nav-btn:focus-visible, .big-card:focus-visible {
@@ -60,8 +101,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, .nav-btn:focus-
   word-wrap: normal;
   -webkit-font-smoothing: antialiased;
 }
-
-.shell { width: min(1320px, calc(100vw - 32px)); margin: 0 auto; padding: 20px 0 44px; }
 .desktop-only { display: block; }
 .mobile-only { display: none; }
 .mobile-list { display: grid; gap: 10px; }
@@ -198,7 +237,7 @@ tr:hover td:first-child { background: rgba(20, 18, 12, 0.98); }
 .pill.muted { border-color: rgba(154,154,154,0.4); color: var(--muted); }
 .score { font-weight: 900; }
 
-.kanban { display: grid; gap: 12px; grid-template-columns: repeat(6, minmax(200px, 1fr)); overflow-x: auto; padding-bottom: 6px; }
+.kanban { display: grid; gap: 12px; grid-template-columns: repeat(7, minmax(200px, 1fr)); overflow-x: auto; padding-bottom: 6px; }
 .kanban-col { min-height: 260px; padding: 12px; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
 .kanban-col.drop-target { border-color: rgba(251,190,10,0.55); box-shadow: inset 0 0 0 1px rgba(251,190,10,0.35); }
 .kanban-title { align-items: center; display: flex; font-size: 12px; font-weight: 900; justify-content: space-between; letter-spacing: 0.08em; margin-bottom: 10px; text-transform: uppercase; }
@@ -1010,7 +1049,7 @@ function renderViewIntro() {
     home: ['Cockpit', 'Principal', 'Escolha uma área para operar leads, prioridades, aceites e análises.', `${all.length} registros`],
     leads: ['Operação', 'Leads', 'Lista completa para busca, filtro, seleção e ações comerciais em lote.', `${visible.length} visíveis`],
     kanban: ['Comercial', 'Kanban', 'Arraste cards entre estágios — as mudanças refletem no pipeline e na lista de leads.', `${visible.length} cards`],
-    acceptances: ['Fechamento', 'Aceites', 'Todos os negócios assinados ou fechados (formulário de aceite ou marcação manual).', `${closed} fechados`],
+    acceptances: ['Fechamento', 'Aceites', 'Todos os negócios assinados ou pagos (formulário de aceite ou marcação manual).', `${closed} fechados`],
     pipeline: ['Comercial', 'Pipeline', 'Estágios do processo comercial — da prospecção ao fechamento ou desqualificação.', `${countActivePipelineLeads(visible)} ativos`],
     insights: ['Análise', 'Insights', 'Padrões por região, produto, pagamento, resultado e gargalos recorrentes.', `${visible.length} registros`],
   }[state.view] || ['Dashboard', 'Cockpit', 'Cockpit comercial Masterboard x ScaleCo.', `${visible.length} registros`];
@@ -1087,7 +1126,7 @@ function renderHome() {
   const cards = [
     ['leads', 'groups', 'Leads', 'Consultar cadastro completo, buscar empresas e executar ações comerciais.', `${counts.leads} registros`],
     ['kanban', 'view_kanban', 'Kanban', 'Arrastar cards entre estágios comerciais (sincroniza com o pipeline).', `${counts.kanban} ativos`],
-    ['acceptances', 'handshake', 'Aceites', 'Negócios assinados ou fechados — alinhado ao estágio Assinado/fechado.', `${counts.acceptances} fechados`],
+    ['acceptances', 'handshake', 'Aceites', 'Negócios assinados ou pagos — alinhado ao estágio Assinado/pago.', `${counts.acceptances} fechados`],
     ['pipeline', 'monitoring', 'Pipeline', 'Acompanhar prospecção, diagnóstico, negociação e fechamentos.', `${counts.pipeline} ativos`],
     ['insights', 'query_stats', 'Insights', 'Analisar padrões de região, produto, pagamento e gargalos.', `${counts.insights} com score`],
   ];
@@ -1266,7 +1305,8 @@ function kanbanEmptyState(stageId) {
     diagnostico_enviado: ['Nenhum lead com diagnóstico enviado.', 'Ver pipeline', 'pipeline'],
     reuniao_diagnostico: ['Nenhum lead em reunião de diagnóstico.', 'Ver pipeline', 'pipeline'],
     negociacao: ['Nenhum lead em negociação.', 'Ver pipeline', 'pipeline'],
-    assinado: ['Nenhum negócio fechado neste recorte.', 'Ver aceites', 'acceptances'],
+    convidado_evento: ['Nenhum lead convidado para o evento.', 'Ver pipeline', 'pipeline'],
+    assinado: ['Nenhum negócio assinado/pago neste recorte.', 'Ver aceites', 'acceptances'],
     sem_fit: ['Nenhum lead marcado como sem fit.', 'Ver pipeline', 'pipeline'],
   };
   const [message, cta, action] = hints[stageId] || [`Sem cards em ${meta?.label || stageId}.`, 'Ir para Leads', 'leads'];
@@ -1345,7 +1385,7 @@ function renderAcceptances() {
   const topPayment = rank(rows, (record) => record.forma_pagamento || 'Não informado')[0];
 
   $('acceptanceSummary').innerHTML = [
-    ['Negócios fechados', rows.length, `Alinhado ao Assinado/fechado · ${today} hoje · ${month} nos últimos 30 dias`],
+    ['Negócios fechados', rows.length, `Alinhado ao Assinado/pago · ${today} hoje · ${month} nos últimos 30 dias`],
     ['Produto mais fechado', topProduct ? topProduct.label : '-', topProduct ? `${topProduct.count} negócio${topProduct.count === 1 ? '' : 's'}` : 'Sem dados'],
     ['Pagamento mais usado', topPayment ? topPayment.label : '-', topPayment ? `${topPayment.count} negócio${topPayment.count === 1 ? '' : 's'}` : 'Sem dados'],
     ['Ação sugerida', rows.length ? 'Onboarding em 24h' : '-', 'Abrir o card para copiar dados e chamar no WhatsApp'],
@@ -1416,7 +1456,7 @@ function renderCommercialPipeline() {
         <div class="commercial-pipeline-count">${counts[stage.id]}</div>
       </div>
     `).join('')}
-    <div class="pipeline-footer">Conversão ativa: ${conversionRate(rows)}% · Assinado/fechado: ${counts.assinado} · Sem fit: ${counts.sem_fit} · Não deu certo: ${countLostCommercial(rows)}</div>
+    <div class="pipeline-footer">Conversão ativa: ${conversionRate(rows)}% · Assinado/pago: ${counts.assinado} · Sem fit: ${counts.sem_fit} · Não deu certo: ${countLostCommercial(rows)}</div>
   `;
 
   document.querySelectorAll('[data-pipeline-stage]').forEach((element) => {

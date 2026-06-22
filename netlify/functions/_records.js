@@ -10,6 +10,7 @@ const PIPELINE_STAGE_IDS = new Set([
   'diagnostico_enviado',
   'reuniao_diagnostico',
   'negociacao',
+  'convidado_evento',
   'assinado',
   'sem_fit',
 ]);

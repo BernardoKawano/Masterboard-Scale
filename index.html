@@ -28,6 +28,11 @@
   --danger: #EF4444;
   --yellow: #FBBE0A;
   --yellow-dim: #C99703;
+  --site-canvas:
+    radial-gradient(circle at 16% 10%, rgba(251, 190, 10, 0.16), transparent 30%),
+    radial-gradient(circle at 88% 16%, rgba(201, 151, 3, 0.12), transparent 28%),
+    radial-gradient(circle at 50% 96%, rgba(251, 190, 10, 0.08), transparent 36%),
+    var(--black);
 }
  
 html {
@@ -39,11 +44,7 @@ body {
   height: 100%;
   min-height: 100%;
   min-height: -webkit-fill-available;
-  background:
-    radial-gradient(circle at 18% 12%, rgba(251,190,10,0.14), transparent 28%),
-    radial-gradient(circle at 88% 18%, rgba(201,151,3,0.10), transparent 26%),
-    radial-gradient(circle at 52% 92%, rgba(251,190,10,0.08), transparent 34%),
-    var(--black);
+  background: var(--site-canvas);
   background-repeat: no-repeat;
   background-size: 100vw 100vh, 100vw 100vh, 100vw 100vh, auto;
   background-attachment: fixed, fixed, fixed, scroll;
@@ -62,35 +63,39 @@ body::after {
   inset: auto;
   pointer-events: none;
   z-index: 0;
-  filter: blur(52px);
   border-radius: 999px;
-  opacity: 0.42;
-  animation: glowBreath 8s ease-in-out infinite;
+  filter: blur(60px);
+  opacity: 0.28;
+  animation: glowBreath 9s ease-in-out infinite;
 }
 
 body::before {
-  width: 260px;
-  height: 260px;
-  left: -90px;
-  top: 18vh;
-  background: rgba(251,190,10,0.30);
+  width: 320px;
+  height: 320px;
+  left: -120px;
+  top: 14vh;
+  background: rgba(251, 190, 10, 0.30);
 }
 
 body::after {
-  width: 320px;
-  height: 320px;
-  right: -120px;
-  bottom: 8vh;
-  background: rgba(201,151,3,0.22);
-  animation-delay: -3s;
+  width: 380px;
+  height: 380px;
+  right: -150px;
+  bottom: 6vh;
+  background: rgba(201, 151, 3, 0.22);
+  animation-delay: -3.5s;
 }
 
 #intro,
 #sintomas-section,
+#form-screen,
+#chat-screen,
+#showoff-screen,
 #report-screen,
 .capa-page {
   position: relative;
   z-index: 1;
+  background: transparent;
 }
 
 .mb-logo-img {
@@ -188,12 +193,12 @@ body::after {
 
 @keyframes glowBreath {
   0%, 100% {
-    opacity: 0.24;
-    transform: translate3d(0, 0, 0) scale(0.92);
+    opacity: 0.22;
+    transform: translate3d(0, 0, 0) scale(0.9);
   }
   50% {
-    opacity: 0.58;
-    transform: translate3d(18px, -12px, 0) scale(1.12);
+    opacity: 0.5;
+    transform: translate3d(20px, -14px, 0) scale(1.14);
   }
 }
  
@@ -280,12 +285,6 @@ body::after {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background:
-    radial-gradient(circle at 18% 12%, rgba(251,190,10,0.18), transparent 30%),
-    radial-gradient(circle at 86% 72%, rgba(201,151,3,0.12), transparent 32%),
-    linear-gradient(135deg, #050505 0%, #0A0A0A 48%, #111007 100%);
-  background-repeat: no-repeat;
-  background-size: cover;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -1290,41 +1289,11 @@ textarea.form-input {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background:
-    radial-gradient(circle at 20% 18%, rgba(251,190,10,0.22), transparent 30%),
-    radial-gradient(circle at 82% 76%, rgba(201,151,3,0.18), transparent 34%),
-    linear-gradient(135deg, #000 0%, #090909 48%, #130f00 100%);
-  background-repeat: no-repeat;
-  background-size: cover;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 40px 24px;
   overflow: hidden;
-}
-
-#showoff-screen::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at center, rgba(255,255,255,0.10) 1px, transparent 1.4px);
-  background-size: 28px 28px;
-  opacity: 0.10;
-  animation: textureDrift 14s linear infinite;
-}
-
-#showoff-screen::after {
-  content: '';
-  position: absolute;
-  width: 360px;
-  height: 360px;
-  border-radius: 999px;
-  background: rgba(251,190,10,0.18);
-  filter: blur(58px);
-  right: -120px;
-  top: 12vh;
-  animation: glowBreath 7s ease-in-out infinite;
 }
 
 #showoff-screen > * {
@@ -1357,11 +1326,6 @@ textarea.form-input {
 @keyframes showoffSpin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}
-
-@keyframes textureDrift {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(28px, 28px, 0); }
 }
 
 .showoff-line {
@@ -1842,12 +1806,6 @@ textarea.form-input {
   display: grid;
   grid-template-columns: 1fr;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 18% 18%, rgba(251,190,10,0.16), transparent 30%),
-    radial-gradient(circle at 88% 78%, rgba(201,151,3,0.12), transparent 32%),
-    linear-gradient(to bottom, #0A0A0A 0%, #111111 40%, #0A0A0A 100%);
-  background-repeat: no-repeat;
-  background-size: cover;
 }
 
 .intro-photo-wrap {
@@ -2090,7 +2048,6 @@ textarea.form-input {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    background: #0A0A0A;
   }
 
   .intro-headline {
@@ -2465,7 +2422,6 @@ function createLeadId() {
       cs.style.bottom = 'auto';
       cs.style.height = 'var(--chat-height, 100dvh)';
       cs.style.zIndex = '999';
-      cs.style.background = '#0A0A0A';
       syncChatViewport();
       startChat();
     };
@@ -2530,7 +2486,6 @@ function createLeadId() {
     cs.style.bottom = 'auto';
     cs.style.height = 'var(--chat-height, 100dvh)';
     cs.style.zIndex = '999';
-    cs.style.background = '#0A0A0A';
     syncChatViewport();
     window.history.replaceState({}, '', '/');
     window.addEventListener('DOMContentLoaded', startChat);
