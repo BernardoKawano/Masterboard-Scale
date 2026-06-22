@@ -325,3 +325,22 @@ test('acao set_pipeline_stage grava estagio comercial', () => {
     /Estagio de pipeline invalido/,
   );
 });
+
+test('hasLeadCaptureEmailSent detecta evento de deduplicacao de e-mail', () => {
+  const {
+    createLeadCaptureEmailSentPatch,
+    hasLeadCaptureEmailSent,
+    hasDiagnosticEmailSent,
+    createDiagnosticEmailSentPatch,
+  } = require('../netlify/functions/_records');
+
+  const captured = createCapturedPatch(formData);
+  assert.equal(hasLeadCaptureEmailSent(captured), false);
+
+  const withEmail = mergeRecord(captured, createLeadCaptureEmailSentPatch(formData.leadId));
+  assert.equal(hasLeadCaptureEmailSent(withEmail), true);
+  assert.equal(hasDiagnosticEmailSent(withEmail), false);
+
+  const withDiagnosticEmail = mergeRecord(withEmail, createDiagnosticEmailSentPatch(formData.leadId));
+  assert.equal(hasDiagnosticEmailSent(withDiagnosticEmail), true);
+});

@@ -324,6 +324,38 @@ function createCapturedPatch(formData = {}, now = new Date()) {
   };
 }
 
+function createLeadCaptureEmailSentPatch(leadId, now = new Date()) {
+  const normalizedLeadId = cleanString(leadId);
+  if (!normalizedLeadId) throw new Error('leadId ausente para marcar e-mail de captura');
+  return {
+    leadId: normalizedLeadId,
+    updatedAt: timestamp(now),
+    events: [{ type: 'lead_capture_email_sent', at: timestamp(now) }],
+  };
+}
+
+function createDiagnosticEmailSentPatch(leadId, now = new Date()) {
+  const normalizedLeadId = cleanString(leadId);
+  if (!normalizedLeadId) throw new Error('leadId ausente para marcar e-mail de diagnóstico');
+  return {
+    leadId: normalizedLeadId,
+    updatedAt: timestamp(now),
+    events: [{ type: 'diagnostic_email_sent', at: timestamp(now) }],
+  };
+}
+
+function hasLeadCaptureEmailSent(record) {
+  return Boolean(
+    record?.events?.some((event) => event.type === 'lead_capture_email_sent')
+  );
+}
+
+function hasDiagnosticEmailSent(record) {
+  return Boolean(
+    record?.events?.some((event) => event.type === 'diagnostic_email_sent')
+  );
+}
+
 function createDealAcceptancePatch(formData = {}, now = new Date()) {
   const normalized = normalizeDealAcceptanceData(formData);
   const leadId = normalized.leadId || createDealAcceptanceId();
@@ -581,6 +613,8 @@ module.exports = {
   cleanString,
   compactMessages,
   createCapturedPatch,
+  createDiagnosticEmailSentPatch,
+  createLeadCaptureEmailSentPatch,
   createCompletedPatch,
   createDealAcceptancePatch,
   createAdminPatch,
@@ -590,6 +624,8 @@ module.exports = {
   createStartedPatch,
   ensureLeadId,
   getRecordKey,
+  hasDiagnosticEmailSent,
+  hasLeadCaptureEmailSent,
   mergeRecord,
   normalizeDealAcceptanceData,
   normalizeFormData,
