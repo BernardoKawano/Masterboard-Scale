@@ -3177,17 +3177,18 @@ function getCTAContent(score) {
   if (score < 60) {
     return {
       sub: `Encontramos problemas, potenciais riscos e gargalos diretos na sua operação. Alguns deles exigem arquitetura de receita, não apenas mais esforço comercial. Por isso, o próximo passo é uma conversa estratégica com Fábio Couto para entender onde o motor de crescimento está travando.`,
-      cta: `AGENDAR CONVERSA ESTRATÉGICA`
+      cta: `AGENDAR CONVERSA ESTRATÉGICA`,
+      href: 'tel:+554137950866',
     };
   } else if (score < 80) {
     return {
       sub: `Você já tem uma base, mas ainda existem pontos de arquitetura de receita que podem limitar previsibilidade, escala e execução. A conversa com Fábio Couto ajuda a separar o que é ajuste operacional do que é decisão estratégica de crescimento.`,
-      cta: `QUERO APERFEIÇOAR MINHA OPERAÇÃO`
+      cta: `QUERO APERFEIÇOAR MINHA OPERAÇÃO`,
     };
   } else {
     return {
       sub: `Sua base mostra sinais de maturidade, mas a próxima camada de crescimento pede arquitetura de receita mais sofisticada. A conversa com Fábio Couto conecta os achados do diagnóstico a decisões práticas de escala.`,
-      cta: `QUERO LEVAR MINHA OPERAÇÃO PARA O PRÓXIMO NÍVEL`
+      cta: `QUERO LEVAR MINHA OPERAÇÃO PARA O PRÓXIMO NÍVEL`,
     };
   }
 }
@@ -3227,7 +3228,7 @@ const DIM_NAMES = {
 function renderReport(data) {
   document.getElementById('chat-screen').style.display = 'none';
   document.getElementById('progressFill').style.width = '100%';
-  const { sub, cta } = getCTAContent(data.score_geral);
+  const { sub, cta, href: ctaHref } = getCTAContent(data.score_geral);
   const rs = document.getElementById('report-screen');
   rs.style.display = 'block';
   const scoreColor = getScoreColor(data.score_geral);
@@ -3243,6 +3244,7 @@ function renderReport(data) {
   const dimColor = getScoreColor(dimData.score);
 
   const waText = encodeURIComponent(`Olá Fábio, acabei de fazer o diagnóstico da ScaleCo. Meu score foi ${data.score_geral} (${data.nivel}) e gostaria de conversar sobre o resultado.`);
+  const ctaLink = ctaHref || `https://wa.me/5511974270077?text=${waText}`;
 
   const escapeHtml = (value) => String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -3349,7 +3351,7 @@ function renderReport(data) {
         <div class="fabio-bio">Ex-VP Salesforce Brasil · 25+ anos liderando vendas e construindo motores de receita em empresas globais de tecnologia.</div>
       </div>
       <div class="cta-sub">${sub}</div>
-     <a class="cta-btn" href="https://wa.me/5511974270077?text=${waText}" target="_blank">${cta}</a>
+     <a class="cta-btn" href="${ctaLink}" target="_blank">${cta}</a>
     </div>
     <div class="email-note">📩 Relatório enviado para ${data.email}</div>
   `;
