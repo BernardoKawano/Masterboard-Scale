@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
+    "dev:diagnostic": "npx --yes serve . -l 4322",
     "build": "astro build && node scripts/copy-static-assets.mjs",
     "preview": "astro preview",
     "test": "node --test",

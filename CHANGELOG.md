@@ -3,6 +3,7 @@
 ## 2026-06-24
 
 ### Fixed
+- CTAs do relatório do diagnóstico passam a abrir sempre o WhatsApp `+55 41 3795-0866`, em todos os níveis de score (antes score abaixo de 60 usava ligação `tel:` e os demais outro número).
 - Corrigido fluxo do Scale Diagnostic no mobile: o chat não fica mais sempre visível por `display: flex` forçado no CSS mobile (header do Archie + campo de resposta apareciam sobre a landing, como na captura de tela), com trava defensiva via classe `.is-open`; scroll da landing liberado; chat ajusta altura/top com `visualViewport` (teclado iOS); formulário abre o chat na mesma página sem redirect que perdia dados no `sessionStorage`; fallback de persistência com `localStorage`.
 
 ## 2026-06-16 (mobile · correção crítica)

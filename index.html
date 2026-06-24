@@ -2028,6 +2028,37 @@ textarea.form-input {
 }
 
 .intro-trust-item { display: flex; align-items: center; gap: 5px; }
+
+.demo-mode-badge {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(251,190,10,0.35);
+  background: rgba(10,10,10,0.92);
+  color: #FBBE0A;
+  font-family: 'Funnel Display', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+  pointer-events: none;
+}
+
+.demo-mode-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22C55E;
+  animation: pulse 2s infinite;
+}
 .intro-check { color: #FBBE0A; font-size: 11px; }
 .intro-sep { color: rgba(255,255,255,0.25); }
 
@@ -2338,7 +2369,18 @@ const FORM_TOTAL_STEPS = 5;
 const CANDIDATURA_STORAGE_KEY = 'masterboard_candidatura_form';
 const MAX_MSGS = 14;
 let demoChatMode = false;
+let demoFlowMode = false;
 let demoStep = 0;
+
+const DEMO_USER_ANSWERS = [
+  'Programa de aceleração para CEOs, ticket médio de R$ 12 mil',
+  'Fundadores de PMEs de serviços com faturamento entre R$ 1M e R$ 10M',
+  'Principalmente indicação e eventos do ecossistema',
+  'Consigo estimar por feeling, sem forecast formal',
+  'Trava bastante se eu sair por 30 dias',
+  'Não consigo cravar a etapa do funil com precisão',
+  'Cada semana funciona de um jeito, sem cadência fixa',
+];
 
 const DEMO_REPORT = {
   tipo: 'relatorio',
@@ -2397,6 +2439,88 @@ const DEMO_CHAT_REPLIES = [
   JSON.stringify(DEMO_REPORT),
 ];
 
+function getDemoFormData() {
+  return {
+    leadId: 'demo-chat',
+    nome: 'Bernardo Kawano',
+    email: 'bernardo@masterboard.com.br',
+    codigo_pais: '+55',
+    whatsapp: '(11) 99999-9999',
+    telefone: '+55 (11) 99999-9999',
+    empresa: 'Masterboard',
+    website: 'https://masterboard.com.br',
+    cargo: 'Sócio ou Fundador',
+    faturamento: 'De R$ 1 milhão a R$ 5 milhões ao ano',
+    colaboradores: 'De 51 a 100 colaboradores',
+    intencao: 'membro',
+    source: 'demo-flow',
+    lgpd: true,
+    localizacao: 'São Paulo – SP',
+  };
+}
+
+function enableDemoMode({ flow = false } = {}) {
+  demoChatMode = true;
+  demoFlowMode = flow;
+  formData = getDemoFormData();
+}
+
+function showDemoBadge(label = 'Modo teste · sem API') {
+  if (document.getElementById('demo-mode-badge')) return;
+  const badge = document.createElement('div');
+  badge.id = 'demo-mode-badge';
+  badge.className = 'demo-mode-badge';
+  badge.innerHTML = `<span class="demo-mode-badge-dot"></span><span>${label}</span>`;
+  document.body.appendChild(badge);
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function sendDemoAnswer(text) {
+  if (isLoading) return false;
+
+  isLoading = true;
+  document.getElementById('sendBtn').disabled = true;
+
+  appendMessage('user', text);
+  history.push({ role: 'user', content: text });
+  msgCount++;
+  updateProgress();
+  showTyping();
+
+  try {
+    const reply = await callAgent(history);
+    removeTyping();
+    history.push({ role: 'assistant', content: reply });
+    msgCount++;
+    updateProgress();
+    if (checkForReport(reply)) return true;
+  } catch (e) {
+    removeTyping();
+    appendMessage('assistant', 'Erro de conexão. Tente novamente.');
+  }
+
+  isLoading = false;
+  document.getElementById('sendBtn').disabled = false;
+  scrollChatToBottom(180);
+  return false;
+}
+
+async function startDemoFlow() {
+  openChatScreen();
+  showDemoBadge('Modo teste · fluxo automático');
+
+  await sendFirst();
+
+  for (const answer of DEMO_USER_ANSWERS) {
+    await sleep(1400);
+    const finished = await sendDemoAnswer(answer);
+    if (finished) return;
+  }
+}
+
 function createLeadId() {
   if (window.crypto && typeof window.crypto.randomUUID === 'function') {
     return window.crypto.randomUUID();
@@ -2404,28 +2528,26 @@ function createLeadId() {
   return `lead_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
-// ── MODO DEMO: ?demo=showoff — mostra tela showoff + relatório sem API ──
+// ── MODO DEMO: ?demo=flow|chat|showoff|test — sem formulário nem API ──
 (function() {
   const p = new URLSearchParams(window.location.search);
-  if (p.get('demo') === 'chat') {
-    demoChatMode = true;
-    formData = {
-      leadId: 'demo-chat',
-      nome: 'Bernardo Kawano',
-      email: 'bernardo@masterboard.com.br',
-      codigo_pais: '+55',
-      whatsapp: '(11) 99999-9999',
-      telefone: '+55 (11) 99999-9999',
-      empresa: 'Empresa Alpha',
-      website: 'https://empresa-alpha.com.br',
-      cargo: 'Sócio ou Fundador',
-      faturamento: 'R$1M–R$5M/ano',
-      colaboradores: 'De 51 a 100 colaboradores',
-      intencao: 'membro',
-      source: 'candidatura-page',
-      lgpd: true,
-      localizacao: 'São Paulo – SP',
-    };
+  const demo = p.get('demo');
+  const isTest = p.get('test') === '1' || demo === 'test' || demo === 'flow';
+
+  if (isTest) {
+    enableDemoMode({ flow: true });
+    const boot = () => showDemoBadge('Modo teste · clique para iniciar');
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else {
+      boot();
+    }
+    return;
+  }
+
+  if (demo === 'chat') {
+    enableDemoMode({ flow: false });
+    showDemoBadge('Modo teste · chat manual');
 
     const openDemoChat = () => {
       openChatScreen();
@@ -2440,7 +2562,7 @@ function createLeadId() {
     return;
   }
 
-  if (p.get('demo') === 'showoff') {
+  if (demo === 'showoff') {
     document.getElementById('intro').style.display = 'none';
     const s = document.getElementById('sintomas-section');
     if (s) s.style.display = 'none';
@@ -2585,6 +2707,10 @@ function initChatViewportHandling() {
 initChatViewportHandling();
 
 function showForm() {
+  if (demoFlowMode) {
+    startDemoFlow();
+    return;
+  }
   document.getElementById('intro').style.display = 'none';
   const sintomas = document.getElementById('sintomas-section');
   if (sintomas) sintomas.style.display = 'none';
@@ -2597,7 +2723,7 @@ function showForm() {
 (function openCandidaturaRoute() {
   const p = new URLSearchParams(window.location.search);
   const isCandidaturaPath = window.location.pathname.replace(/\/+$/, '') === '/candidatura';
-  if (!isCandidaturaPath || p.get('start') === '1' || p.has('demo')) return;
+  if (!isCandidaturaPath || p.get('start') === '1' || p.has('demo') || p.get('test') === '1') return;
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', showForm);
   } else {
@@ -2812,6 +2938,10 @@ function getStoredFormData(leadId) {
 }
 
 async function submitForm() {
+  if (demoChatMode) {
+    await startDemoFlow();
+    return;
+  }
   if (currentFormStep !== FORM_TOTAL_STEPS - 1) {
     nextFormStep();
     return;
@@ -2841,6 +2971,7 @@ async function submitForm() {
 }
  
 async function captureLead(data) {
+  if (demoChatMode) return;
   try {
     const request = fetch('/api/diagnostic', {
       method: 'POST',
@@ -3163,12 +3294,20 @@ function getNivelClass(nivel) {
   return map[nivel] || 'nivel-desenvolvimento';
 }
 
+const DIAGNOSTIC_CTA_WHATSAPP = '554137950866';
+
+function buildDiagnosticCtaLink(data) {
+  const waText = encodeURIComponent(
+    `Olá Fábio, acabei de fazer o diagnóstico da ScaleCo. Meu score foi ${data.score_geral} (${data.nivel}) e gostaria de conversar sobre o resultado.`,
+  );
+  return `https://wa.me/${DIAGNOSTIC_CTA_WHATSAPP}?text=${waText}`;
+}
+
 function getCTAContent(score) {
   if (score < 60) {
     return {
       sub: `Encontramos problemas, potenciais riscos e gargalos diretos na sua operação. Alguns deles exigem arquitetura de receita, não apenas mais esforço comercial. Por isso, o próximo passo é uma conversa estratégica com Fábio Couto para entender onde o motor de crescimento está travando.`,
       cta: `AGENDAR CONVERSA ESTRATÉGICA`,
-      href: 'tel:+554137950866',
     };
   } else if (score < 80) {
     return {
@@ -3218,7 +3357,7 @@ const DIM_NAMES = {
 function renderReport(data) {
   closeChatScreen();
   document.getElementById('progressFill').style.width = '100%';
-  const { sub, cta, href: ctaHref } = getCTAContent(data.score_geral);
+  const { sub, cta } = getCTAContent(data.score_geral);
   const rs = document.getElementById('report-screen');
   rs.style.display = 'block';
   const scoreColor = getScoreColor(data.score_geral);
@@ -3233,8 +3372,7 @@ function renderReport(data) {
   const dimData = dimCritica[1];
   const dimColor = getScoreColor(dimData.score);
 
-  const waText = encodeURIComponent(`Olá Fábio, acabei de fazer o diagnóstico da ScaleCo. Meu score foi ${data.score_geral} (${data.nivel}) e gostaria de conversar sobre o resultado.`);
-  const ctaLink = ctaHref || `https://wa.me/5511974270077?text=${waText}`;
+  const ctaLink = buildDiagnosticCtaLink(data);
 
   const escapeHtml = (value) => String(value ?? '')
     .replace(/&/g, '&amp;')
