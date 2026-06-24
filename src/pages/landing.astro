@@ -2,15 +2,14 @@
 import SectionShell from '../components/landing/SectionShell.astro';
 import ThreadRail from '../components/landing/ThreadRail.astro';
 import {
-  advisoryItems,
   eventMeta,
+  eventModules,
   faqItems,
   growthItems,
   methodCards,
   offer,
   painCards,
   scaleItems,
-  schedule,
   sessions,
   socialProof,
   symptomCards,
@@ -24,6 +23,8 @@ const logos = [
   { name: 'Microsoft', slug: 'microsoft' },
   { name: 'Salesforce', slug: 'salesforce' },
 ];
+
+const ctaTarget = eventMeta.formUrl;
 ---
 
 <!doctype html>
@@ -32,7 +33,7 @@ const logos = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0A0A0A" />
-    <title>Edição 171 · Masterboard powered by ScaleCo</title>
+    <title>Masterboard powered by ScaleCo · Imersão presencial</title>
     <meta
       name="description"
       content="Imersão presencial de 2 dias para founders — Curitiba 17-18/07 e Maringá 30-31/07. Transforme esforço heroico em sistema replicável."
@@ -68,11 +69,6 @@ const logos = [
         <SectionShell id="hero">
           <div class="hero-layout">
             <div>
-              <div class="hero-tags" data-reveal style="--delay:80ms">
-                <span class="tag is-gold">{eventMeta.label}</span>
-                <span class="tag">{eventMeta.subtag}</span>
-              </div>
-
               <h1 id="hero-title" class="section-title">
                 <span data-reveal style="--delay:120ms">Crescimento vem do <mark>esforço.</mark></span><br />
                 <span data-reveal style="--delay:240ms">Escala vem da <mark>arquitetura.</mark></span>
@@ -83,12 +79,12 @@ const logos = [
               </p>
 
               <div class="hero-actions" data-reveal="scale" style="--delay:680ms">
-                <a class="cta-button is-filled is-pulsing" href="#offer">{eventMeta.ctaPrimary}</a>
+                <a class="cta-button is-filled is-pulsing" href={ctaTarget}>{eventMeta.ctaPrimary}</a>
               </div>
 
-              <div class="hero-sessions" data-reveal style="--delay:800ms" aria-label="Turmas da Edição 171">
+              <div class="hero-sessions" data-reveal style="--delay:800ms" aria-label="Turmas disponíveis">
                 {sessions.map((s) => (
-                  <a href="#offer" class="hero-session-tag">
+                  <a href={ctaTarget} class="hero-session-tag">
                     <strong>{s.city}</strong>
                     <span>{s.dates}</span>
                   </a>
@@ -104,9 +100,9 @@ const logos = [
 
             <div class="hero-visual" data-hero-visual data-reveal="scale" style="--delay:320ms">
               <img src="/assets/fabio-couto-2.jpeg" alt="Fábio Couto conduzindo a imersão" />
-              <div class="edition-mark" aria-hidden="true">
-                <strong>171</strong>
-                <span>Edição</span>
+              <div class="program-mark" aria-hidden="true">
+                <strong>2</strong>
+                <span>Módulos</span>
               </div>
               <div class="hero-visual__caption">
                 Masterboard presencial. Uma sala menor, com líderes construindo a próxima arquitetura da empresa.
@@ -236,7 +232,7 @@ const logos = [
             Não é teoria. É o padrão identificado em 25 anos construindo motores de receita — traduzido para o estágio do seu negócio.
           </p>
 
-          <p class="section-label" style="margin-top:34px">O que existe — e você vai descobrir na Edição 171</p>
+          <p class="section-label" style="margin-top:34px">O que existe — e você vai descobrir na imersão</p>
           <div class="grid-three">
             {methodCards.map((card, index) => (
               <article class="paper-card veil-card" data-tilt data-reveal style={`--delay:${index * 80}ms`}>
@@ -263,7 +259,7 @@ const logos = [
           </div>
 
           <div class="section-cta" data-reveal style="--delay:120ms">
-            <a class="cta-button is-filled" href="#offer">Quero construir na Edição 171</a>
+            <a class="cta-button is-filled" href={ctaTarget}>{eventMeta.ctaPrimary}</a>
           </div>
         </SectionShell>
 
@@ -271,29 +267,37 @@ const logos = [
         <SectionShell id="schedule">
           <h2 id="schedule-title" class="section-title is-medium" data-reveal>Da chegada ao encerramento.</h2>
           <p class="section-copy" data-reveal style="--delay:120ms">
-            Mesmo programa nas duas cidades. Programação detalhada em breve.
+            Dois módulos presenciais para conectar cultura, processo comercial e técnica de venda em uma mesma arquitetura.
           </p>
 
-          <div class="timeline-grid" style="margin-top:28px">
-            {schedule.days.map((day, index) => (
-              <article class="paper-card timeline-day" data-reveal={index % 2 === 0 ? 'left' : 'right'} style={`--delay:${index * 120}ms`}>
-                <p class="section-label" style="color:#000;margin-bottom:12px">{day.label} · {day.window}</p>
-                <h3>{day.headline}</h3>
+          <div class="module-grid" style="margin-top:28px">
+            {eventModules.map((module, index) => (
+              <article class={`module-card ${index === 0 ? 'is-dark' : 'is-light'}`} data-reveal={index % 2 === 0 ? 'left' : 'right'} style={`--delay:${index * 120}ms`}>
+                <div class="module-card__header">
+                  <span>{module.module}</span>
+                </div>
+                <h3>{module.title}</h3>
+                <p class="module-card__audience">{module.audience}</p>
+                <ul>
+                  {module.bullets.map((item) => <li>{item}</li>)}
+                </ul>
+                {'caseStudy' in module && <p class="module-card__case">{module.caseStudy}</p>}
+                {'note' in module && <p class="module-card__note">{module.note}</p>}
               </article>
             ))}
           </div>
 
           <div class="timeline-divider" data-reveal>
-            Hoje mapeamos a arquitetura estratégica. Amanhã começamos a construir o motor que faz funcionar.
+            Primeiro alinhamos pessoas e processos. Depois avançamos para prospecção, follow-up, fechamento e negociação.
           </div>
 
           <div class="section-cta" data-reveal style="--delay:120ms">
-            <a class="cta-button is-filled" href="#offer">Ver turmas e participação</a>
+            <a class="cta-button is-filled" href={ctaTarget}>{eventMeta.ctaPrimary}</a>
           </div>
         </SectionShell>
 
         <!-- 06 · OFFER (track record + countdown + duas turmas) -->
-        <SectionShell id="offer" class="section-ink" eyebrow="Edição 171 · Escolha sua turma">
+        <SectionShell id="offer" class="section-ink" eyebrow="Escolha sua turma">
           <h2 id="offer-title" class="section-title is-medium" data-reveal>
             2 dias. <mark>Presencial.</mark> Curitiba ou Maringá.
           </h2>
@@ -341,7 +345,7 @@ const logos = [
               <article class="session-card" data-reveal={i === 0 ? 'left' : 'right'} style={`--delay:${i * 150}ms`}>
                 <p class="session-card__city">{session.city}</p>
                 <p class="session-card__date">{session.dates} · {session.state} · 2026</p>
-                <a class="cta-button is-filled" href="#faq" style="width:100%;justify-content:center;margin-top:auto">
+                <a class="cta-button is-filled" href={ctaTarget} style="width:100%;justify-content:center;margin-top:auto">
                   {eventMeta.ctaOffer} · {session.city}
                 </a>
               </article>
@@ -364,21 +368,7 @@ const logos = [
           </div>
         </SectionShell>
 
-        <!-- 07 · ADVISORY -->
-        <SectionShell id="advisory">
-          <article class="advisory-card" data-reveal>
-            <h2 id="advisory-title" class="section-title is-medium">Para quem quer construção acelerada.</h2>
-            <p class="section-copy">
-              Advisory ScaleCo · 6 meses — não é mais imersão, é arquitetura aplicada no seu negócio com acompanhamento direto.
-            </p>
-            <ul style="margin:28px 0 0;padding:0;list-style:none;color:var(--text-muted);line-height:1.8">
-              {advisoryItems.map((item) => <li>— {item}</li>)}
-            </ul>
-            <div class="price-seal" data-reveal="scale">7 vagas · 6 meses · R$150k (R$120k para participantes da Edição 171)</div>
-          </article>
-        </SectionShell>
-
-        <!-- 08 · FAQ + FOOTER -->
+        <!-- 07 · FAQ + FOOTER -->
         <SectionShell id="faq">
           <div class="quote-panel" data-reveal>
             <p>
@@ -404,7 +394,7 @@ const logos = [
           </div>
 
           <div class="hero-actions" style="justify-content:center;margin-top:32px" data-reveal="scale">
-            <a class="text-link" href="#offer">Rever detalhes da participação →</a>
+            <a class="text-link" href={ctaTarget}>Submeter participação →</a>
           </div>
 
           <h2 id="faq-title" class="section-title is-medium" style="margin-top:52px" data-reveal>
@@ -421,7 +411,7 @@ const logos = [
       </main>
 
       <div class="sticky-cta" data-sticky-cta>
-        <a class="cta-button is-filled" href="#offer">Ver participação</a>
+        <a class="cta-button is-filled" href={ctaTarget}>{eventMeta.ctaPrimary}</a>
       </div>
     </div>
 

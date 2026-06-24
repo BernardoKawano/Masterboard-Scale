@@ -140,6 +140,8 @@ test('cria patch de aceite como negocio vendido', () => {
   assert.equal(accepted.recordType, 'deal_acceptance');
   assert.equal(accepted.status, 'deal_accepted');
   assert.equal(accepted.commercialStatus, 'sold');
+  assert.equal(accepted.pipelineStage, 'assinado');
+  assert.equal(accepted.pipelineStageAt, '2026-06-12T15:00:00.000Z');
   assert.equal(accepted.acceptedAt, '2026-06-12T15:00:00.000Z');
   assert.equal(accepted.convertedAt, '2026-06-12T15:00:00.000Z');
   assert.equal(accepted.formData.produto, 'Scale');
@@ -212,6 +214,8 @@ test('resume registro para listagem do dashboard', () => {
     soldAt: '',
     lostAt: '',
     deletedAt: '',
+    pipelineStage: '',
+    pipelineStageAt: '',
     nome: 'Ana Founder',
     empresa: 'Empresa Alpha',
     email: 'ana@example.com',
@@ -274,9 +278,13 @@ test('acoes administrativas preservam diagnostico e registram status comercial',
   assert.equal(deletedRecord.status, 'completed');
   assert.equal(deletedRecord.report.empresa, 'Empresa Alpha');
   assert.equal(wonRecord.commercialStatus, 'sold');
+  assert.equal(wonRecord.pipelineStage, 'assinado');
+  assert.equal(wonRecord.pipelineStageAt, '2026-06-11T12:10:00.000Z');
   assert.equal(wonRecord.convertedAt, '2026-06-11T12:10:00.000Z');
   assert.equal(wonRecord.soldAt, '2026-06-11T12:10:00.000Z');
   assert.equal(deletedRecord.commercialStatus, 'lost');
+  assert.equal(lostRecord.pipelineStage, 'sem_fit');
+  assert.equal(lostRecord.pipelineStageAt, '2026-06-11T12:12:00.000Z');
   assert.equal(deletedRecord.convertedAt, '');
   assert.equal(deletedRecord.soldAt, '');
   assert.equal(deletedRecord.lostAt, '2026-06-11T12:12:00.000Z');
@@ -297,4 +305,42 @@ test('acoes antigas de convertido e vendido continuam significando ganho', () =>
   assert.equal(soldRecord.commercialStatus, 'sold');
   assert.equal(soldRecord.convertedAt, '2026-06-11T12:10:00.000Z');
   assert.equal(soldRecord.soldAt, '2026-06-11T12:12:00.000Z');
+});
+
+test('acao set_pipeline_stage grava estagio comercial', () => {
+  const completed = createCompletedPatch(formData, report, messages, new Date('2026-06-11T12:08:00.000Z'));
+  const stagePatch = createAdminPatch('lead_abc123', 'set_pipeline_stage', {
+    now: new Date('2026-06-11T12:09:00.000Z'),
+    stage: 'negociacao',
+  });
+
+  const staged = mergeRecord(completed, stagePatch);
+  assert.equal(staged.pipelineStage, 'negociacao');
+  assert.equal(staged.pipelineStageAt, '2026-06-11T12:09:00.000Z');
+  assert.equal(staged.events.at(-1).type, 'dashboard_pipeline_stage_set');
+  assert.equal(staged.events.at(-1).stage, 'negociacao');
+
+  assert.throws(
+    () => createAdminPatch('lead_abc123', 'set_pipeline_stage', { stage: 'invalido' }),
+    /Estagio de pipeline invalido/,
+  );
+});
+
+test('hasLeadCaptureEmailSent detecta evento de deduplicacao de e-mail', () => {
+  const {
+    createLeadCaptureEmailSentPatch,
+    hasLeadCaptureEmailSent,
+    hasDiagnosticEmailSent,
+    createDiagnosticEmailSentPatch,
+  } = require('../netlify/functions/_records');
+
+  const captured = createCapturedPatch(formData);
+  assert.equal(hasLeadCaptureEmailSent(captured), false);
+
+  const withEmail = mergeRecord(captured, createLeadCaptureEmailSentPatch(formData.leadId));
+  assert.equal(hasLeadCaptureEmailSent(withEmail), true);
+  assert.equal(hasDiagnosticEmailSent(withEmail), false);
+
+  const withDiagnosticEmail = mergeRecord(withEmail, createDiagnosticEmailSentPatch(formData.leadId));
+  assert.equal(hasDiagnosticEmailSent(withDiagnosticEmail), true);
 });

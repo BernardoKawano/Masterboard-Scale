@@ -5,7 +5,7 @@
 ### Fixed
 - Mobile `/edicao-171`: hero, botões e blocos iniciais deixavam de aparecer/interagir porque o `IntersectionObserver` não revelava conteúdo acima da dobra a tempo; agora o hero é revelado imediatamente, há fallback por scroll/viewport e opções de observer mais permissivas em touch.
 - Removido `overflow-x: clip` do `html` (risco em Safari/iOS) e sticky CTA oculto não intercepta mais toques (`pointer-events: none`).
-- Netlify: redirects explícitos para `/edicao-171` e `/edicao-171/`.
+- Netlify: redirects explícitos para `/edicao-171` e `/edicao-171/` apontando para a landing publicada em `/landing/`.
 - Fallback `noscript` para exibir conteúdo caso JS não carregue.
 
 ### Changed
@@ -14,9 +14,67 @@
 ## 2026-06-15 (noite · mobile viability)
 
 ### Changed
-- Mobile `/edicao-171`: removido overflow horizontal real (`scrollWidth` agora igual ao viewport), com `overflow-x: clip`, correções em fixed bars e reveals laterais convertidos para entrada vertical em telas menores.
+- Mobile `/edicao-171`: removido overflow horizontal real (`scrollWidth` agora igual ao viewport), correções em fixed bars e reveals laterais convertidos para entrada vertical em telas menores.
 - Mobile hero/cards: header, hero, tags, prova rápida, cards, quote, logos, stat badge, countdown, turmas e sticky CTA receberam espaçamento/padding/tipografia mais compactos para leitura em 390px, sem salto brusco de largura no breakpoint de 620px.
 - Pain cards (01–04): stagger reduzido de 170ms para 130ms para manter cascata perceptível sem fazer o quarto card parecer ausente no mobile.
+
+## 2026-06-19
+
+### Added
+- Aba **Pipeline** no dashboard com funil comercial de 6 estágios (Prospecção → Assinado + Sem fit): barras coloridas, contagem por estágio, lista operacional e métricas de conversão.
+- Campo persistido `pipelineStage` / `pipelineStageAt` no blob, com inferência automática para registros legados e ação `set_pipeline_stage` via PATCH do dashboard.
+- Módulo `lib/dashboard-pipeline.mjs` e testes em `test/dashboard-pipeline.test.js`.
+
+### Changed
+- A aba Funil analítica foi substituída pelo pipeline comercial; estágio ajustável no drawer do lead.
+
+## 2026-06-19 (anterior)
+- PDF do dashboard (`Abrir PDF`) reescrito em modo papel do brandbook: fundo claro, texto ink (#0A0A0A), labels legíveis e `print-color-adjust: exact` — elimina dourado escuro (#9b7400) sobre hero preto que tornava o texto ilegível na impressão.
+- Popup de perguntas/respostas usa a mesma folha de estilos de impressão compartilhada.
+
+### Changed
+- Dashboard alinhado ao design system Masterboard: Funnel Display, tokens ink/gold/muted do brandbook e contraste reforçado em textos secundários, pills e drawer.
+- Drawer ganhou backdrop escuro com clique fora para fechar e estados `:focus-visible` nos controles interativos.
+- Navegação sempre visível; home exibe contadores reais por área; drawer reorganizado em blocos (principal, comercial, risco).
+- Tabela de leads com menu `⋯` para ações secundárias, indicadores de ordenação e botão "Copiar selecionados" desabilitado sem seleção.
+- Kanban com 5 colunas corretas; exclusão removida dos cards (fica no drawer).
+- Modo `?fixture=1` para auditoria visual local com dados de demonstração.
+- Criado `lib/dashboard-brand.mjs` como fonte única de tokens e estilos de impressão, com testes em `test/dashboard-brand.test.js`.
+
+### Fixed
+- Inicialização do dashboard corrigida: `loadDashboard()` agora roda após helpers de localização, evitando tela vazia.
+- Handlers do drawer corrigidos após migração para `type="module"` (delegação de eventos em vez de `onclick` global).
+
+### Changed (iteração UX)
+- Empty states do kanban e insights com mensagem contextual e CTA (ir para Leads, limpar filtros, etc.).
+- Tabelas com hint “Role para ver mais colunas” e fade lateral quando há scroll horizontal.
+- Prévia PDF/Q&A inline em modal com iframe (sem dependência de pop-up).
+- Topbar mobile colapsável em “Ações do cockpit”.
+- Helpers de UI em `lib/dashboard-ui.mjs` com testes em `test/dashboard-ui.test.js`.
+
+### Changed (prévia e polish)
+- Prévia PDF/Q&A via blob URL com estado de carregamento, botão **Nova aba** e painel fullscreen no mobile.
+- Empty state da tabela de Leads com CTA (limpar filtros ou voltar ao início).
+- Script `npm run audit:dashboard` e screenshots do conteúdo do iframe na auditoria visual.
+
+## 2026-06-16
+
+### Changed
+- Neutralizada a copy visível da landing `/edicao-171` para reutilização em múltiplas edições, removendo menções promocionais específicas a "171" e trocando o selo do hero para "2 módulos".
+- CTAs da landing agora usam "Submeter participação" e apontam direto para o formulário de candidatura do diagnóstico em `https://masterboard.scaleco.ai/candidatura`.
+- Rota da landing alterada de `/edicao-171` para `/landing`.
+- Removida a seção de Advisory ScaleCo da landing e da navegação lateral.
+- Atualizada a copy dos cards dos módulos da landing e removidas datas dos selos dos cards.
+- Adicionada aba `Aceites` no dashboard para visualizar fechamentos recebidos, métricas de produto/pagamento e dados jurídicos.
+- Cards gerais de métricas do dashboard agora aparecem apenas na aba `Principal`.
+- Simplificada a UI do dashboard com navegação compacta, cabeçalho contextual por aba e resumo principal reduzido a KPIs essenciais.
+- Resumo de métricas movido estruturalmente para dentro da aba `Principal`, impedindo exibição nas demais telas.
+- Página `Principal` redesenhada como home de navegação sem KPIs duplicados, com botões por área e ícones Material Symbols do Google Fonts.
+- Removida a cidade "Curitiba" dos selos dos cards de Módulo 1 e Módulo 2 na landing.
+- Removida a data da nota do Módulo 2 sobre a próxima edição do Scale.
+
+### Added
+- Cards dos módulos 1 e 2 na seção de programação, com público, tópicos e cases Grupo Barigui/Market4u conforme referência visual.
 
 ## 2026-06-15 (noite · refino premium 3)
 

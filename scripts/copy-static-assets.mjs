@@ -35,6 +35,7 @@ await Promise.all([
   copyIfPresent(join(root, 'dashboard.html'), join(outDir, 'dashboard.html')),
   copyIfPresent(join(root, 'archie.jpeg'), join(outDir, 'archie.jpeg')),
   copyDirIfPresent(join(root, 'assets'), join(outDir, 'assets')),
+  copyDirIfPresent(join(root, 'lib'), join(outDir, 'lib')),
 ]);
 
 console.log('Legacy static pages copied to dist.');

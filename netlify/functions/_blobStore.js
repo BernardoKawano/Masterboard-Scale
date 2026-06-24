@@ -76,6 +76,7 @@ async function listDashboardRecords() {
 module.exports = {
   connectBlobLambda,
   listDashboardRecords,
+  readDashboardRecord: readRecord,
   saveRecordPatch,
   updateDashboardRecord,
 };

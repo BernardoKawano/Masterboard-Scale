@@ -5,6 +5,16 @@ const RECORD_PREFIX = 'leads/';
 const DEAL_ACCEPTANCE_PRODUCTS = ['Scale', 'Masterboard Club', 'Combo Club + Scale'];
 const DEAL_ACCEPTANCE_PAYMENT_OPTIONS = ['Cartão - à vista', 'Cartão - parcelado'];
 
+const PIPELINE_STAGE_IDS = new Set([
+  'prospeccao',
+  'diagnostico_enviado',
+  'reuniao_diagnostico',
+  'negociacao',
+  'convidado_evento',
+  'assinado',
+  'sem_fit',
+]);
+
 const STATUS_RANK = {
   captured: 1,
   started: 2,
@@ -315,6 +325,38 @@ function createCapturedPatch(formData = {}, now = new Date()) {
   };
 }
 
+function createLeadCaptureEmailSentPatch(leadId, now = new Date()) {
+  const normalizedLeadId = cleanString(leadId);
+  if (!normalizedLeadId) throw new Error('leadId ausente para marcar e-mail de captura');
+  return {
+    leadId: normalizedLeadId,
+    updatedAt: timestamp(now),
+    events: [{ type: 'lead_capture_email_sent', at: timestamp(now) }],
+  };
+}
+
+function createDiagnosticEmailSentPatch(leadId, now = new Date()) {
+  const normalizedLeadId = cleanString(leadId);
+  if (!normalizedLeadId) throw new Error('leadId ausente para marcar e-mail de diagnóstico');
+  return {
+    leadId: normalizedLeadId,
+    updatedAt: timestamp(now),
+    events: [{ type: 'diagnostic_email_sent', at: timestamp(now) }],
+  };
+}
+
+function hasLeadCaptureEmailSent(record) {
+  return Boolean(
+    record?.events?.some((event) => event.type === 'lead_capture_email_sent')
+  );
+}
+
+function hasDiagnosticEmailSent(record) {
+  return Boolean(
+    record?.events?.some((event) => event.type === 'diagnostic_email_sent')
+  );
+}
+
 function createDealAcceptancePatch(formData = {}, now = new Date()) {
   const normalized = normalizeDealAcceptanceData(formData);
   const leadId = normalized.leadId || createDealAcceptanceId();
@@ -325,6 +367,8 @@ function createDealAcceptancePatch(formData = {}, now = new Date()) {
     recordType: 'deal_acceptance',
     status: 'deal_accepted',
     commercialStatus: 'sold',
+    pipelineStage: 'assinado',
+    pipelineStageAt: at,
     createdAt: at,
     updatedAt: at,
     acceptedAt: at,
@@ -392,8 +436,13 @@ function createErrorPatch(formData = {}, error, now = new Date()) {
   };
 }
 
-function createAdminPatch(leadId, action, now = new Date()) {
+function createAdminPatch(leadId, action, options = {}) {
   const normalizedLeadId = cleanString(leadId);
+  const now = options instanceof Date
+    ? options
+    : options.now instanceof Date
+      ? options.now
+      : new Date(options.now || Date.now());
   const at = timestamp(now);
 
   if (!normalizedLeadId) throw new Error('leadId ausente para acao administrativa');
@@ -424,6 +473,8 @@ function createAdminPatch(leadId, action, now = new Date()) {
       convertedAt: at,
       soldAt: at,
       lostAt: '',
+      pipelineStage: 'assinado',
+      pipelineStageAt: at,
       events: [{ type: 'dashboard_marked_won', at }],
     };
   }
@@ -436,6 +487,8 @@ function createAdminPatch(leadId, action, now = new Date()) {
       convertedAt: '',
       soldAt: '',
       lostAt: at,
+      pipelineStage: 'sem_fit',
+      pipelineStageAt: at,
       events: [{ type: 'dashboard_marked_lost', at }],
     };
   }
@@ -449,6 +502,21 @@ function createAdminPatch(leadId, action, now = new Date()) {
       soldAt: '',
       lostAt: '',
       events: [{ type: 'dashboard_cleared_commercial_status', at }],
+    };
+  }
+
+  if (action === 'set_pipeline_stage') {
+    const stage = cleanString(options.stage);
+    if (!PIPELINE_STAGE_IDS.has(stage)) {
+      throw new Error('Estagio de pipeline invalido');
+    }
+
+    return {
+      leadId: normalizedLeadId,
+      updatedAt: at,
+      pipelineStage: stage,
+      pipelineStageAt: at,
+      events: [{ type: 'dashboard_pipeline_stage_set', at, stage }],
     };
   }
 
@@ -518,6 +586,8 @@ function summarizeRecord(record) {
     soldAt: record.soldAt || '',
     lostAt: record.lostAt || '',
     deletedAt: record.deletedAt || '',
+    pipelineStage: record.pipelineStage || '',
+    pipelineStageAt: record.pipelineStageAt || '',
     nome: report.nome || form.nome || '',
     empresa: report.empresa || form.empresa || '',
     email: report.email || form.email || '',
@@ -544,6 +614,8 @@ module.exports = {
   cleanString,
   compactMessages,
   createCapturedPatch,
+  createDiagnosticEmailSentPatch,
+  createLeadCaptureEmailSentPatch,
   createCompletedPatch,
   createDealAcceptancePatch,
   createAdminPatch,
@@ -553,6 +625,8 @@ module.exports = {
   createStartedPatch,
   ensureLeadId,
   getRecordKey,
+  hasDiagnosticEmailSent,
+  hasLeadCaptureEmailSent,
   mergeRecord,
   normalizeDealAcceptanceData,
   normalizeFormData,

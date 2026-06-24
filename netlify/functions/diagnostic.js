@@ -1,10 +1,14 @@
 const {
   createCapturedPatch,
   createCompletedPatch,
+  createDiagnosticEmailSentPatch,
   createErrorPatch,
+  createLeadCaptureEmailSentPatch,
   createStartedPatch,
+  hasDiagnosticEmailSent,
+  hasLeadCaptureEmailSent,
 } = require('./_records');
-const { connectBlobLambda, saveRecordPatch } = require('./_blobStore');
+const { connectBlobLambda, readDashboardRecord, saveRecordPatch } = require('./_blobStore');
 
 exports.handler = async function (event) {
   if (event.httpMethod !== "POST") {
@@ -163,9 +167,7 @@ TOM: Direto, frases curtas, sem elogios. Nunca use as palavras "mentoria" ou "co
     // Handle lead capture (form submitted, chat not started)
     if (messages && messages.length === 1 && messages[0].content === '__lead_capture__') {
       await persistDashboardRecord(createCapturedPatch(formData), 'lead_capture');
-      if (formData && formData.email) {
-        await sendLeadCapture(formData);
-      }
+      await maybeSendLeadCapture(formData);
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -197,12 +199,13 @@ TOM: Direto, frases curtas, sem elogios. Nunca use as palavras "mentoria" ou "co
         ];
       }
 
-      // FALLBACK iOS/Safari: dispara lead capture aqui também,
-      // pois o Safari cancela a requisição anterior antes de navegar.
+      // FALLBACK iOS/Safari: só dispara lead capture se o envio do formulário
+      // não chegou a concluir (Safari cancela a requisição antes de navegar).
       if (messages.length === 1 && messages[0].content === 'olá' && formData.email) {
         persistDashboardRecord(createStartedPatch(formData, messages), 'diagnostic_started')
           .catch(e => console.error('Dashboard started fallback:', e.message));
-        sendLeadCapture(formData).catch(e => console.error('Lead capture fallback:', e.message));
+        maybeSendLeadCapture(formData, { ensureCaptured: true })
+          .catch(e => console.error('Lead capture fallback:', e.message));
       }
     }
 
@@ -271,7 +274,7 @@ TOM: Direto, frases curtas, sem elogios. Nunca use as palavras "mentoria" ou "co
           delete clientReport.answers;
           reply = JSON.stringify(clientReport);
 
-          await sendEmails(report);
+          await maybeSendDiagnosticEmail(report, formData);
         }
       }
     } catch (e) {
@@ -302,6 +305,48 @@ async function persistDashboardRecord(patch, stage) {
     console.error(`[dashboard_metric] write_failed stage=${stage} leadId=${patch?.leadId || 'unknown'} error=${e.message}`);
     return null;
   }
+}
+
+async function maybeSendLeadCapture(formData, { ensureCaptured = false } = {}) {
+  if (!formData?.email) return;
+
+  const leadId = formData.leadId;
+  if (leadId) {
+    const existing = await readDashboardRecord(leadId);
+    if (hasLeadCaptureEmailSent(existing)) {
+      console.log(`[email] lead capture skipped leadId=${leadId}`);
+      return;
+    }
+
+    await persistDashboardRecord(
+      createLeadCaptureEmailSentPatch(leadId),
+      'lead_capture_email_claim'
+    );
+
+    if (ensureCaptured && !existing?.events?.some((event) => event.type === 'lead_captured')) {
+      await persistDashboardRecord(createCapturedPatch(formData), 'lead_capture_fallback');
+    }
+  }
+
+  await sendLeadCapture(formData);
+}
+
+async function maybeSendDiagnosticEmail(report, formData = {}) {
+  const leadId = formData.leadId || report.leadId;
+  if (leadId) {
+    const existing = await readDashboardRecord(leadId);
+    if (hasDiagnosticEmailSent(existing)) {
+      console.log(`[email] diagnostic skipped leadId=${leadId}`);
+      return;
+    }
+
+    await persistDashboardRecord(
+      createDiagnosticEmailSentPatch(leadId),
+      'diagnostic_email_claim'
+    );
+  }
+
+  await sendEmails(report);
 }
 
 async function sendLeadCapture(data) {

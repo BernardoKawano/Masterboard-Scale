@@ -26,7 +26,10 @@ exports.handler = async function (event) {
 
     if (event.httpMethod === 'PATCH') {
       const body = parseJsonBody(event);
-      const patch = createAdminPatch(body.leadId, body.action);
+      const patch = createAdminPatch(body.leadId, body.action, {
+        now: new Date(),
+        stage: body.stage,
+      });
       const { record, durationMs } = await updateDashboardRecord(patch);
 
       return jsonResponse(200, {

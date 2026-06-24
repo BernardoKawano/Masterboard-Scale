@@ -16,10 +16,11 @@ export const sessions = [
 ];
 
 export const eventMeta = {
-  label: 'EDIÇÃO 171 · Masterboard powered by ScaleCo',
+  label: 'Masterboard powered by ScaleCo',
   subtag: 'Imersão presencial · Curitiba 17-18/07 e Maringá 30-31/07',
-  ctaPrimary: 'Solicitar minha participação',
-  ctaOffer: 'Solicitar participação',
+  ctaPrimary: 'Submeter participação',
+  ctaOffer: 'Submeter participação',
+  formUrl: 'https://masterboard.scaleco.ai/candidatura',
   targetDate: '2026-07-17T08:00:00-03:00',
 };
 
@@ -98,20 +99,34 @@ export const transformationCards = [
   },
 ];
 
-export const schedule = {
-  days: [
-    {
-      label: 'Dia 1',
-      window: '8h00–18h00',
-      headline: 'Diagnóstico e direção',
-    },
-    {
-      label: 'Dia 2',
-      window: '8h00–16h30',
-      headline: 'Construindo o motor',
-    },
-  ],
-};
+export const eventModules = [
+  {
+    module: 'Módulo 1',
+    title: 'Visão, ICP e processo replicável.',
+    audience: 'Para sócios e líderes.',
+    bullets: [
+      'Antes de arquitetar a receita, escreva a visão.',
+      'ICP e proposta de valor.',
+      'Growth Motion, 7 formas de crescimento.',
+      'Processo replicável: da estratégia para o sistema.',
+      'Conversão e previsibilidade comercial.',
+    ],
+    caseStudy:
+      'Case Market4u: +2.600 lojas e 2 mi de clientes, presente em mais de 180 cidades e 20 estados.',
+  },
+  {
+    module: 'Módulo 2',
+    title: 'Motor de receita sem heróis.',
+    audience: 'Para sócios e líderes.',
+    bullets: [
+      'Motor que gera receita sem heróis.',
+      'Gestão de time: contratar, treinar, acompanhar.',
+      'Cadência e governança de receita: pipeline review, forecast, 1:1, cadência semanal e outras ações.',
+    ],
+    note:
+      'Na próxima edição do Scale, entraremos em Analytics e Governance: KPIs, ritmo e clareza, accountability e dados na tomada de decisão.',
+  },
+];
 
 export const socialProof = [
   {
@@ -135,16 +150,9 @@ export const offer = {
   ],
 };
 
-export const advisoryItems = [
-  'Scale Diagnostic™ individual',
-  'Scale Plan™ do seu negócio',
-  'Sessões semanais com Fábio',
-  'Acesso ao cohort de founders',
-];
-
 export const faqItems = [
   {
-    question: 'Para quem é a Edição 171?',
+    question: 'Para quem é a imersão?',
     answer:
       'Founders e C-level de empresas com receita entre R$1M e R$50M que querem construir um sistema de escala — não apenas crescer na base do esforço.',
   },
@@ -156,7 +164,7 @@ export const faqItems = [
   {
     question: 'Preciso ter feito as edições anteriores?',
     answer:
-      'Não — a Edição 171 é ponto de entrada e funciona sozinha. Quem participar das próximas edições aprofunda o que começou aqui.',
+      'Não. A imersão funciona como ponto de entrada e aprofunda, em dois módulos, os fundamentos para transformar crescimento em sistema de escala.',
   },
   {
     question: 'O que levo para casa?',
@@ -166,8 +174,8 @@ export const faqItems = [
   {
     question: 'Como funciona a jornada de encontros?',
     answer:
-      'A Edição 171 é a primeira de uma sequência. Cada encontro aprofunda uma camada diferente da arquitetura — participar de um não obriga aos demais.',
+      'Cada encontro aprofunda uma camada diferente da arquitetura de receita. Entrar em um ciclo não obriga a entrada nos demais.',
   },
 ];
 
-export const sectionIds = ['hero', 'problem', 'authority', 'method', 'schedule', 'offer', 'advisory', 'faq'];
+export const sectionIds = ['hero', 'problem', 'authority', 'method', 'schedule', 'offer', 'faq'];

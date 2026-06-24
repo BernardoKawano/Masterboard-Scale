@@ -5,13 +5,18 @@
 
 [[redirects]]
   from = "/edicao-171"
-  to = "/edicao-171/"
+  to = "/landing/"
   status = 301
 
 [[redirects]]
   from = "/edicao-171/"
-  to = "/edicao-171/index.html"
+  to = "/landing/index.html"
   status = 200
+
+[[redirects]]
+  from = "/landing"
+  to = "/landing/"
+  status = 301
 
 [[redirects]]
   from = "/candidatura/"
