@@ -36,12 +36,11 @@
 }
  
 html {
-  height: 100%;
-  height: -webkit-fill-available;
+  min-height: 100%;
+  min-height: -webkit-fill-available;
 }
 
 body {
-  height: 100%;
   min-height: 100%;
   min-height: -webkit-fill-available;
   background: var(--site-canvas);
@@ -596,7 +595,10 @@ textarea.form-input {
   display: none;
   flex-direction: column;
   height: var(--chat-height, 100dvh);
-  height: 100vh;
+}
+
+#chat-screen.is-open {
+  display: flex;
 }
  
 .chat-header {
@@ -1398,8 +1400,6 @@ textarea.form-input {
   .msg-body { max-width: calc(100vw - 80px); }
   .chat-header { padding: 12px 16px; }
   .progress-bar { width: 80px; }
-  #chat-screen { height: 100dvh; overflow: hidden; }
-
   .brand-lockup {
     justify-content: center;
     gap: 8px;
@@ -1519,17 +1519,33 @@ textarea.form-input {
     min-height: 52px;
   }
 
-  /* Chat: teclado virtual — usa dvh e variável CSS para offset do teclado */
-  #chat-screen {
+  /* Chat: só visível com .is-open — evita header/input sobre a landing no mobile */
+  #chat-screen:not(.is-open) {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  #chat-screen.is-open {
     height: var(--chat-height, 100dvh);
     position: fixed;
-    top: 0;
+    top: var(--chat-top, 0px);
     left: 0;
     right: 0;
     bottom: auto;
-    display: flex;
     flex-direction: column;
     overflow: hidden;
+    z-index: 999;
+    background: #0A0A0A;
+  }
+
+  #chat-screen.is-open .messages {
+    background: #0A0A0A;
+  }
+
+  body.is-chat-open {
+    overflow: hidden;
+    touch-action: none;
   }
 
   .messages {
@@ -1848,7 +1864,9 @@ textarea.form-input {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(255,255,255,0.4);
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  max-width: calc(100% - 32px);
 }
 
 .intro-badge-dot {
@@ -1863,7 +1881,8 @@ textarea.form-input {
   display: flex;
   flex-direction: column;
   align-items: center;
-
+  position: relative;
+  z-index: 2;
 }
 
 .intro-headline {
@@ -2409,20 +2428,7 @@ function createLeadId() {
     };
 
     const openDemoChat = () => {
-      document.getElementById('intro').style.display = 'none';
-      const s = document.getElementById('sintomas-section');
-      if (s) s.style.display = 'none';
-      document.getElementById('form-screen').style.display = 'none';
-      const cs = document.getElementById('chat-screen');
-      cs.style.display = 'flex';
-      cs.style.position = 'fixed';
-      cs.style.top = 'var(--chat-top, 0px)';
-      cs.style.left = '0';
-      cs.style.right = '0';
-      cs.style.bottom = 'auto';
-      cs.style.height = 'var(--chat-height, 100dvh)';
-      cs.style.zIndex = '999';
-      syncChatViewport();
+      openChatScreen();
       startChat();
     };
 
@@ -2473,20 +2479,7 @@ function createLeadId() {
       lgpd: p.get('lgpd') === '1' || Boolean(storedFormData.lgpd),
       localizacao: p.get('localizacao') || storedFormData.localizacao || '',
     };
-    document.getElementById('intro').style.display = 'none';
-    const s = document.getElementById('sintomas-section');
-    if (s) s.style.display = 'none';
-    document.getElementById('form-screen').style.display = 'none';
-    const cs = document.getElementById('chat-screen');
-    cs.style.display = 'flex';
-    cs.style.position = 'fixed';
-    cs.style.top = 'var(--chat-top, 0px)';
-    cs.style.left = '0';
-    cs.style.right = '0';
-    cs.style.bottom = 'auto';
-    cs.style.height = 'var(--chat-height, 100dvh)';
-    cs.style.zIndex = '999';
-    syncChatViewport();
+    openChatScreen();
     window.history.replaceState({}, '', '/');
     window.addEventListener('DOMContentLoaded', startChat);
     if (document.readyState !== 'loading') startChat();
@@ -2511,17 +2504,42 @@ function syncChatViewport() {
   const chat = document.getElementById('chat-screen');
   if (!chat || !isMobileChatViewport()) {
     document.documentElement.style.removeProperty('--chat-height');
+    document.documentElement.style.removeProperty('--chat-top');
     return;
   }
 
   const viewport = window.visualViewport;
-  const height = viewport ? viewport.height : window.innerHeight;
+  if (viewport) {
+    document.documentElement.style.setProperty('--chat-height', `${Math.round(viewport.height)}px`);
+    document.documentElement.style.setProperty('--chat-top', `${Math.round(viewport.offsetTop)}px`);
+  } else {
+    document.documentElement.style.setProperty('--chat-height', `${Math.round(window.innerHeight)}px`);
+    document.documentElement.style.removeProperty('--chat-top');
+  }
 
-  document.documentElement.style.setProperty('--chat-height', `${Math.round(height)}px`);
-
-  if (chat.style.display === 'flex' && window.scrollY !== 0) {
+  if (chat.classList.contains('is-open') && window.scrollY !== 0) {
     window.scrollTo(0, 0);
   }
+}
+
+function closeChatScreen() {
+  const chat = document.getElementById('chat-screen');
+  if (chat) chat.classList.remove('is-open');
+  document.body.classList.remove('is-chat-open');
+}
+
+function openChatScreen() {
+  document.getElementById('intro').style.display = 'none';
+  const sintomas = document.getElementById('sintomas-section');
+  if (sintomas) sintomas.style.display = 'none';
+  document.getElementById('form-screen').style.display = 'none';
+  document.getElementById('showoff-screen').style.display = 'none';
+
+  const chat = document.getElementById('chat-screen');
+  chat.classList.add('is-open');
+  document.body.classList.add('is-chat-open');
+  window.scrollTo(0, 0);
+  syncChatViewport();
 }
 
 function scrollChatToBottom(delay = 0) {
@@ -2767,16 +2785,29 @@ function buildCandidaturaData(leadId) {
 }
 
 function persistFormDataForChat(data) {
+  const serialized = JSON.stringify(data);
   try {
-    sessionStorage.setItem(CANDIDATURA_STORAGE_KEY, JSON.stringify(data));
+    sessionStorage.setItem(CANDIDATURA_STORAGE_KEY, serialized);
+  } catch (e) {}
+  try {
+    localStorage.setItem(CANDIDATURA_STORAGE_KEY, serialized);
   } catch (e) {}
 }
 
 function getStoredFormData(leadId) {
+  const sources = [];
   try {
-    const parsed = JSON.parse(sessionStorage.getItem(CANDIDATURA_STORAGE_KEY) || '{}');
-    if (!leadId || parsed.leadId === leadId) return parsed;
+    const sessionValue = sessionStorage.getItem(CANDIDATURA_STORAGE_KEY);
+    if (sessionValue) sources.push(JSON.parse(sessionValue));
   } catch (e) {}
+  try {
+    const localValue = localStorage.getItem(CANDIDATURA_STORAGE_KEY);
+    if (localValue) sources.push(JSON.parse(localValue));
+  } catch (e) {}
+
+  for (const parsed of sources) {
+    if (!leadId || parsed.leadId === leadId) return parsed;
+  }
   return {};
 }
 
@@ -2800,9 +2831,13 @@ async function submitForm() {
   persistFormDataForChat(formData);
   await captureLead(formData);
 
-  // Redireciona na mesma aba — compatível com todos os browsers/mobile
-  const params = new URLSearchParams({ leadId, start: '1' });
-  window.location.href = '/?' + params.toString();
+  openChatScreen();
+  startChat();
+
+  if (nextBtn) {
+    nextBtn.disabled = false;
+    nextBtn.textContent = 'Enviar candidatura';
+  }
 }
  
 async function captureLead(data) {
@@ -2972,7 +3007,7 @@ function checkForReport(reply) {
 
 function restoreChatWithAssistantReply(reply) {
   document.getElementById('showoff-screen').style.display = 'none';
-  document.getElementById('chat-screen').style.display = 'flex';
+  openChatScreen();
   history.push({ role: 'assistant', content: reply });
   msgCount++;
   updateProgress();
@@ -3001,7 +3036,7 @@ function parseReport(reply) {
 }
 
 async function showShowoffWhenReady(reportPromise) {
-  document.getElementById('chat-screen').style.display = 'none';
+  closeChatScreen();
 
   const showoff = document.getElementById('showoff-screen');
   showoff.style.display = 'flex';
@@ -3060,7 +3095,7 @@ async function showShowoffWhenReady(reportPromise) {
 }
 
 function showShowoff(reportData) {
-  document.getElementById('chat-screen').style.display = 'none';
+  closeChatScreen();
 
   const showoff = document.getElementById('showoff-screen');
   showoff.style.display = 'flex';
@@ -3181,7 +3216,7 @@ const DIM_NAMES = {
 };
  
 function renderReport(data) {
-  document.getElementById('chat-screen').style.display = 'none';
+  closeChatScreen();
   document.getElementById('progressFill').style.width = '100%';
   const { sub, cta, href: ctaHref } = getCTAContent(data.score_geral);
   const rs = document.getElementById('report-screen');

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-06-24
+
+### Fixed
+- Corrigido fluxo do Scale Diagnostic no mobile: o chat não fica mais sempre visível por `display: flex` forçado no CSS mobile (header do Archie + campo de resposta apareciam sobre a landing, como na captura de tela), com trava defensiva via classe `.is-open`; scroll da landing liberado; chat ajusta altura/top com `visualViewport` (teclado iOS); formulário abre o chat na mesma página sem redirect que perdia dados no `sessionStorage`; fallback de persistência com `localStorage`.
+
 ## 2026-06-16 (mobile · correção crítica)
 
 ### Fixed
@@ -121,6 +126,12 @@
 - Corrigido espaçamento dos chips de prova do hero (whitespace colapsado por `inline-flex`).
 
 ## 2026-06-15 (tarde)
+
+### Added
+- Pagina estatica `analise-ihc-ui-ux.html` (rota `/analise-ihc-ui-ux`) com a analise comparativa de IHC, UI e UX de eventos premium B2B.
+- Narrativa em jornada (problema -> IHC -> UX -> UI -> analise por site -> matriz -> padroes -> resultado), reaproveitando o sistema visual do `index.html` (fundo preto, glows amarelos com blur, profundidade 3D) e a fonte Funnel Display.
+- Microinteracoes leves: barra de progresso de scroll, revelacao por IntersectionObserver e barras de nota animadas, com fallback para `prefers-reduced-motion`.
+- Redirects 200 em `netlify.toml` para `/analise-ihc-ui-ux` e `/analise-ihc-ui-ux/`.
 
 ### Changed
 - Aplicados aprendizados da análise IHC/UX/UI na landing `/edicao-171`, mantendo a estética "papel":
