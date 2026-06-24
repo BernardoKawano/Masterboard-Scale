@@ -1,9 +1,27 @@
 # Changelog
 
+## 2026-06-16 (mobile · correção crítica)
+
+### Fixed
+- Mobile `/edicao-171`: hero, botões e blocos iniciais deixavam de aparecer/interagir porque o `IntersectionObserver` não revelava conteúdo acima da dobra a tempo; agora o hero é revelado imediatamente, há fallback por scroll/viewport e opções de observer mais permissivas em touch.
+- Removido `overflow-x: clip` do `html` (risco em Safari/iOS) e sticky CTA oculto não intercepta mais toques (`pointer-events: none`).
+- Netlify: redirects explícitos para `/edicao-171` e `/edicao-171/`.
+- Fallback `noscript` para exibir conteúdo caso JS não carregue.
+
+### Changed
+- Ajustes mobile de layout/spacing mantidos e validados em 390px/620px sem overflow horizontal.
+
+## 2026-06-15 (noite · mobile viability)
+
+### Changed
+- Mobile `/edicao-171`: removido overflow horizontal real (`scrollWidth` agora igual ao viewport), com `overflow-x: clip`, correções em fixed bars e reveals laterais convertidos para entrada vertical em telas menores.
+- Mobile hero/cards: header, hero, tags, prova rápida, cards, quote, logos, stat badge, countdown, turmas e sticky CTA receberam espaçamento/padding/tipografia mais compactos para leitura em 390px, sem salto brusco de largura no breakpoint de 620px.
+- Pain cards (01–04): stagger reduzido de 170ms para 130ms para manter cascata perceptível sem fazer o quarto card parecer ausente no mobile.
+
 ## 2026-06-15 (noite · refino premium 3)
 
 ### Changed
-- Pain cards (01–04): reveal de scroll bem mais pronunciado — entrada com `translateY(52px) + scale(0.94)` e curva suave, stagger de 170ms por card; o número (01–04) "estoura" com leve atraso adicional. Desativado em `prefers-reduced-motion`. Confirmado via Playwright que a cascata é visível (cards ocultos antes de entrar no viewport e revelados em sequência ao rolar).
+- Pain cards (01–04): reveal de scroll bem mais pronunciado — entrada com `translateY(52px) + scale(0.94)` e curva suave, stagger em cascata; o número (01–04) "estoura" com leve atraso adicional. Desativado em `prefers-reduced-motion`. Confirmado via Playwright que a cascata é visível (cards ocultos antes de entrar no viewport e revelados em sequência ao rolar).
 - Quote do método: palavras-chave da promessa foram grifadas com `mark` para herdar o amarelo Masterboard (`slides`, `arquitetura`, `negócio`, `2 dias`, `Fábio`).
 
 ## 2026-06-15 (noite · refino premium 2)

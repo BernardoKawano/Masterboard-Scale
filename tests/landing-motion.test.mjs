@@ -6,6 +6,8 @@ import {
   formatCountdownParts,
   getCountdownParts,
   getPageScrollProgress,
+  getRevealObserverOptions,
+  isElementInRevealViewport,
   shouldShowStickyCta,
 } from '../src/scripts/landingMotionCore.mjs';
 
@@ -42,4 +44,19 @@ test('shouldShowStickyCta hides duplicate CTAs in offer and final FAQ sections',
   assert.equal(shouldShowStickyCta(700, 600, 'offer'), false);
   assert.equal(shouldShowStickyCta(700, 600, 'faq'), false);
   assert.equal(shouldShowStickyCta(300, 600, 'diagnosis'), false);
+});
+
+test('isElementInRevealViewport detects elements inside the viewport margin', () => {
+  assert.equal(isElementInRevealViewport({ top: 120, bottom: 220 }, 800, 48), true);
+  assert.equal(isElementInRevealViewport({ top: -20, bottom: 30 }, 800, 48), false);
+  assert.equal(isElementInRevealViewport({ top: 760, bottom: 820 }, 800, 48), false);
+});
+
+test('getRevealObserverOptions is more permissive on coarse pointers', () => {
+  const mobile = getRevealObserverOptions(true);
+  const desktop = getRevealObserverOptions(false);
+
+  assert.ok(mobile.threshold[0] <= desktop.threshold[0]);
+  assert.ok(mobile.rootMargin.includes('-4%'));
+  assert.ok(desktop.rootMargin.includes('-8%'));
 });

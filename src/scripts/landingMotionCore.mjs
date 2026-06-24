@@ -31,3 +31,21 @@ export function shouldShowStickyCta(scrollY, heroBottom, activeSectionId) {
   const hiddenSections = new Set(['offer', 'faq']);
   return scrollY > heroBottom && !hiddenSections.has(activeSectionId);
 }
+
+export function isElementInRevealViewport(rect, viewportHeight, margin = 48) {
+  return rect.bottom > margin && rect.top < viewportHeight - margin;
+}
+
+export function getRevealObserverOptions(isCoarsePointer = false) {
+  if (isCoarsePointer) {
+    return {
+      threshold: [0, 0.08, 0.18],
+      rootMargin: '0px 0px -4% 0px',
+    };
+  }
+
+  return {
+    threshold: [0, 0.12, 0.22],
+    rootMargin: '0px 0px -8% 0px',
+  };
+}

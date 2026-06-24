@@ -37,6 +37,15 @@ const logos = [
       name="description"
       content="Imersão presencial de 2 dias para founders — Curitiba 17-18/07 e Maringá 30-31/07. Transforme esforço heroico em sistema replicável."
     />
+    <noscript>
+      <style>
+        [data-reveal] {
+          opacity: 1 !important;
+          transform: none !important;
+          clip-path: none !important;
+        }
+      </style>
+    </noscript>
   </head>
   <body>
     <a class="skip-link" href="#hero">Pular para o conteúdo</a>
@@ -137,7 +146,7 @@ const logos = [
 
           <div class="grid-two" style="margin-top:24px">
             {painCards.map((pain, index) => (
-              <article class="dark-card pain-card" data-reveal style={`--delay:${index * 170}ms`}>
+              <article class="dark-card pain-card" data-reveal style={`--delay:${index * 130}ms`}>
                 <span class="pain-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
                 <p>{pain}</p>
               </article>

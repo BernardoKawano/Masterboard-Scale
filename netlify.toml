@@ -4,6 +4,16 @@
   functions = "netlify/functions"
 
 [[redirects]]
+  from = "/edicao-171"
+  to = "/edicao-171/"
+  status = 301
+
+[[redirects]]
+  from = "/edicao-171/"
+  to = "/edicao-171/index.html"
+  status = 200
+
+[[redirects]]
   from = "/candidatura/"
   to = "/index.html"
   status = 200

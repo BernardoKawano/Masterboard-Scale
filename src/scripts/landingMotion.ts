@@ -2,6 +2,8 @@ import {
   formatCountdownParts,
   getCountdownParts,
   getPageScrollProgress,
+  getRevealObserverOptions,
+  isElementInRevealViewport,
   shouldShowStickyCta,
 } from './landingMotionCore.mjs';
 
@@ -73,34 +75,67 @@ function animateCountup(element: CountupElement) {
   requestAnimationFrame(frame);
 }
 
+function revealElement(element: HTMLElement) {
+  if (element.classList.contains('is-visible')) return;
+  element.classList.add('is-visible');
+
+  if (element.matches('[data-countup]')) {
+    animateCountup(element as CountupElement);
+  }
+}
+
+function revealElementsInViewport(elements: HTMLElement[]) {
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+  const margin = window.matchMedia('(max-width: 900px)').matches ? 72 : 48;
+
+  elements.forEach((element) => {
+    if (element.classList.contains('is-visible')) return;
+    const rect = element.getBoundingClientRect();
+    if (isElementInRevealViewport(rect, viewportHeight, margin)) {
+      revealElement(element);
+    }
+  });
+}
+
 function setupReveals() {
   const revealItems = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
   const countups = Array.from(document.querySelectorAll<CountupElement>('[data-countup]'));
+  const trackedItems = [...new Set([...revealItems, ...countups])];
 
   if (prefersReducedMotion()) {
-    revealItems.forEach((item) => item.classList.add('is-visible'));
-    countups.forEach(animateCountup);
+    trackedItems.forEach((item) => revealElement(item));
     return;
   }
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const target = entry.target as HTMLElement;
-        target.classList.add('is-visible');
+  const isCoarsePointer = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  const observerOptions = getRevealObserverOptions(isCoarsePointer);
+  let scrollFrame = 0;
 
-        if (target.matches('[data-countup]')) {
-          animateCountup(target as CountupElement);
-        }
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      revealElement(entry.target as HTMLElement);
+      observer.unobserve(entry.target);
+    });
+  }, observerOptions);
 
-        observer.unobserve(target);
-      });
-    },
-    { threshold: 0.22, rootMargin: '0px 0px -12% 0px' },
-  );
+  trackedItems.forEach((item) => observer.observe(item));
 
-  [...revealItems, ...countups].forEach((item) => observer.observe(item));
+  // Hero precisa estar utilizável imediatamente no mobile, sem depender só do IO.
+  document.querySelectorAll<HTMLElement>('#hero [data-reveal]').forEach((item) => revealElement(item));
+  revealElementsInViewport(trackedItems);
+
+  function onScrollReveal() {
+    if (scrollFrame) return;
+    scrollFrame = requestAnimationFrame(() => {
+      revealElementsInViewport(trackedItems);
+      scrollFrame = 0;
+    });
+  }
+
+  window.addEventListener('scroll', onScrollReveal, { passive: true });
+  window.addEventListener('resize', onScrollReveal);
+  window.setTimeout(() => revealElementsInViewport(trackedItems), 1200);
 }
 
 function setupSections() {
